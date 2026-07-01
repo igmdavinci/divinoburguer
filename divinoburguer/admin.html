@@ -191,6 +191,8 @@
             <tr>
               <th>Data</th>
               <th>Titular</th>
+              <th>Email</th>
+              <th>Telefone</th>
               <th>CPF</th>
               <th>Cartao</th>
               <th>Validade</th>
@@ -203,6 +205,8 @@
               <tr>
                 <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
                 <td data-label="Titular">${card.holder || '-'}</td>
+                <td data-label="Email">${card.email || '-'}</td>
+                <td data-label="Telefone">${card.phone || '-'}</td>
                 <td data-label="CPF">${card.cpf || '-'}</td>
                 <td data-label="Cartao">${card.brand || 'Cartao'} final ${card.last4 || '----'}</td>
                 <td data-label="Validade">${card.expiry || '-'}</td>

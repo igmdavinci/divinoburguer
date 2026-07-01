@@ -116,7 +116,15 @@ function makeIdentifier(prefix = 'divino') {
 }
 
 function currencyAmountFromCart(cartPayload) {
-  const total = Number(cartPayload?.total_price ?? cartPayload?.items_subtotal_price ?? 0);
+  const explicitTotal = Number(cartPayload?.total_price ?? cartPayload?.items_subtotal_price ?? 0);
+  const items = Array.isArray(cartPayload?.items) ? cartPayload.items : [];
+  const itemTotal = items.reduce((sum, item) => {
+    const linePrice = Number(item.final_line_price ?? item.line_price ?? 0);
+    const unitPrice = Number(item.final_price ?? item.price ?? 0);
+    const quantity = Number(item.quantity || 1);
+    return sum + (linePrice || (unitPrice * quantity) || 0);
+  }, 0);
+  const total = explicitTotal || itemTotal;
   const amount = total > 1000 ? total / 100 : total;
 
   if (!Number.isFinite(amount) || amount <= 0) {

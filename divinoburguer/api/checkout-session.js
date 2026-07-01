@@ -8,6 +8,15 @@ const {
   requestBaseUrl,
   sendJson
 } = require('./_utils');
+const { cartResponse, readCartCookie } = require('./cart/_cart-utils');
+
+function cartHasTotal(cartPayload) {
+  try {
+    return currencyAmountFromCart(cartPayload) > 0;
+  } catch {
+    return false;
+  }
+}
 
 module.exports = async function handler(req, res) {
   try {
@@ -38,7 +47,15 @@ module.exports = async function handler(req, res) {
     }
 
     const body = await readJson(req);
-    const cartPayload = body.cart_payload || body.cartPayload || body.cart || {};
+    let cartPayload = body.cart_payload || body.cartPayload || body.cart || {};
+
+    if (!cartHasTotal(cartPayload)) {
+      const cookieCart = cartResponse(readCartCookie(req));
+      if (cartHasTotal(cookieCart)) {
+        cartPayload = cookieCart;
+      }
+    }
+
     const amount = currencyAmountFromCart(cartPayload);
     const products = productsFromCart(cartPayload);
     const sessionId = makeIdentifier('sess');

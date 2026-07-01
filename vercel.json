@@ -1,22 +1,22 @@
 {
-  "redirects": [
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "divinoburguer/www.hexadivinosdelivery.site/products/**"
+    }
+  },
+  "rewrites": [
     {
       "source": "/",
-      "destination": "/divinoburguer/www.hexadivinosdelivery.site/index.html",
-      "permanent": false
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/index.html"
     },
     {
       "source": "/cart",
-      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html",
-      "permanent": false
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
     },
     {
       "source": "/cart/",
-      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
+    },
     {
       "source": "/cart.json",
       "destination": "/api/cart"

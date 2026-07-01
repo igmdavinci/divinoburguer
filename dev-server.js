@@ -114,12 +114,12 @@ const server = http.createServer((req, res) => {
   const pathname = url.pathname;
 
   if (pathname === '/') {
-    redirect(res, '/divinoburguer/www.hexadivinosdelivery.site/index.html');
+    sendFile(res, './divinoburguer/www.hexadivinosdelivery.site/index.html');
     return;
   }
 
   if (pathname === '/cart' || pathname === '/cart/') {
-    redirect(res, '/divinoburguer/www.hexadivinosdelivery.site/cart.html');
+    sendFile(res, './divinoburguer/www.hexadivinosdelivery.site/cart.html');
     return;
   }
 
