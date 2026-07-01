@@ -99,6 +99,10 @@
       cursor: pointer;
     }
 
+    button.copied {
+      background: var(--green);
+    }
+
     a.button.secondary {
       background: #252525;
     }
@@ -145,6 +149,8 @@
     const pixCode = document.getElementById('pix-code');
     const statusBox = document.getElementById('status');
     const copyButton = document.getElementById('copy');
+    const defaultCopyText = copyButton.textContent;
+    let copyResetTimer = null;
 
     function setStatus(text, isError) {
       statusBox.textContent = text || '';
@@ -165,14 +171,24 @@
       }
     }
 
+    function showCopyFeedback() {
+      copyButton.textContent = 'codigo pix copiado';
+      copyButton.classList.add('copied');
+      clearTimeout(copyResetTimer);
+      copyResetTimer = setTimeout(() => {
+        copyButton.textContent = defaultCopyText;
+        copyButton.classList.remove('copied');
+      }, 3000);
+    }
+
     copyButton.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(pixCode.value);
-        setStatus('Codigo Pix copiado.');
+        showCopyFeedback();
       } catch {
         pixCode.select();
         document.execCommand('copy');
-        setStatus('Codigo Pix copiado.');
+        showCopyFeedback();
       }
     });
 

@@ -162,6 +162,21 @@ function supabaseConfig() {
   };
 }
 
+function localStore() {
+  if (!globalThis.__divinoLocalStore) {
+    globalThis.__divinoLocalStore = {
+      orders: [],
+      callbacks: []
+    };
+  }
+
+  return globalThis.__divinoLocalStore;
+}
+
+function canUseLocalStore() {
+  return !supabaseConfig() && !process.env.VERCEL;
+}
+
 async function supabaseRequest(path, options = {}) {
   const config = supabaseConfig();
   if (!config) {
@@ -197,6 +212,19 @@ async function supabaseRequest(path, options = {}) {
 }
 
 async function insertOrder(row) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    const order = {
+      id: store.orders.length + 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ...row
+    };
+
+    store.orders.push(order);
+    return order;
+  }
+
   const data = await supabaseRequest('amplopay_orders', {
     method: 'POST',
     headers: {
@@ -209,6 +237,18 @@ async function insertOrder(row) {
 }
 
 async function updateOrderByIdentifier(identifier, patch) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    const order = store.orders.find((item) => item.identifier === identifier);
+    if (!order) return null;
+
+    Object.assign(order, patch, {
+      updated_at: new Date().toISOString()
+    });
+
+    return order;
+  }
+
   const data = await supabaseRequest(`amplopay_orders?identifier=eq.${encodeURIComponent(identifier)}`, {
     method: 'PATCH',
     headers: {
@@ -224,6 +264,11 @@ async function updateOrderByIdentifier(identifier, patch) {
 }
 
 async function getOrderBySession(sessionId) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    return store.orders.find((order) => order.session_id === sessionId) || null;
+  }
+
   const data = await supabaseRequest(
     `amplopay_orders?session_id=eq.${encodeURIComponent(sessionId)}&select=*&limit=1`,
     { method: 'GET' }
@@ -233,6 +278,11 @@ async function getOrderBySession(sessionId) {
 }
 
 async function getOrderByIdentifier(identifier) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    return store.orders.find((order) => order.identifier === identifier) || null;
+  }
+
   const data = await supabaseRequest(
     `amplopay_orders?identifier=eq.${encodeURIComponent(identifier)}&select=*&limit=1`,
     { method: 'GET' }
@@ -242,6 +292,18 @@ async function getOrderByIdentifier(identifier) {
 }
 
 async function insertCallback(row) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    const callback = {
+      id: store.callbacks.length + 1,
+      created_at: new Date().toISOString(),
+      ...row
+    };
+
+    store.callbacks.push(callback);
+    return callback;
+  }
+
   return supabaseRequest('amplopay_callbacks', {
     method: 'POST',
     headers: {

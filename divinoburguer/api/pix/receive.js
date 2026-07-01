@@ -7,10 +7,10 @@ const {
   updateOrderByIdentifier
 } = require('../_utils');
 
-function tomorrowDate() {
+function tomorrowDateTime() {
   const date = new Date();
   date.setDate(date.getDate() + 1);
-  return date.toISOString().slice(0, 10);
+  return date.toISOString();
 }
 
 function amplopayCallbackBaseUrl(req) {
@@ -27,8 +27,51 @@ function amplopayCallbackBaseUrl(req) {
   return requestBaseUrl(req);
 }
 
+function onlyDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function normalizeClient(client) {
+  return {
+    name: String(client.name || '').trim(),
+    email: String(client.email || '').trim(),
+    phone: onlyDigits(client.phone),
+    document: onlyDigits(client.document)
+  };
+}
+
+function readableDetails(details) {
+  if (!details) {
+    return '';
+  }
+
+  if (typeof details === 'string') {
+    return details;
+  }
+
+  if (Array.isArray(details)) {
+    return details.map((item) => {
+      if (typeof item === 'string') return item;
+      const field = item.field || item.path || item.param || item.property;
+      const message = item.message || item.error || item.reason || JSON.stringify(item);
+      return field ? `${field}: ${message}` : message;
+    }).filter(Boolean).join(' | ');
+  }
+
+  if (typeof details === 'object') {
+    return Object.entries(details).map(([field, value]) => {
+      if (Array.isArray(value)) return `${field}: ${value.join(', ')}`;
+      if (value && typeof value === 'object') return `${field}: ${JSON.stringify(value)}`;
+      return `${field}: ${value}`;
+    }).join(' | ');
+  }
+
+  return String(details);
+}
+
 function normalizeGatewayError(payload, statusCode) {
   const message = String(payload?.message || payload?.error || '');
+  const details = readableDetails(payload?.details);
 
   if (statusCode === 403 && !message) {
     return {
@@ -44,6 +87,13 @@ function normalizeGatewayError(payload, statusCode) {
     };
   }
 
+  if (details && !message.includes(details)) {
+    return {
+      ...payload,
+      message: `${message || 'Dados da requisicao invalidos.'} Detalhes: ${details}`
+    };
+  }
+
   return payload;
 }
 
@@ -55,7 +105,7 @@ module.exports = async function handler(req, res) {
 
     const body = await readJson(req);
     const sessionId = body.sessionId || body.session_id;
-    const client = body.client || {};
+    const client = normalizeClient(body.client || {});
 
     if (!sessionId) {
       return sendJson(res, 400, { message: 'Sessao ausente.' });
@@ -63,6 +113,14 @@ module.exports = async function handler(req, res) {
 
     if (!client.name || !client.email || !client.phone || !client.document) {
       return sendJson(res, 400, { message: 'Preencha nome, email, telefone e CPF.' });
+    }
+
+    if (client.document.length !== 11) {
+      return sendJson(res, 400, { message: 'CPF invalido. Informe 11 digitos.' });
+    }
+
+    if (client.phone.length < 10 || client.phone.length > 11) {
+      return sendJson(res, 400, { message: 'Telefone invalido. Informe DDD + numero.' });
     }
 
     const order = await getOrderBySession(sessionId);
@@ -85,7 +143,7 @@ module.exports = async function handler(req, res) {
       amount: Number(order.amount),
       client,
       products: order.products || [],
-      dueDate: tomorrowDate(),
+      dueDate: tomorrowDateTime(),
       metadata: {
         sessionId,
         source: 'divinoburguer'
