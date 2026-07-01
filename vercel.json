@@ -1,13 +1,22 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
-      "destination": "/www.hexadivinosdelivery.site/index.html"
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/index.html",
+      "permanent": false
     },
     {
       "source": "/cart",
-      "destination": "/www.hexadivinosdelivery.site/cart.html"
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html",
+      "permanent": false
     },
+    {
+      "source": "/cart/",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
     {
       "source": "/cart.json",
       "destination": "/api/cart"
@@ -38,27 +47,27 @@
     },
     {
       "source": "/checkout",
-      "destination": "/checkout.html"
+      "destination": "/divinoburguer/checkout.html"
     },
     {
       "source": "/admin",
-      "destination": "/admin.html"
+      "destination": "/divinoburguer/admin.html"
     },
     {
       "source": "/admin.html",
-      "destination": "/admin.html"
+      "destination": "/divinoburguer/admin.html"
     },
     {
       "source": "/checkout.html",
-      "destination": "/checkout.html"
+      "destination": "/divinoburguer/checkout.html"
     },
     {
       "source": "/pix",
-      "destination": "/pix.html"
+      "destination": "/divinoburguer/pix.html"
     },
     {
       "source": "/pix.html",
-      "destination": "/pix.html"
+      "destination": "/divinoburguer/pix.html"
     },
     {
       "source": "/.well-known/shopify/monorail/v1/produce",

@@ -243,6 +243,7 @@
     const summary = document.getElementById('summary');
     const submitButton = document.getElementById('submit-button');
     let currentSession = null;
+    const minimumOrderAmount = 15;
 
     function money(value) {
       return Number(value || 0).toLocaleString('pt-BR', {
@@ -291,6 +292,11 @@
 
       currentSession = payload;
       renderSummary(payload);
+
+      if (Number(payload.amount || 0) < minimumOrderAmount) {
+        setMessage('O pedido minimo para gerar Pix e R$ 15,00. Adicione mais itens ao carrinho.', true);
+        submitButton.disabled = true;
+      }
     }
 
     form.addEventListener('submit', async (event) => {
@@ -302,6 +308,10 @@
       try {
         if (!currentSession) {
           await loadSession();
+        }
+
+        if (Number(currentSession.amount || 0) < minimumOrderAmount) {
+          throw new Error('O pedido minimo para gerar Pix e R$ 15,00. Adicione mais itens ao carrinho.');
         }
 
         const data = new FormData(form);

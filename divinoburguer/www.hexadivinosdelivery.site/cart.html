@@ -1226,7 +1226,7 @@ sizeChartsRelentless.product = null;
      
     <script src="cdn/shop/t/2/assets/vendor5b3f.js?v=162644391628613446311780917620" defer></script>
     <script src="cdn/shop/t/2/assets/theme.min18ae.js?v=152940201276689373991780917619" defer></script>
-    <script src="cdn/shop/t/2/assets/custom6792.js?v=165930397078196874451780917605" defer></script>
+    <script src="cdn/shop/t/2/assets/custom6792.js?v=1782930163" defer></script>
 
     <script>window.performance && window.performance.mark && window.performance.mark('shopify.content_for_header.start');</script><meta id="shopify-digital-wallet" name="shopify-digital-wallet" content="/82489770198/digital_wallets/dialog">
 <meta name="shopify-checkout-api-token" content="4607a9df05cdd09c5bf1eeb3fa995758">
@@ -2637,7 +2637,7 @@ first.parentNode.insertBefore(script, first);
 
     for (let i = 0; i < mnCartForm.length; i++) {
       mnCartForm[i].setAttribute('method', 'GET');
-      mnCartForm[i].addEventListener('submit', fakeClick);
+      mnCartForm[i].addEventListener('submit', function (event) { event.preventDefault(); });
     }
   });
 
@@ -2657,6 +2657,28 @@ first.parentNode.insertBefore(script, first);
   function hidechtLoader() {
     var el = document.querySelector('.cht-loader');
     el.style.display = 'none';
+  }
+
+  function showCheckoutError(response) {
+    hidechtLoader();
+
+    var message = 'Nao foi possivel iniciar o checkout agora. Tente novamente em alguns instantes.';
+    try {
+      var parsed = JSON.parse(response || '{}');
+      if (parsed.message) message = parsed.message;
+    } catch (e) {}
+
+    var existing = document.getElementById('divino-checkout-error');
+    if (existing) {
+      existing.textContent = message;
+      return;
+    }
+
+    var box = document.createElement('div');
+    box.id = 'divino-checkout-error';
+    box.style.cssText = 'margin:16px auto;padding:12px 16px;max-width:760px;border:1px solid #f5c2c7;background:#f8d7da;color:#842029;border-radius:6px;font-size:14px;text-align:center;';
+    box.textContent = message;
+    document.body.insertBefore(box, document.body.firstChild);
   }
 
   if (currentShopPage == 'cart') {
@@ -2788,7 +2810,7 @@ first.parentNode.insertBefore(script, first);
               .querySelector('a[href="/a/checkout"]'))) {
 
           } else if (!checkoutBtnFound && (!document.querySelector('a[href="/a/checkout"]'))) {
-            fakeClick(new Event(null));
+            // Auto-checkout disabled: the local cart button handles checkout.
           }
 
 
@@ -2799,6 +2821,8 @@ first.parentNode.insertBefore(script, first);
             btns.hide();
           }
         }
+      }, function (response) {
+        showCheckoutError(response);
       });
     });
   }
@@ -2838,7 +2862,7 @@ first.parentNode.insertBefore(script, first);
   }
 
   function yampiClick() {
-    window.location.href = 'cart/indexd176.html?skipCart=1';
+    return false;
     return false;
   }
 
@@ -2861,6 +2885,8 @@ first.parentNode.insertBefore(script, first);
         window.location.href = cht_getUrlWithUtms(resp.checkout_direct_url);
 
 
+      }, function (response) {
+        showCheckoutError(response);
       });
     });
   }
@@ -2891,7 +2917,7 @@ first.parentNode.insertBefore(script, first);
     return xhr;
   }
 
-  function postAjax(url, data, success) {
+  function postAjax(url, data, success, failure) {
     var params = typeof data == 'string' ? data : Object.keys(data).map(
       function (k) {
         return encodeURIComponent(k) + '=' + encodeURIComponent(data[k])
@@ -2902,8 +2928,24 @@ first.parentNode.insertBefore(script, first);
 
     xhr.open('POST', url);
     xhr.onreadystatechange = function () {
-      if (xhr.readyState > 3 && xhr.status == 200) {
+      if (xhr.readyState <= 3) return;
+
+      if (xhr.status == 200) {
         success(xhr.responseText);
+        return;
+      }
+
+      if (failure) {
+        failure(xhr.responseText, xhr);
+      } else if (typeof hidechtLoader === 'function') {
+        hidechtLoader();
+      }
+    };
+    xhr.onerror = function () {
+      if (failure) {
+        failure('', xhr);
+      } else if (typeof hidechtLoader === 'function') {
+        hidechtLoader();
       }
     };
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');

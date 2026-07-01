@@ -40,8 +40,16 @@ function getCatalog() {
     return catalogCache;
   }
 
-  const productsDir = path.join(process.cwd(), 'www.hexadivinosdelivery.site', 'products');
+  const productsDir = [
+    path.join(process.cwd(), 'www.hexadivinosdelivery.site', 'products'),
+    path.join(process.cwd(), 'divinoburguer', 'www.hexadivinosdelivery.site', 'products')
+  ].find((candidate) => fs.existsSync(candidate));
   const products = new Map();
+
+  if (!productsDir) {
+    catalogCache = products;
+    return products;
+  }
 
   for (const file of fs.readdirSync(productsDir)) {
     if (!file.endsWith('.js')) continue;
@@ -111,6 +119,21 @@ function cartResponse(items) {
   };
 }
 
+function resolveVariantId(id, productId) {
+  if (id) {
+    return String(id);
+  }
+
+  if (!productId) {
+    return '';
+  }
+
+  const product = Array.from(getCatalog().values())
+    .find((item) => String(item.product_id) === String(productId));
+
+  return product ? String(product.id) : '';
+}
+
 async function readFormOrJson(req) {
   const body = await readJson(req);
   return body || {};
@@ -121,5 +144,6 @@ module.exports = {
   clearCartCookie,
   readCartCookie,
   readFormOrJson,
+  resolveVariantId,
   writeCartCookie
 };

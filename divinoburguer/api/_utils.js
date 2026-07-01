@@ -6,18 +6,86 @@ function sendJson(res, statusCode, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function parseFormBody(raw, contentType = '') {
+  if (raw && typeof raw === 'object') {
+    if (Buffer.isBuffer(raw)) {
+      return parseFormBody(raw.toString('utf8'), contentType);
+    }
+
+    if (raw instanceof ArrayBuffer) {
+      return parseFormBody(Buffer.from(raw).toString('utf8'), contentType);
+    }
+
+    if (Buffer.isBuffer(raw.body) || typeof raw.body === 'string') {
+      return parseFormBody(raw.body, contentType);
+    }
+
+    if (raw.fields && typeof raw.fields === 'object') {
+      return raw.fields;
+    }
+
+    return raw;
+  }
+
+  if (contentType.includes('multipart/form-data')) {
+    return parseMultipartForm(raw, contentType);
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const params = new URLSearchParams(raw);
+    return Object.fromEntries(params.entries());
+  }
+}
+
+function parseMultipartForm(raw, contentType) {
+  const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/i);
+  if (!boundaryMatch) {
+    return {};
+  }
+
+  const fields = {};
+  const boundary = `--${boundaryMatch[1]}`;
+  const normalized = String(raw).replace(/\r\n/g, '\n');
+
+  normalized.split(boundary).forEach((part) => {
+    const separator = part.indexOf('\n\n');
+    if (separator === -1) {
+      return;
+    }
+
+    const header = part.slice(0, separator);
+    const nameMatch = header.match(/name="([^"]+)"/i);
+    if (!nameMatch || /filename="/i.test(header)) {
+      return;
+    }
+
+    let value = part.slice(separator + 2);
+    value = value.replace(/\n--$/, '').replace(/\n$/, '');
+    fields[nameMatch[1]] = value;
+  });
+
+  return fields;
+}
+
 async function readJson(req) {
-  if (req.body && typeof req.body === 'object') {
-    return req.body;
+  const contentType = String(req.headers['content-type'] || '');
+
+  if (Buffer.isBuffer(req.body)) {
+    return parseFormBody(req.body.toString('utf8'), contentType);
+  }
+
+  if (req.body instanceof ArrayBuffer) {
+    return parseFormBody(Buffer.from(req.body).toString('utf8'), contentType);
   }
 
   if (typeof req.body === 'string') {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      const params = new URLSearchParams(req.body);
-      return Object.fromEntries(params.entries());
-    }
+    return parseFormBody(req.body, contentType);
+  }
+
+  if (req.body && typeof req.body === 'object') {
+    return parseFormBody(req.body, contentType);
   }
 
   const chunks = [];
@@ -30,12 +98,7 @@ async function readJson(req) {
     return {};
   }
 
-  try {
-    return JSON.parse(raw);
-  } catch (error) {
-    const params = new URLSearchParams(raw);
-    return Object.fromEntries(params.entries());
-  }
+  return parseFormBody(raw, contentType);
 }
 
 function requestBaseUrl(req) {

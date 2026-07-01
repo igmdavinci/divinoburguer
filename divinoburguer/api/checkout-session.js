@@ -43,7 +43,11 @@ module.exports = async function handler(req, res) {
     const products = productsFromCart(cartPayload);
     const sessionId = makeIdentifier('sess');
     const identifier = makeIdentifier('pix');
-    const baseUrl = requestBaseUrl(req);
+    const requestHost = String(req.headers.host || req.headers['x-forwarded-host'] || '');
+    const bodyOrigin = String(body.origin || '').replace(/\/$/, '');
+    const isLocalRequest = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(requestHost);
+    const isLocalOrigin = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(bodyOrigin);
+    const baseUrl = isLocalRequest && isLocalOrigin ? bodyOrigin : requestBaseUrl(req);
 
     await insertOrder({
       session_id: sessionId,
