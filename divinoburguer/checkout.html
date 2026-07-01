@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout Pix - Divino Burguer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --red: #d02122;
+      --ink: #191919;
+      --muted: #676767;
+      --line: #e8e0dc;
+      --paper: #fffaf6;
+      --white: #ffffff;
+      --green: #12805c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .bar,
+    main {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .bar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .secure {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 28px;
+      padding: 32px 0 48px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    section,
+    aside {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #d8ceca;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--ink);
+      background: var(--white);
+    }
+
+    input:focus {
+      outline: 2px solid rgba(208, 33, 34, 0.22);
+      border-color: var(--red);
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 18px;
+      background: var(--red);
+      color: var(--white);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .item small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding-top: 6px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .message {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .message.error {
+      color: #a31919;
+      font-weight: 700;
+    }
+
+    .pix-note {
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 820px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand">Divino Burguer</div>
+      <div class="secure">Pagamento via Pix</div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h1>Finalize seu pedido</h1>
+      <form id="checkout-form">
+        <label>
+          Nome completo
+          <input name="name" autocomplete="name" required>
+        </label>
+
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+
+        <label>
+          Telefone
+          <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
+        </label>
+
+        <label>
+          CPF
+          <input name="document" inputmode="numeric" autocomplete="off" placeholder="123.456.789-00" required>
+        </label>
+
+        <p class="pix-note">Na proxima tela voce recebe o QR Code e o Pix copia e cola.</p>
+        <button id="submit-button" type="submit">Gerar Pix</button>
+        <div id="message" class="message" role="status"></div>
+      </form>
+    </section>
+
+    <aside>
+      <h2>Resumo</h2>
+      <div id="summary" class="summary">
+        <div class="message">Carregando pedido...</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session');
+    const form = document.getElementById('checkout-form');
+    const message = document.getElementById('message');
+    const summary = document.getElementById('summary');
+    const submitButton = document.getElementById('submit-button');
+    let currentSession = null;
+
+    function money(value) {
+      return Number(value || 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+
+    function setMessage(text, isError) {
+      message.textContent = text || '';
+      message.classList.toggle('error', Boolean(isError));
+    }
+
+    function renderSummary(session) {
+      const products = Array.isArray(session.products) ? session.products : [];
+      const items = products.map((product) => `
+        <div class="item">
+          <div>
+            ${product.name || 'Produto'}
+            <small>${product.quantity || 1} unidade(s)</small>
+          </div>
+          <strong>${money((product.price || 0) * (product.quantity || 1))}</strong>
+        </div>
+      `).join('');
+
+      summary.innerHTML = `
+        ${items || '<div class="message">Nenhum item encontrado.</div>'}
+        <div class="total">
+          <span>Total</span>
+          <strong>${money(session.amount)}</strong>
+        </div>
+      `;
+    }
+
+    async function loadSession() {
+      if (!sessionId) {
+        throw new Error('Sessao de checkout ausente. Volte ao carrinho e tente novamente.');
+      }
+
+      const response = await fetch(`/api/checkout-session?id=${encodeURIComponent(sessionId)}`);
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || 'Nao foi possivel carregar o pedido.');
+      }
+
+      currentSession = payload;
+      renderSummary(payload);
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setMessage('');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Gerando Pix...';
+
+      try {
+        if (!currentSession) {
+          await loadSession();
+        }
+
+        const data = new FormData(form);
+        const response = await fetch('/api/pix/receive', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId,
+            client: {
+              name: data.get('name'),
+              email: data.get('email'),
+              phone: data.get('phone'),
+              document: data.get('document')
+            }
+          })
+        });
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.message || 'Nao foi possivel gerar o Pix.');
+        }
+
+        localStorage.setItem('divino:lastPix', JSON.stringify(payload));
+        window.location.href = `/pix.html?identifier=${encodeURIComponent(payload.identifier)}&transactionId=${encodeURIComponent(payload.transactionId || '')}`;
+      } catch (error) {
+        setMessage(error.message, true);
+        submitButton.disabled = false;
+        submitButton.textContent = 'Gerar Pix';
+      }
+    });
+
+    loadSession().catch((error) => {
+      summary.innerHTML = `<div class="message error">${error.message}</div>`;
+      submitButton.disabled = true;
+    });
+  </script>
+</body>
+</html>

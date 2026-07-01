@@ -1,0 +1,48 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/www.hexadivinosdelivery.site/index.html"
+    },
+    {
+      "source": "/cart",
+      "destination": "/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
+      "source": "/cart.json",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart.js",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart/add",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/add.js",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/change.js",
+      "destination": "/api/cart/change"
+    },
+    {
+      "source": "/cart/clear.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/cart/clear177b.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/pix",
+      "destination": "/pix.html"
+    }
+  ]
+}

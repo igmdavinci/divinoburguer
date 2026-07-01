@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pix - Divino Burguer</title>
+  <style>
+    :root {
+      --red: #d02122;
+      --ink: #191919;
+      --muted: #68615f;
+      --line: #e7ddd8;
+      --paper: #fffaf6;
+      --white: #ffffff;
+      --green: #12805c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    main {
+      width: min(560px, 100%);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .qr {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      margin: 18px 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .qr img {
+      width: min(260px, 100%);
+      height: auto;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border: 1px solid #d8ceca;
+      border-radius: 6px;
+      padding: 12px;
+      font: 14px/1.45 Consolas, monospace;
+      color: var(--ink);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button,
+    a.button {
+      min-height: 46px;
+      display: inline-grid;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 16px;
+      background: var(--red);
+      color: var(--white);
+      font: inherit;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.button.secondary {
+      background: #252525;
+    }
+
+    .status {
+      margin-top: 14px;
+      min-height: 22px;
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .status.error {
+      color: #a31919;
+    }
+
+    @media (max-width: 520px) {
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pix gerado</h1>
+    <p>Escaneie o QR Code ou copie o codigo Pix abaixo para pagar seu pedido.</p>
+
+    <div id="qr" class="qr">Carregando Pix...</div>
+    <textarea id="pix-code" readonly></textarea>
+
+    <div class="actions">
+      <button id="copy">Copiar codigo</button>
+      <a class="button secondary" href="/www.hexadivinosdelivery.site/index.html">Voltar para loja</a>
+    </div>
+
+    <div id="status" class="status" role="status"></div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const identifier = params.get('identifier');
+    const transactionId = params.get('transactionId');
+    const qr = document.getElementById('qr');
+    const pixCode = document.getElementById('pix-code');
+    const statusBox = document.getElementById('status');
+    const copyButton = document.getElementById('copy');
+
+    function setStatus(text, isError) {
+      statusBox.textContent = text || '';
+      statusBox.classList.toggle('error', Boolean(isError));
+    }
+
+    function renderPix(payload) {
+      const pix = payload && payload.pix ? payload.pix : {};
+      const code = pix.code || '';
+      pixCode.value = code;
+
+      if (pix.base64) {
+        qr.innerHTML = `<img alt="QR Code Pix" src="data:image/png;base64,${pix.base64}">`;
+      } else if (pix.image) {
+        qr.innerHTML = `<img alt="QR Code Pix" src="${pix.image}">`;
+      } else {
+        qr.textContent = code ? 'Use o Pix copia e cola abaixo.' : 'Pix nao encontrado.';
+      }
+    }
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pixCode.value);
+        setStatus('Codigo Pix copiado.');
+      } catch {
+        pixCode.select();
+        document.execCommand('copy');
+        setStatus('Codigo Pix copiado.');
+      }
+    });
+
+    async function checkStatus() {
+      if (!identifier && !transactionId) {
+        return;
+      }
+
+      const query = new URLSearchParams();
+      if (transactionId) query.set('id', transactionId);
+      if (identifier) query.set('clientIdentifier', identifier);
+
+      try {
+        const response = await fetch(`/api/pix/status?${query.toString()}`);
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.message || 'Nao foi possivel consultar o pagamento.');
+        }
+
+        if (payload.status) {
+          setStatus(`Status: ${payload.status}`);
+        }
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    try {
+      const payload = JSON.parse(localStorage.getItem('divino:lastPix') || '{}');
+      renderPix(payload);
+      if (!payload.pix) {
+        setStatus('Abra esta tela logo apos gerar o Pix para ver o QR Code.', true);
+      }
+    } catch {
+      setStatus('Pix nao encontrado neste navegador.', true);
+    }
+
+    checkStatus();
+    setInterval(checkStatus, 15000);
+  </script>
+</body>
+</html>

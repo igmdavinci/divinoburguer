@@ -1,0 +1,33 @@
+HTTrack3.49-2+htsswf+htsjava launched on Wed, 01 Jul 2026 13:35:39 at https://www.hexadivinosdelivery.site/ +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar +*.gif +*.jpg +*.jpeg +*.png +*.tif +*.bmp +*.zip +*.tar +*.tgz +*.gz +*.rar +*.z +*.exe +*.mov +*.mpg +*.mpeg +*.avi +*.asf +*.mp3 +*.mp2 +*.rm +*.wav +*.vob +*.qt +*.vid +*.ac3 +*.wma +*.wmv
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://www.hexadivinosdelivery.site/ -O1 "C:\Users\cieiw\Desktop\divinoburguer\divinoburguer" +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar +*.gif +*.jpg +*.jpeg +*.png +*.tif +*.bmp +*.zip +*.tar +*.tgz +*.gz +*.rar +*.z +*.exe +*.mov +*.mpg +*.mpeg +*.avi +*.asf +*.mp3 +*.mp2 +*.rm +*.wav +*.vob +*.qt +*.vid +*.ac3 +*.wma +*.wmv )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+13:37:28	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/POST (from https://www.hexadivinosdelivery.site/)
+13:37:28	Error: 	"Error when decompressing" (-1) at link https://www.hexadivinosdelivery.site/cdn (from https://www.hexadivinosdelivery.site/)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/GET (from https://www.hexadivinosdelivery.site/)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/url (from https://www.hexadivinosdelivery.site/)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/window.location.href (from https://www.hexadivinosdelivery.site/)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/collections/POST (from https://www.hexadivinosdelivery.site/collections/all)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/collections/GET (from https://www.hexadivinosdelivery.site/collections/all)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/collections/url (from https://www.hexadivinosdelivery.site/collections/all)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/collections/window.location.href (from https://www.hexadivinosdelivery.site/collections/all)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/pages/POST (from https://www.hexadivinosdelivery.site/pages/contact)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/pages/GET (from https://www.hexadivinosdelivery.site/pages/contact)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/pages/url (from https://www.hexadivinosdelivery.site/pages/contact)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/pages/window.location.href (from https://www.hexadivinosdelivery.site/pages/contact)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/products/POST (from https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/json/ (from https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/products/GET (from https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/products/url (from https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/products/window.location.href (from https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/cart/POST (from https://www.hexadivinosdelivery.site/cart/?skipCart=1)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/cart/GET (from https://www.hexadivinosdelivery.site/cart/?skipCart=1)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/cart/url (from https://www.hexadivinosdelivery.site/cart/?skipCart=1)
+13:38:34	Error: 	"Not Found" (404) at link https://www.hexadivinosdelivery.site/cart/window.location.href (from https://www.hexadivinosdelivery.site/cart/?skipCart=1)
+
+HTTrack Website Copier/3.49-2 mirror complete in 2 minutes 55 seconds : 214 links scanned, 191 files written (77324040 bytes overall) [70078216 bytes received at 400446 bytes/sec], 12860685 bytes transferred using HTTP compression in 115 files, ratio 19%, 7.9 requests per connection
+(22 errors, 0 warnings, 0 messages)
