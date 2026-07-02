@@ -38,6 +38,13 @@
       padding: 24px;
     }
 
+    main.confirmed-only {
+      width: min(334px, 100%);
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
     h1 {
       margin: 0 0 8px;
       font-size: 26px;
@@ -120,19 +127,31 @@
 
     .confirmed {
       display: grid;
-      gap: 8px;
+      gap: 24px;
       place-items: center;
-      padding: 22px;
+      min-height: 180px;
+      margin: 0;
+      padding: 28px 24px;
       border: 1px solid #9bd4bd;
+      border-radius: 6px;
       background: #e9f8f1;
       color: var(--green);
       text-align: center;
       font-weight: 800;
     }
 
+    .confirmed strong {
+      max-width: 286px;
+      color: #087a55;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
     .confirmed span {
-      color: var(--green);
-      font-size: 15px;
+      color: #087a55;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.4;
     }
 
     @media (max-width: 520px) {
@@ -200,16 +219,16 @@
 
     function showOrderConfirmed() {
       orderConfirmed = true;
-      document.querySelector('h1').textContent = 'Pedido confirmado';
-      document.querySelector('main > p').textContent = '';
+      document.querySelector('main').classList.add('confirmed-only');
+      document.querySelector('h1').hidden = true;
+      document.querySelector('main > p').hidden = true;
       qr.classList.add('confirmed');
       qr.innerHTML = `
         <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
         <span>Previsão de entrega: ${deliveryEstimateText}</span>
       `;
       pixCode.hidden = true;
-      copyButton.hidden = true;
-      testApprovedButton.hidden = true;
+      document.querySelector('.actions').hidden = true;
       setStatus('');
     }
 

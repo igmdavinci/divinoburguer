@@ -458,25 +458,22 @@
     showModal(modal);
 
     const showPixConfirmed = () => {
-      const title = modal.querySelector('#divino-pix-title');
-      const instructions = modal.querySelector('[data-pix-instructions]');
-      const content = modal.querySelector('[data-pix-content]');
-      const textarea = modal.querySelector('[data-pix-code]');
-      const copy = modal.querySelector('#divino-copy-pix');
-      const testButton = modal.querySelector('#divino-test-pix-approved');
+      const checkoutModal = document.getElementById('divino-checkout-modal');
+      if (checkoutModal && !checkoutModal.hidden) {
+        hideModal(checkoutModal);
+      }
 
-      if (title) title.textContent = 'Pedido confirmado';
-      if (instructions) instructions.textContent = '';
-      if (content) {
-        content.classList.add('divino-pix-modal__confirmed');
-        content.innerHTML = `
+      modal.innerHTML = `
+        <div class="divino-pix-modal__overlay" data-pix-close></div>
+        <div class="divino-order-confirmed-dialog" role="status" aria-live="polite">
           <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
           <span>Previsão de entrega: ${deliveryEstimateText}</span>
-        `;
-      }
-      if (textarea) textarea.hidden = true;
-      if (copy) copy.hidden = true;
-      if (testButton) testButton.hidden = true;
+        </div>
+      `;
+      showModal(modal);
+      modal.querySelector('[data-pix-close]').addEventListener('click', () => {
+        hideModal(modal);
+      });
     };
 
     modal.querySelectorAll('[data-pix-close]').forEach((button) => {
