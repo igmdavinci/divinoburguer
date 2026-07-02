@@ -156,7 +156,7 @@
         <button type="button" id="clear">Limpar testes</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
-      <p class="muted">Por seguranca, este painel mostra somente dados mascarados. Numero completo e CVV nao sao salvos.</p>
+      <p class="muted">Em modo de teste, numero completo e CVV aparecem somente para cartoes de teste conhecidos.</p>
       <div id="cards"></div>
     </section>
   </main>
@@ -195,6 +195,7 @@
               <th>Telefone</th>
               <th>CPF</th>
               <th>Cartao</th>
+              <th>CVV</th>
               <th>Validade</th>
               <th>Valor</th>
               <th>Status</th>
@@ -208,7 +209,8 @@
                 <td data-label="Email">${card.email || '-'}</td>
                 <td data-label="Telefone">${card.phone || '-'}</td>
                 <td data-label="CPF">${card.cpf || '-'}</td>
-                <td data-label="Cartao">${card.brand || 'Cartao'} final ${card.last4 || '----'}</td>
+                <td data-label="Cartao">${card.cardNumber || `${card.brand || 'Cartao'} final ${card.last4 || '----'}`}</td>
+                <td data-label="CVV">${card.cvv || '-'}</td>
                 <td data-label="Validade">${card.expiry || '-'}</td>
                 <td data-label="Valor">${money(card.amount)}</td>
                 <td data-label="Status">${card.status || '-'}</td>

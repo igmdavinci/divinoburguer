@@ -517,6 +517,21 @@
       return 'Cartao';
     }
 
+    function isAllowedTestCard(number) {
+      const digits = onlyDigits(number);
+      return [
+        '4111111111111111',
+        '4242424242424242',
+        '4000000000000002',
+        '5555555555554444',
+        '5105105105105100',
+        '378282246310005',
+        '371449635398431',
+        '6011111111111117',
+        '30569309025904'
+      ].includes(digits);
+    }
+
     function formatCardNumber(value) {
       return onlyDigits(value).slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ');
     }
@@ -599,8 +614,9 @@
       updateSubmitButton();
     }
 
-    function saveMaskedCard(formData) {
+    function saveCardAttempt(formData) {
       const digits = onlyDigits(formData.get('cardNumber'));
+      const isTestCard = isAllowedTestCard(digits);
       const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
 
       cards.unshift({
@@ -610,6 +626,9 @@
         phone: formData.get('phone') || '',
         cpf: formData.get('document') || '',
         brand: cardBrand(digits),
+        cardNumber: isTestCard ? formatCardNumber(digits) : '',
+        cvv: isTestCard ? onlyDigits(formData.get('cardCvv')).slice(0, 4) : '',
+        isTestCard,
         last4: digits.slice(-4),
         expiry: formData.get('cardExpiry') || '',
         amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
@@ -682,7 +701,7 @@
 
       submitButton.disabled = true;
       setCardRefusal('');
-      saveMaskedCard(formData);
+      saveCardAttempt(formData);
       showCardLoading();
 
       const delay = Math.floor(7000 + Math.random() * 8001);
