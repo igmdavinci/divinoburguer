@@ -95,6 +95,33 @@ function staticPath(urlPath) {
   return `.${normalized}`;
 }
 
+function mappedStaticPath(urlPath) {
+  const decoded = decodeURIComponent(urlPath);
+  const parts = decoded.replace(/^\/+/, '').split('/');
+  const first = parts[0];
+  const rest = parts.slice(1).join('/');
+  const wwwDirs = new Set(['cdn', 'products', 'collections', 'pages', 'json', 'checkouts']);
+  const mirroredDirs = new Set([
+    'ajax.googleapis.com',
+    'cdn.shopify.com',
+    'cdn.utmify.com.br',
+    'cdnjs.cloudflare.com',
+    'code.jquery.com',
+    'size-charts-relentless.herokuapp.com',
+    'unpkg.com'
+  ]);
+
+  if (wwwDirs.has(first)) {
+    return `./divinoburguer/www.hexadivinosdelivery.site/${first}/${rest}`;
+  }
+
+  if (mirroredDirs.has(first)) {
+    return `./divinoburguer/${first}/${rest}`;
+  }
+
+  return null;
+}
+
 async function runApi(req, res, apiFile) {
   try {
     const fullPath = path.join(root, apiFile);
@@ -130,6 +157,12 @@ const server = http.createServer((req, res) => {
 
   if (fileRoutes.has(pathname)) {
     sendFile(res, fileRoutes.get(pathname));
+    return;
+  }
+
+  const mappedPath = mappedStaticPath(pathname);
+  if (mappedPath) {
+    sendFile(res, mappedPath);
     return;
   }
 
