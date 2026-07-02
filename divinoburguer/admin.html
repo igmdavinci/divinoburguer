@@ -153,6 +153,7 @@
       <div class="actions">
         <button type="button" class="secondary" id="refresh">Atualizar</button>
         <button type="button" class="secondary" id="export-txt" disabled>Exportar TXT</button>
+        <button type="button" class="secondary" id="clear-list" disabled>Limpar lista</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
       <div id="cards"></div>
@@ -165,6 +166,7 @@
     const cardsBox = document.getElementById('cards');
     const loginError = document.getElementById('login-error');
     const exportButton = document.getElementById('export-txt');
+    const clearButton = document.getElementById('clear-list');
     let cardRecords = [];
 
     function escapeHtml(value) {
@@ -180,6 +182,7 @@
     async function renderCards() {
       cardsBox.innerHTML = '<p class="muted">Carregando...</p>';
       exportButton.disabled = true;
+      clearButton.disabled = true;
       const response = await fetch('/api/admin/card-attempts', {
         credentials: 'same-origin'
       });
@@ -191,6 +194,7 @@
       const cards = payload.records || [];
       cardRecords = cards;
       exportButton.disabled = cards.length === 0;
+      clearButton.disabled = cards.length === 0;
       if (!cards.length) {
         cardsBox.innerHTML = '<p class="muted">Nenhum registro encontrado.</p>';
         return;
@@ -260,6 +264,31 @@
       }
     }
 
+    async function clearCards() {
+      if (!cardRecords.length) return;
+      if (!window.confirm('Tem certeza que deseja limpar todos os registros da lista?')) return;
+
+      clearButton.disabled = true;
+      try {
+        const response = await fetch('/api/admin/card-attempts', {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.message || 'Nao foi possivel limpar a lista.');
+        }
+      } catch (error) {
+        clearButton.disabled = false;
+        throw error;
+      }
+
+      cardRecords = [];
+      exportButton.disabled = true;
+      clearButton.disabled = true;
+      cardsBox.innerHTML = '<p class="muted">Nenhum registro encontrado.</p>';
+    }
+
     document.getElementById('login-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -302,6 +331,11 @@
       });
     });
     exportButton.addEventListener('click', exportTxt);
+    clearButton.addEventListener('click', () => {
+      clearCards().catch((error) => {
+        cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+      });
+    });
     document.getElementById('logout').addEventListener('click', async () => {
       await fetch('/api/admin/logout', {
         method: 'POST',
@@ -309,6 +343,7 @@
       }).catch(() => null);
       cardRecords = [];
       exportButton.disabled = true;
+      clearButton.disabled = true;
       updateView(false);
     });
 

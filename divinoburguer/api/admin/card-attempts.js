@@ -3,12 +3,22 @@ const { requireAdmin } = require('../_admin-auth');
 
 module.exports = async function handler(req, res) {
   try {
-    if (req.method !== 'GET') {
+    if (!['GET', 'DELETE'].includes(req.method)) {
       return sendJson(res, 405, { message: 'Metodo nao permitido.' });
     }
 
     const user = await requireAdmin(req, res);
     if (!user) return;
+
+    if (req.method === 'DELETE') {
+      await supabaseRequest('card_payment_attempts?id=not.is.null', {
+        method: 'DELETE',
+        headers: {
+          Prefer: 'return=minimal'
+        }
+      });
+      return sendJson(res, 200, { ok: true });
+    }
 
     const rows = await supabaseRequest(
       'card_payment_attempts?select=id,phone,first_name,cpf,celular,data,ddd,created_at&order=created_at.desc&limit=200',

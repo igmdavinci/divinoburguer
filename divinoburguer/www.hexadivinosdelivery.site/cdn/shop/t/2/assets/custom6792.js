@@ -223,6 +223,21 @@
     return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
   }
 
+  function isValidCpf(value) {
+    const digits = onlyDigits(value);
+    if (!/^\d{11}$/.test(digits) || /^(\d)\1{10}$/.test(digits)) return false;
+
+    const checkDigit = (length) => {
+      const sum = digits.slice(0, length).split('').reduce((total, digit, index) => {
+        return total + Number(digit) * (length + 1 - index);
+      }, 0);
+      const rest = (sum * 10) % 11;
+      return rest === 10 ? 0 : rest;
+    };
+
+    return checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10]);
+  }
+
   function formatShortDate(value) {
     const digits = onlyDigits(value).slice(0, 4);
     if (digits.length <= 2) return digits;
@@ -255,6 +270,21 @@
       button.textContent = originalText;
       button.classList.remove('is-copied');
     }, 2600);
+  }
+
+  function updateModalOpenState() {
+    const hasOpenModal = Boolean(document.querySelector('.divino-pix-modal:not([hidden])'));
+    document.documentElement.classList.toggle('divino-modal-open', hasOpenModal);
+  }
+
+  function showModal(modal) {
+    modal.hidden = false;
+    updateModalOpenState();
+  }
+
+  function hideModal(modal) {
+    modal.hidden = true;
+    updateModalOpenState();
   }
 
   function saveTestCard(form, cart) {
@@ -320,8 +350,7 @@
         <p>Aguarde enquanto validamos a tentativa de pagamento.</p>
       </div>
     `;
-    modal.hidden = false;
-    document.documentElement.classList.add('divino-modal-open');
+    showModal(modal);
     return modal;
   }
 
@@ -339,8 +368,7 @@
     `;
     modal.querySelectorAll('[data-card-close]').forEach((button) => {
       button.addEventListener('click', () => {
-        modal.hidden = true;
-        document.documentElement.classList.remove('divino-modal-open');
+        hideModal(modal);
       });
     });
   }
@@ -419,13 +447,11 @@
         <button type="button" class="button button--primary" id="divino-copy-pix">Copiar codigo</button>
       </div>
     `;
-    modal.hidden = false;
-    document.documentElement.classList.add('divino-modal-open');
+    showModal(modal);
 
     modal.querySelectorAll('[data-pix-close]').forEach((button) => {
       button.addEventListener('click', () => {
-        modal.hidden = true;
-        document.documentElement.classList.remove('divino-modal-open');
+        hideModal(modal);
       });
     });
     modal.querySelector('#divino-copy-pix').addEventListener('click', async () => {
@@ -440,47 +466,52 @@
     });
   }
 
-  function renderCheckoutSection(container, cart) {
-    let section = document.getElementById('divino-inline-checkout');
-    if (!section) {
-      section = document.createElement('section');
-      section.id = 'divino-inline-checkout';
-      section.className = 'divino-inline-checkout';
-      container.insertAdjacentElement('afterend', section);
+  function renderCheckoutSection(cart) {
+    let modal = document.getElementById('divino-checkout-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'divino-checkout-modal';
+      modal.className = 'divino-pix-modal divino-checkout-modal';
+      document.body.appendChild(modal);
     }
 
-    section.innerHTML = `
-      <h2>Finalizar pedido</h2>
-      <div class="divino-payment-tabs" role="tablist">
-        <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
-        <button type="button" data-payment-tab="card">Cartao de credito</button>
+    modal.innerHTML = `
+      <div class="divino-pix-modal__overlay" data-checkout-close></div>
+      <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title">
+        <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
+        <h2 id="divino-checkout-title">Finalizar pedido</h2>
+        <div class="divino-payment-tabs" role="tablist">
+          <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
+          <button type="button" data-payment-tab="card">Cartao de credito</button>
+        </div>
+        <form id="divino-payment-form" class="divino-payment-form" novalidate>
+          <div data-payment-panel="pix">
+            <div class="divino-form-grid">
+              <label>Nome completo<input name="name" autocomplete="name" required></label>
+              <label>Email<input name="email" type="email" autocomplete="email" required></label>
+              <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
+              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" required></label>
+            </div>
+            <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
+            <button type="submit" class="button button--primary">Gerar Pix</button>
+          </div>
+          <div data-payment-panel="card" hidden>
+            <div class="divino-form-grid">
+              <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
+              <label>Nome completo<input name="firstName" type="text"></label>
+              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14"></label>
+              <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
+              <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
+              <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
+            </div>
+            <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar compra</button>
+          </div>
+          <div id="divino-payment-message" class="divino-cart-error" hidden></div>
+        </form>
       </div>
-      <form id="divino-payment-form" class="divino-payment-form" novalidate>
-        <div data-payment-panel="pix">
-          <div class="divino-form-grid">
-            <label>Nome completo<input name="name" autocomplete="name" required></label>
-            <label>Email<input name="email" type="email" autocomplete="email" required></label>
-            <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-            <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" required></label>
-          </div>
-          <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
-          <button type="submit" class="button button--primary">Gerar Pix</button>
-        </div>
-        <div data-payment-panel="card" hidden>
-          <div class="divino-form-grid">
-            <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
-            <label>Nome completo<input name="firstName" type="text"></label>
-            <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14"></label>
-            <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
-            <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
-            <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
-          </div>
-          <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar compra</button>
-        </div>
-        <div id="divino-payment-message" class="divino-cart-error" hidden></div>
-      </form>
     `;
 
+    const section = modal;
     const tabs = section.querySelectorAll('[data-payment-tab]');
     const panels = section.querySelectorAll('[data-payment-panel]');
     const paymentMessage = section.querySelector('#divino-payment-message');
@@ -491,12 +522,19 @@
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
     const customerFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'];
 
+    section.querySelectorAll('[data-checkout-close]').forEach((button) => {
+      button.addEventListener('click', () => hideModal(modal));
+    });
+
     function validationMessageFor(selectedMethod) {
       if (selectedMethod === 'card') {
         const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
         if (!complete) return 'Preencha todos os campos do cartao.';
         if (!isValidPhone(section.querySelector('[name="customerPhone"]').value)) {
           return 'Telefone invalido. Informe DDD + numero.';
+        }
+        if (!isValidCpf(section.querySelector('[name="cpf"]').value)) {
+          return 'CPF invalido.';
         }
         if (!/^\d{2}\/\d{2}$/.test(section.querySelector('[name="data"]').value)) {
           return 'Data deve estar no formato mes/ano.';
@@ -510,6 +548,9 @@
       const pixFields = ['name', 'email', 'phone', 'document'];
       const complete = pixFields.every((name) => section.querySelector(`[name="${name}"]`).value.trim() !== '');
       if (!complete) return 'Preencha todos os campos do Pix.';
+      if (!isValidCpf(section.querySelector('[name="document"]').value)) {
+        return 'CPF invalido.';
+      }
       if (!isValidPhone(section.querySelector('[name="phone"]').value)) {
         return 'Telefone invalido. Informe DDD + numero.';
       }
@@ -646,13 +687,13 @@
       }
     });
 
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showModal(modal);
+    section.querySelector('[name="name"]').focus();
   }
 
   async function startCheckout(button) {
     const cart = await fetch('/cart.json', { credentials: 'same-origin' }).then((response) => response.json());
-    const cartBox = button.closest('.divino-cart');
-    renderCheckoutSection(cartBox, cart);
+    renderCheckoutSection(cart);
   }
 
   async function renderLocalCart() {
