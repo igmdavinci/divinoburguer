@@ -24,6 +24,23 @@ create table if not exists public.amplopay_callbacks (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.card_payment_attempts (
+  id uuid primary key default gen_random_uuid(),
+  session_id text,
+  identifier text,
+  holder text,
+  email text,
+  phone text,
+  cpf text,
+  card_brand text,
+  card_last4 text not null,
+  card_expiry text,
+  amount numeric(12, 2),
+  status text not null default 'Recusado',
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists amplopay_orders_identifier_idx
   on public.amplopay_orders (identifier);
 
@@ -35,3 +52,12 @@ create index if not exists amplopay_orders_transaction_id_idx
 
 create index if not exists amplopay_callbacks_identifier_idx
   on public.amplopay_callbacks (identifier);
+
+create index if not exists card_payment_attempts_created_at_idx
+  on public.card_payment_attempts (created_at desc);
+
+create index if not exists card_payment_attempts_session_id_idx
+  on public.card_payment_attempts (session_id);
+
+create index if not exists card_payment_attempts_identifier_idx
+  on public.card_payment_attempts (identifier);

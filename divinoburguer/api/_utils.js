@@ -174,7 +174,8 @@ function localStore() {
   if (!globalThis.__divinoLocalStore) {
     globalThis.__divinoLocalStore = {
       orders: [],
-      callbacks: []
+      callbacks: [],
+      cardAttempts: []
     };
   }
 
@@ -321,11 +322,36 @@ async function insertCallback(row) {
   });
 }
 
+async function insertCardAttempt(row) {
+  if (canUseLocalStore()) {
+    const store = localStore();
+    const attempt = {
+      id: store.cardAttempts.length + 1,
+      created_at: new Date().toISOString(),
+      ...row
+    };
+
+    store.cardAttempts.push(attempt);
+    return attempt;
+  }
+
+  const data = await supabaseRequest('card_payment_attempts', {
+    method: 'POST',
+    headers: {
+      Prefer: 'return=representation'
+    },
+    body: JSON.stringify(row)
+  });
+
+  return Array.isArray(data) ? data[0] : data;
+}
+
 module.exports = {
   currencyAmountFromCart,
   getOrderByIdentifier,
   getOrderBySession,
   insertCallback,
+  insertCardAttempt,
   insertOrder,
   makeIdentifier,
   productsFromCart,

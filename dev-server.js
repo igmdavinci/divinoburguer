@@ -42,6 +42,7 @@ const apiRoutes = new Map([
   ['/cart/clear.js', './api/cart/clear.js'],
   ['/cart/clear177b.js', './api/cart/clear.js'],
   ['/api/checkout-session', './api/checkout-session.js'],
+  ['/api/card-attempts', './api/card-attempts.js'],
   ['/api/pix/receive', './api/pix/receive.js'],
   ['/api/pix/status', './api/pix/status.js'],
   ['/api/pix/callback', './api/pix/callback.js'],
