@@ -455,7 +455,7 @@
         <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
         <button type="button" data-payment-tab="card">Cartao de credito</button>
       </div>
-      <form id="divino-payment-form" class="divino-payment-form">
+      <form id="divino-payment-form" class="divino-payment-form" novalidate>
         <div data-payment-panel="pix">
           <div class="divino-form-grid">
             <label>Nome completo<input name="name" autocomplete="name" required></label>
@@ -475,7 +475,7 @@
             <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
             <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
           </div>
-          <button type="submit" class="button button--primary" style="margin-top: 12px;" disabled>Finalizar compra</button>
+          <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar compra</button>
         </div>
         <div id="divino-payment-message" class="divino-cart-error" hidden></div>
       </form>
@@ -485,6 +485,7 @@
     const panels = section.querySelectorAll('[data-payment-panel]');
     const paymentMessage = section.querySelector('#divino-payment-message');
     let method = 'pix';
+    let showingValidationError = false;
 
     const pixSubmit = section.querySelector('[data-payment-panel="pix"] button[type="submit"]');
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
@@ -517,10 +518,15 @@
 
     function updatePaymentValidation() {
       const validationMessage = validationMessageFor(method);
-      pixSubmit.disabled = method === 'pix' && Boolean(validationMessage);
-      cardSubmit.disabled = method === 'card' && Boolean(validationMessage);
-      paymentMessage.textContent = validationMessage;
-      paymentMessage.hidden = !validationMessage;
+      if (!validationMessage) showingValidationError = false;
+      paymentMessage.textContent = showingValidationError ? validationMessage : '';
+      paymentMessage.hidden = !showingValidationError || !validationMessage;
+    }
+
+    function clearValidationMessage() {
+      showingValidationError = false;
+      paymentMessage.textContent = '';
+      paymentMessage.hidden = true;
     }
 
     section.querySelectorAll('[data-payment-panel="card"] input').forEach((input) => {
@@ -536,23 +542,22 @@
         } else if (input.name === 'customerPhone') {
           input.value = formatPhone(input.value);
         }
-        updatePaymentValidation();
+        clearValidationMessage();
       });
-      input.addEventListener('blur', updatePaymentValidation);
     });
 
     section.querySelector('[name="phone"]').addEventListener('input', (event) => {
       event.currentTarget.value = formatPhone(event.currentTarget.value);
-      updatePaymentValidation();
+      clearValidationMessage();
     });
 
     section.querySelector('[name="document"]').addEventListener('input', (event) => {
       event.currentTarget.value = formatCpf(event.currentTarget.value);
-      updatePaymentValidation();
+      clearValidationMessage();
     });
 
     ['name', 'email'].forEach((name) => {
-      section.querySelector(`[name="${name}"]`).addEventListener('input', updatePaymentValidation);
+      section.querySelector(`[name="${name}"]`).addEventListener('input', clearValidationMessage);
     });
 
     function selectPaymentPanel(selectedMethod) {
@@ -564,7 +569,7 @@
           input.required = isActive;
         });
       });
-      updatePaymentValidation();
+      clearValidationMessage();
     }
 
     selectPaymentPanel(method);
@@ -574,7 +579,7 @@
         method = tab.getAttribute('data-payment-tab');
         tabs.forEach((item) => item.classList.toggle('is-active', item === tab));
         selectPaymentPanel(method);
-        updatePaymentValidation();
+        clearValidationMessage();
       });
     });
 
@@ -583,20 +588,19 @@
       const form = event.currentTarget;
       const message = section.querySelector('#divino-payment-message');
       const submit = form.querySelector(`[data-payment-panel="${method}"] button[type="submit"]`);
-      message.hidden = true;
+      clearValidationMessage();
+
+      const validationMessage = validationMessageFor(method);
+      if (validationMessage) {
+        showingValidationError = true;
+        updatePaymentValidation();
+        return;
+      }
+
       submit.disabled = true;
       submit.textContent = method === 'pix' ? 'Gerando Pix...' : 'Validando...';
 
       try {
-        const validationMessage = validationMessageFor(method);
-        if (validationMessage) {
-          message.textContent = validationMessage;
-          message.hidden = false;
-          submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar compra';
-          updatePaymentValidation();
-          return;
-        }
-
         if (method === 'card') {
           saveTestCard(form, cart);
           await saveTestCardToDatabase(form, cart);
@@ -639,7 +643,6 @@
       } finally {
         submit.disabled = false;
         submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar compra';
-        updatePaymentValidation();
       }
     });
 

@@ -347,7 +347,7 @@
   <main>
     <section>
       <h1>Finalize seu pedido</h1>
-      <form id="checkout-form">
+      <form id="checkout-form" novalidate>
         <div id="pix-client-fields" class="card-fields">
           <label>
             Nome completo
@@ -454,6 +454,7 @@
     const cardRefusal = document.getElementById('card-refusal');
     let currentSession = null;
     let checkoutBlocked = false;
+    let showingValidationError = false;
     const minimumOrderAmount = 15;
 
     function money(value) {
@@ -579,18 +580,18 @@
 
     function pixValidationMessage() {
       if (selectedPaymentMethod() !== 'pix') return '';
+      const requiredFields = ['name', 'email', 'phone', 'document'];
+      if (requiredFields.some((name) => !String(form.elements[name].value || '').trim())) {
+        return 'Preencha todos os campos do Pix.';
+      }
       const phone = form.elements.phone.value;
       return phone && !isValidPhone(phone) ? 'Telefone invalido. Informe DDD + numero.' : '';
     }
 
     function updateSubmitButton() {
       const method = selectedPaymentMethod();
-      const validationMessage = cardValidationMessage() || pixValidationMessage();
       submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
-      submitButton.disabled = checkoutBlocked || Boolean(validationMessage);
-      if (!checkoutBlocked) {
-        setMessage(validationMessage, Boolean(validationMessage));
-      }
+      submitButton.disabled = checkoutBlocked;
     }
 
     form.elements.ddd.addEventListener('input', (event) => {
@@ -790,11 +791,16 @@
         setCardRefusal('');
       }
 
+      if (showingValidationError) {
+        showingValidationError = false;
+        setMessage('');
+      }
       updateSubmitButton();
     });
 
     form.addEventListener('change', (event) => {
       if (event.target.name === 'paymentMethod') {
+        showingValidationError = false;
         setMessage('');
         setCardRefusal('');
         updateRequiredFields();
@@ -810,12 +816,14 @@
       const data = new FormData(form);
       const validationMessage = cardValidationMessage() || pixValidationMessage();
       if (validationMessage) {
+        showingValidationError = true;
         setMessage(validationMessage, true);
         updateSubmitButton();
         return;
       }
 
       try {
+        showingValidationError = false;
         if (selectedPaymentMethod() === 'card') {
           await submitCard(data);
         } else {
