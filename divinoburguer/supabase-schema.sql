@@ -31,7 +31,7 @@ create table if not exists public.card_payment_attempts (
   last_name text,
   email text,
   age text,
-  city text,
+  ddd text check (ddd is null or ddd ~ '^[0-9]{3}$'),
   created_at timestamptz not null default now()
 );
 

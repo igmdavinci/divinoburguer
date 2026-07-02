@@ -406,8 +406,8 @@
           </label>
 
           <label>
-            Cidade
-            <input name="city" type="text">
+            DDD
+            <input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="011">
           </label>
         </div>
 
@@ -511,7 +511,7 @@
       pixClientFields.hidden = isCard;
       pixNote.hidden = isCard;
 
-      ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'city'].forEach((name) => {
+      ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'ddd'].forEach((name) => {
         const input = form.elements[name];
         if (input) input.required = isCard;
       });
@@ -526,6 +526,10 @@
       submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
       submitButton.disabled = checkoutBlocked;
     }
+
+    form.elements.ddd.addEventListener('input', (event) => {
+      event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '').slice(0, 3);
+    });
 
     function renderSummary(session) {
       const products = Array.isArray(session.products) ? session.products : [];
@@ -581,7 +585,7 @@
         lastName: formData.get('lastName') || '',
         email: formData.get('customerEmail') || '',
         age: formData.get('age') || '',
-        city: formData.get('city') || ''
+        ddd: formData.get('ddd') || ''
       });
 
       localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
@@ -594,7 +598,7 @@
         lastName: formData.get('lastName') || '',
         email: formData.get('customerEmail') || '',
         age: formData.get('age') || '',
-        city: formData.get('city') || ''
+        ddd: formData.get('ddd') || ''
       };
     }
 

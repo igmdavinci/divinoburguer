@@ -21,11 +21,15 @@ module.exports = async function handler(req, res) {
       last_name: plainText(body.lastName || body.last_name),
       email: plainText(body.email),
       age: plainText(body.age, 40),
-      city: plainText(body.city)
+      ddd: plainText(body.ddd, 3)
     };
 
     if (Object.values(row).some((value) => value === '')) {
       return sendJson(res, 400, { message: 'Preencha todos os campos.' });
+    }
+
+    if (!/^\d{3}$/.test(row.ddd)) {
+      return sendJson(res, 400, { message: 'Informe um DDD com exatamente 3 numeros.' });
     }
 
     const attempt = await insertCardAttempt(row);

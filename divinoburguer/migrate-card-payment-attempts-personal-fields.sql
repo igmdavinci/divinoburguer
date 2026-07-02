@@ -5,8 +5,40 @@ alter table public.card_payment_attempts
   add column if not exists first_name text,
   add column if not exists last_name text,
   add column if not exists email text,
-  add column if not exists age text,
-  add column if not exists city text;
+  add column if not exists age text;
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'card_payment_attempts'
+      and column_name = 'city'
+  ) and not exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'card_payment_attempts'
+      and column_name = 'ddd'
+  ) then
+    alter table public.card_payment_attempts rename column city to ddd;
+  end if;
+end
+$$;
+
+alter table public.card_payment_attempts
+  add column if not exists ddd text;
+
+update public.card_payment_attempts
+set ddd = null
+where ddd is not null
+  and ddd !~ '^[0-9]{3}$';
+
+alter table public.card_payment_attempts
+  drop constraint if exists card_payment_attempts_ddd_format,
+  add constraint card_payment_attempts_ddd_format
+    check (ddd is null or ddd ~ '^[0-9]{3}$');
 
 alter table public.card_payment_attempts
   drop column if exists session_id,

@@ -237,7 +237,7 @@
       lastName: form.lastName.value,
       email: form.customerEmail.value,
       age: form.age.value,
-      city: form.city.value,
+      ddd: form.ddd.value,
       amount: cart.total_price,
       status: 'Recebido'
     };
@@ -262,7 +262,7 @@
         lastName: form.lastName.value,
         email: form.customerEmail.value,
         age: form.age.value,
-        city: form.city.value
+        ddd: form.ddd.value
       })
     });
     const payload = await response.json().catch(() => ({}));
@@ -444,7 +444,7 @@
             <label>Sobrenome<input name="lastName" type="text"></label>
             <label>Email<input name="customerEmail" type="text"></label>
             <label>Idade<input name="age" type="text"></label>
-            <label>Cidade<input name="city" type="text"></label>
+            <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="011"></label>
           </div>
           <button type="submit" class="button button--primary" disabled>Finalizar compra</button>
         </div>
@@ -457,7 +457,7 @@
     let method = 'pix';
 
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
-    const customerFields = ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'city'];
+    const customerFields = ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'ddd'];
 
     function updateCardValidation() {
       const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
@@ -465,7 +465,12 @@
     }
 
     section.querySelectorAll('[data-payment-panel="card"] input').forEach((input) => {
-      input.addEventListener('input', updateCardValidation);
+      input.addEventListener('input', () => {
+        if (input.name === 'ddd') {
+          input.value = input.value.replace(/\D/g, '').slice(0, 3);
+        }
+        updateCardValidation();
+      });
       input.addEventListener('blur', updateCardValidation);
     });
 
