@@ -232,8 +232,9 @@
 
     document.getElementById('login-form').addEventListener('submit', async (event) => {
       event.preventDefault();
-      const data = new FormData(event.currentTarget);
-      const submit = event.currentTarget.querySelector('button[type="submit"]');
+      const form = event.currentTarget;
+      const data = new FormData(form);
+      const submit = form.querySelector('button[type="submit"]');
       submit.disabled = true;
       loginError.hidden = true;
 
@@ -254,7 +255,7 @@
           throw new Error(payload.message || 'Nao foi possivel entrar.');
         }
 
-        event.currentTarget.reset();
+        form.reset();
         loginError.hidden = true;
         updateView(true);
       } catch (error) {
