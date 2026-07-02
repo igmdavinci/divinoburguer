@@ -215,6 +215,14 @@
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   }
 
+  function formatCpf(value) {
+    const digits = onlyDigits(value).slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+  }
+
   function formatShortDate(value) {
     const digits = onlyDigits(value).slice(0, 4);
     if (digits.length <= 2) return digits;
@@ -453,7 +461,7 @@
             <label>Nome completo<input name="name" autocomplete="name" required></label>
             <label>Email<input name="email" type="email" autocomplete="email" required></label>
             <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-            <label>CPF<input name="document" inputmode="numeric" autocomplete="off" required></label>
+            <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" required></label>
           </div>
           <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
           <button type="submit" class="button button--primary">Gerar Pix</button>
@@ -462,10 +470,10 @@
           <div class="divino-form-grid">
             <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
             <label>Nome completo<input name="firstName" type="text"></label>
-            <label>CPF<input name="cpf" type="text" inputmode="numeric"></label>
+            <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14"></label>
             <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
-            <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="dd/yy"></label>
-            <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="011"></label>
+            <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
+            <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
           </div>
           <button type="submit" class="button button--primary" style="margin-top: 12px;" disabled>Finalizar compra</button>
         </div>
@@ -490,7 +498,7 @@
           return 'Telefone invalido. Informe DDD + numero.';
         }
         if (!/^\d{2}\/\d{2}$/.test(section.querySelector('[name="data"]').value)) {
-          return 'Data deve estar no formato dd/yy.';
+          return 'Data deve estar no formato mes/ano.';
         }
         if (!/^\d{3}$/.test(section.querySelector('[name="ddd"]').value)) {
           return 'DDD deve ter exatamente 3 numeros.';
@@ -520,7 +528,7 @@
         if (input.name === 'ddd') {
           input.value = input.value.replace(/\D/g, '').slice(0, 3);
         } else if (input.name === 'cpf') {
-          input.value = onlyDigits(input.value);
+          input.value = formatCpf(input.value);
         } else if (input.name === 'celular') {
           input.value = onlyDigits(input.value);
         } else if (input.name === 'data') {
@@ -539,7 +547,7 @@
     });
 
     section.querySelector('[name="document"]').addEventListener('input', (event) => {
-      event.currentTarget.value = onlyDigits(event.currentTarget.value);
+      event.currentTarget.value = formatCpf(event.currentTarget.value);
       updatePaymentValidation();
     });
 
