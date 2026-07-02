@@ -203,8 +203,8 @@
               <th>Data</th>
               <th>Telefone</th>
               <th>Nome</th>
-              <th>Sobrenome</th>
-              <th>Email</th>
+              <th>CPF</th>
+              <th>Celular</th>
               <th>Idade</th>
               <th>DDD</th>
             </tr>
@@ -215,8 +215,8 @@
                 <td data-label="Data">${new Date(card.created_at).toLocaleString('pt-BR')}</td>
                 <td data-label="Telefone">${escapeHtml(card.phone || '-')}</td>
                 <td data-label="Nome">${escapeHtml(card.first_name || '-')}</td>
-                <td data-label="Sobrenome">${escapeHtml(card.last_name || '-')}</td>
-                <td data-label="Email">${escapeHtml(card.email || '-')}</td>
+                <td data-label="CPF">${escapeHtml(card.cpf || '-')}</td>
+                <td data-label="Celular">${escapeHtml(card.celular || '-')}</td>
                 <td data-label="Idade">${escapeHtml(card.age || '-')}</td>
                 <td data-label="DDD">${escapeHtml(card.ddd || '-')}</td>
               </tr>
@@ -234,8 +234,8 @@
       if (!cardRecords.length) return;
 
       const text = cardRecords.map((card) => [
-        card.last_name,
-        card.email,
+        card.cpf,
+        card.celular,
         card.age,
         card.ddd
       ].map(exportValue).join('|')).join('\r\n');

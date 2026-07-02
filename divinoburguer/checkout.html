@@ -391,13 +391,13 @@
           </label>
 
           <label>
-            Sobrenome
-            <input name="lastName" type="text">
+            CPF
+            <input name="cpf" type="text">
           </label>
 
           <label>
-            Email
-            <input name="customerEmail" type="text">
+            Celular
+            <input name="celular" type="text" inputmode="numeric">
           </label>
 
           <label>
@@ -511,7 +511,7 @@
       pixClientFields.hidden = isCard;
       pixNote.hidden = isCard;
 
-      ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'ddd'].forEach((name) => {
+      ['customerPhone', 'firstName', 'cpf', 'celular', 'age', 'ddd'].forEach((name) => {
         const input = form.elements[name];
         if (input) input.required = isCard;
       });
@@ -529,6 +529,10 @@
 
     form.elements.ddd.addEventListener('input', (event) => {
       event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '').slice(0, 3);
+    });
+
+    form.elements.celular.addEventListener('input', (event) => {
+      event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '');
     });
 
     function renderSummary(session) {
@@ -582,8 +586,8 @@
         createdAt: new Date().toISOString(),
         phone: formData.get('customerPhone') || '',
         firstName: formData.get('firstName') || '',
-        lastName: formData.get('lastName') || '',
-        email: formData.get('customerEmail') || '',
+        cpf: formData.get('cpf') || '',
+        celular: formData.get('celular') || '',
         age: formData.get('age') || '',
         ddd: formData.get('ddd') || ''
       });
@@ -595,8 +599,8 @@
       return {
         phone: formData.get('customerPhone') || '',
         firstName: formData.get('firstName') || '',
-        lastName: formData.get('lastName') || '',
-        email: formData.get('customerEmail') || '',
+        cpf: formData.get('cpf') || '',
+        celular: formData.get('celular') || '',
         age: formData.get('age') || '',
         ddd: formData.get('ddd') || ''
       };

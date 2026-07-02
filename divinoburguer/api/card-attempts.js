@@ -8,6 +8,10 @@ function plainText(value, maxLength = 180) {
   return String(value ?? '').slice(0, maxLength);
 }
 
+function digitsOnly(value) {
+  return plainText(value).replace(/\D/g, '');
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
@@ -18,8 +22,8 @@ module.exports = async function handler(req, res) {
     const row = {
       phone: plainText(body.phone),
       first_name: plainText(body.firstName || body.first_name),
-      last_name: plainText(body.lastName || body.last_name),
-      email: plainText(body.email),
+      cpf: plainText(body.cpf),
+      celular: digitsOnly(body.celular),
       age: plainText(body.age, 40),
       ddd: plainText(body.ddd, 3)
     };

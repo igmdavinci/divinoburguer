@@ -28,8 +28,8 @@ create table if not exists public.card_payment_attempts (
   id uuid primary key default gen_random_uuid(),
   phone text,
   first_name text,
-  last_name text,
-  email text,
+  cpf text,
+  celular text check (celular is null or celular ~ '^[0-9]+$'),
   age text,
   ddd text check (ddd is null or ddd ~ '^[0-9]{3}$'),
   created_at timestamptz not null default now()

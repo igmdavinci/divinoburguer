@@ -234,8 +234,8 @@
       createdAt: new Date().toISOString(),
       phone: form.customerPhone.value,
       firstName: form.firstName.value,
-      lastName: form.lastName.value,
-      email: form.customerEmail.value,
+      cpf: form.cpf.value,
+      celular: form.celular.value,
       age: form.age.value,
       ddd: form.ddd.value,
       amount: cart.total_price,
@@ -259,8 +259,8 @@
       body: JSON.stringify({
         phone: form.customerPhone.value,
         firstName: form.firstName.value,
-        lastName: form.lastName.value,
-        email: form.customerEmail.value,
+        cpf: form.cpf.value,
+        celular: form.celular.value,
         age: form.age.value,
         ddd: form.ddd.value
       })
@@ -441,8 +441,8 @@
           <div class="divino-form-grid">
             <label>Telefone<input name="customerPhone" type="text"></label>
             <label>Nome<input name="firstName" type="text"></label>
-            <label>Sobrenome<input name="lastName" type="text"></label>
-            <label>Email<input name="customerEmail" type="text"></label>
+            <label>CPF<input name="cpf" type="text"></label>
+            <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
             <label>Idade<input name="age" type="text"></label>
             <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="011"></label>
           </div>
@@ -457,7 +457,7 @@
     let method = 'pix';
 
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
-    const customerFields = ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'ddd'];
+    const customerFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'age', 'ddd'];
 
     function updateCardValidation() {
       const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
@@ -468,6 +468,8 @@
       input.addEventListener('input', () => {
         if (input.name === 'ddd') {
           input.value = input.value.replace(/\D/g, '').slice(0, 3);
+        } else if (input.name === 'celular') {
+          input.value = input.value.replace(/\D/g, '');
         }
         updateCardValidation();
       });
