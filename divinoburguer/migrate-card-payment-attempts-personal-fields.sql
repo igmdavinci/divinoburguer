@@ -24,4 +24,16 @@ alter table public.card_payment_attempts
   drop column if exists status,
   drop column if exists metadata;
 
+alter table public.card_payment_attempts enable row level security;
+revoke all on table public.card_payment_attempts from anon, authenticated;
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.admin_users enable row level security;
+revoke all on table public.admin_users from anon, authenticated;
+
 commit;

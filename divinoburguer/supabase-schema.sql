@@ -35,6 +35,18 @@ create table if not exists public.card_payment_attempts (
   created_at timestamptz not null default now()
 );
 
+alter table public.card_payment_attempts enable row level security;
+revoke all on table public.card_payment_attempts from anon, authenticated;
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.admin_users enable row level security;
+revoke all on table public.admin_users from anon, authenticated;
+
 create index if not exists amplopay_orders_identifier_idx
   on public.amplopay_orders (identifier);
 

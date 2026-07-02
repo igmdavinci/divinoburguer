@@ -284,5 +284,6 @@ module.exports = {
   requestBaseUrl,
   requiredEnv,
   sendJson,
+  supabaseRequest,
   updateOrderByIdentifier
 };

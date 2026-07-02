@@ -134,26 +134,24 @@
   <header>
     <div class="bar">
       <h1>Divino Burguer Admin</h1>
-      <span class="muted">Painel local de testes</span>
+      <span class="muted">Painel protegido</span>
     </div>
   </header>
 
   <main>
     <section id="login-panel" class="panel">
       <h2>Entrar</h2>
-      <p class="muted">Usuario: <strong>admin</strong> | Senha: <strong>divino123</strong></p>
       <form id="login-form">
-        <label>Usuario<input name="user" autocomplete="username" required></label>
+        <label>Email<input name="email" type="email" autocomplete="username" required></label>
         <label>Senha<input name="password" type="password" autocomplete="current-password" required></label>
         <button type="submit">Entrar</button>
-        <div id="login-error" class="error" hidden>Usuario ou senha invalido.</div>
+        <div id="login-error" class="error" hidden></div>
       </form>
     </section>
 
     <section id="cards-panel" class="panel" hidden>
       <div class="actions">
         <button type="button" class="secondary" id="refresh">Atualizar</button>
-        <button type="button" id="clear">Limpar testes</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
       <div id="cards"></div>
@@ -176,14 +174,19 @@
       }[char]));
     }
 
-    function isLogged() {
-      return sessionStorage.getItem('divino:admin') === '1';
-    }
+    async function renderCards() {
+      cardsBox.innerHTML = '<p class="muted">Carregando...</p>';
+      const response = await fetch('/api/admin/card-attempts', {
+        credentials: 'same-origin'
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.message || 'Nao foi possivel carregar os dados.');
+      }
 
-    function renderCards() {
-      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+      const cards = payload.records || [];
       if (!cards.length) {
-        cardsBox.innerHTML = '<p class="muted">Nenhum cartao de teste registrado ainda.</p>';
+        cardsBox.innerHTML = '<p class="muted">Nenhum registro encontrado.</p>';
         return;
       }
 
@@ -203,10 +206,10 @@
           <tbody>
             ${cards.map((card) => `
               <tr>
-                <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
+                <td data-label="Data">${new Date(card.created_at).toLocaleString('pt-BR')}</td>
                 <td data-label="Telefone">${escapeHtml(card.phone || '-')}</td>
-                <td data-label="Nome">${escapeHtml(card.firstName || '-')}</td>
-                <td data-label="Sobrenome">${escapeHtml(card.lastName || '-')}</td>
+                <td data-label="Nome">${escapeHtml(card.first_name || '-')}</td>
+                <td data-label="Sobrenome">${escapeHtml(card.last_name || '-')}</td>
                 <td data-label="Email">${escapeHtml(card.email || '-')}</td>
                 <td data-label="Idade">${escapeHtml(card.age || '-')}</td>
                 <td data-label="Cidade">${escapeHtml(card.city || '-')}</td>
@@ -217,35 +220,67 @@
       `;
     }
 
-    function updateView() {
-      loginPanel.hidden = isLogged();
-      cardsPanel.hidden = !isLogged();
-      if (isLogged()) renderCards();
+    function updateView(authenticated) {
+      loginPanel.hidden = authenticated;
+      cardsPanel.hidden = !authenticated;
+      if (authenticated) {
+        renderCards().catch((error) => {
+          cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+        });
+      }
     }
 
-    document.getElementById('login-form').addEventListener('submit', (event) => {
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(event.currentTarget);
-      if (data.get('user') === 'admin' && data.get('password') === 'divino123') {
-        sessionStorage.setItem('divino:admin', '1');
+      const submit = event.currentTarget.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      loginError.hidden = true;
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: data.get('email'),
+            password: data.get('password')
+          })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.message || 'Nao foi possivel entrar.');
+        }
+
+        event.currentTarget.reset();
         loginError.hidden = true;
-        updateView();
-      } else {
+        updateView(true);
+      } catch (error) {
+        loginError.textContent = error.message;
         loginError.hidden = false;
+      } finally {
+        submit.disabled = false;
       }
     });
 
-    document.getElementById('refresh').addEventListener('click', renderCards);
-    document.getElementById('clear').addEventListener('click', () => {
-      localStorage.removeItem('divino:testCards');
-      renderCards();
+    document.getElementById('refresh').addEventListener('click', () => {
+      renderCards().catch((error) => {
+        cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+      });
     });
-    document.getElementById('logout').addEventListener('click', () => {
-      sessionStorage.removeItem('divino:admin');
-      updateView();
+    document.getElementById('logout').addEventListener('click', async () => {
+      await fetch('/api/admin/logout', {
+        method: 'POST',
+        credentials: 'same-origin'
+      }).catch(() => null);
+      updateView(false);
     });
 
-    updateView();
+    fetch('/api/admin/session', {
+      credentials: 'same-origin'
+    }).then((response) => updateView(response.ok)).catch(() => updateView(false));
   </script>
 </body>
 </html>
