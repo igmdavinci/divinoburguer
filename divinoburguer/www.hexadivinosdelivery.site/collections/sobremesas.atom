@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="pt-BR" xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:s="http://jadedpixel.com/-/spec/shopify">
+  <id>https://www.hexadivinosdelivery.site/collections/all.atom</id>
+  <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/collections/all"/>
+  <link rel="self" type="application/atom+xml" href="https://www.hexadivinosdelivery.site/collections/sobremesas.atom"/>
+  <title>Divino Burguer</title>
+  <updated>2026-06-08T08:19:01-03:00</updated>
+  <author>
+    <name>Divino Burguer</name>
+  </author>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108399318</id>
+    <published>2026-06-08T08:19:01-03:00</published>
+    <updated>2026-06-08T08:19:01-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/mini-churros-doce-de-leite-3-unidades"/>
+    <title>Mini Churros Doce de Leite 3 Unidades</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/Group_1706.png?v=1780917542"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            6.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108399318</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">6.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375106728150</id>
+    <published>2026-06-08T08:17:13-03:00</published>
+    <updated>2026-06-08T08:17:13-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/brownie-de-chocolate"/>
+    <title>Brownie de Chocolate</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/pngtree-delicious-fudgy-brownie-slice-png-image_14307145.png?v=1780917435"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375106728150</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375106597078</id>
+    <published>2026-06-08T08:17:09-03:00</published>
+    <updated>2026-06-08T08:17:09-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/acai-completo-300ml"/>
+    <title>Açaí Completo 300ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/79b96d1c296265683e3c3f3834cc1527-removebg-preview.png?v=1780917431"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            11.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375106597078</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">11.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+</feed>

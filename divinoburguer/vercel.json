@@ -1,0 +1,97 @@
+{
+  "redirects": [
+    {
+      "source": "/cart",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart/",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart.html",
+      "destination": "/sacola",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/www.hexadivinosdelivery.site/index.html"
+    },
+    {
+      "source": "/sacola",
+      "destination": "/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
+      "source": "/cardapio",
+      "destination": "/www.hexadivinosdelivery.site/collections/all.html"
+    },
+    {
+      "source": "/contato",
+      "destination": "/www.hexadivinosdelivery.site/pages/contact.html"
+    },
+    {
+      "source": "/buscar",
+      "destination": "/www.hexadivinosdelivery.site/search.html"
+    },
+    {
+      "source": "/cart.json",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart.js",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart/add",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/add.js",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/change.js",
+      "destination": "/api/cart/change"
+    },
+    {
+      "source": "/cart/clear.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/cart/clear177b.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/checkout.html",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/pix",
+      "destination": "/pix.html"
+    },
+    {
+      "source": "/pix.html",
+      "destination": "/pix.html"
+    },
+    {
+      "source": "/.well-known/shopify/monorail/v1/produce",
+      "destination": "/api/monorail"
+    }
+  ]
+}

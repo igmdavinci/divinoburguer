@@ -1,0 +1,11 @@
+{
+  "name": "divinoburguer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "vercel deploy --prod"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

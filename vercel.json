@@ -1,0 +1,154 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "divinoburguer/www.hexadivinosdelivery.site/products/**"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/cart",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart/",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart.html",
+      "destination": "/sacola",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/index.html"
+    },
+    {
+      "source": "/sacola",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
+      "source": "/cardapio",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/collections/all.html"
+    },
+    {
+      "source": "/contato",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/pages/contact.html"
+    },
+    {
+      "source": "/buscar",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/search.html"
+    },
+    {
+      "source": "/cdn/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cdn/:path*"
+    },
+    {
+      "source": "/products/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/products/:path*"
+    },
+    {
+      "source": "/collections/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/collections/:path*"
+    },
+    {
+      "source": "/pages/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/pages/:path*"
+    },
+    {
+      "source": "/json/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/json/:path*"
+    },
+    {
+      "source": "/checkouts/:path*",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/checkouts/:path*"
+    },
+    {
+      "source": "/cdn.shopify.com/:path*",
+      "destination": "/divinoburguer/cdn.shopify.com/:path*"
+    },
+    {
+      "source": "/cdnjs.cloudflare.com/:path*",
+      "destination": "/divinoburguer/cdnjs.cloudflare.com/:path*"
+    },
+    {
+      "source": "/ajax.googleapis.com/:path*",
+      "destination": "/divinoburguer/ajax.googleapis.com/:path*"
+    },
+    {
+      "source": "/unpkg.com/:path*",
+      "destination": "/divinoburguer/unpkg.com/:path*"
+    },
+    {
+      "source": "/code.jquery.com/:path*",
+      "destination": "/divinoburguer/code.jquery.com/:path*"
+    },
+    {
+      "source": "/size-charts-relentless.herokuapp.com/:path*",
+      "destination": "/divinoburguer/size-charts-relentless.herokuapp.com/:path*"
+    },
+    {
+      "source": "/cdn.utmify.com.br/:path*",
+      "destination": "/divinoburguer/cdn.utmify.com.br/:path*"
+    },
+    {
+      "source": "/cart.json",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart.js",
+      "destination": "/api/cart"
+    },
+    {
+      "source": "/cart/add",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/add.js",
+      "destination": "/api/cart/add"
+    },
+    {
+      "source": "/cart/change.js",
+      "destination": "/api/cart/change"
+    },
+    {
+      "source": "/cart/clear.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/cart/clear177b.js",
+      "destination": "/api/cart/clear"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/divinoburguer/checkout.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/divinoburguer/admin.html"
+    },
+    {
+      "source": "/admin.html",
+      "destination": "/divinoburguer/admin.html"
+    },
+    {
+      "source": "/checkout.html",
+      "destination": "/divinoburguer/checkout.html"
+    },
+    {
+      "source": "/pix",
+      "destination": "/divinoburguer/pix.html"
+    },
+    {
+      "source": "/pix.html",
+      "destination": "/divinoburguer/pix.html"
+    },
+    {
+      "source": "/.well-known/shopify/monorail/v1/produce",
+      "destination": "/api/monorail"
+    }
+  ]
+}

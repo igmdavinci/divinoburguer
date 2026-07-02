@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="pt-BR" xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:s="http://jadedpixel.com/-/spec/shopify">
+  <id>https://www.hexadivinosdelivery.site/collections/all.atom</id>
+  <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/collections/all"/>
+  <link rel="self" type="application/atom+xml" href="https://www.hexadivinosdelivery.site/collections/all.atom"/>
+  <title>Divino Burguer</title>
+  <updated>2026-06-08T08:19:25-03:00</updated>
+  <author>
+    <name>Divino Burguer</name>
+  </author>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108759766</id>
+    <published>2026-06-08T08:19:25-03:00</published>
+    <updated>2026-06-08T08:19:25-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/agua-mineral-500ml"/>
+    <title>Água Mineral 500ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/agua-mineral-Cg6Y9tkG.webp?v=1780917566"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            5.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Água mineral sem gás, garrafa 500ml. Pura e refrescante!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108759766</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">5.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108661462</id>
+    <published>2026-06-08T08:19:21-03:00</published>
+    <updated>2026-06-08T08:19:21-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/suco-natural-de-morango-400-ml"/>
+    <title>Suco Natural de Morango 400 ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/xc0hcwkxcgl94zvjxxiq7g58kvfx.png?v=1780917562"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108661462</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108628694</id>
+    <published>2026-06-08T08:19:18-03:00</published>
+    <updated>2026-06-08T08:19:18-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/suco-natural-de-maracuja-400ml"/>
+    <title>Suco Natural de Maracujá 400ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/images.jpg?v=1780917559"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108628694</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108563158</id>
+    <published>2026-06-08T08:19:15-03:00</published>
+    <updated>2026-06-08T08:19:15-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/suco-natural-de-laranja-400ml"/>
+    <title>Suco Natural de Laranja 400ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/download.jpg?v=1780917556"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108563158</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108530390</id>
+    <published>2026-06-08T08:19:12-03:00</published>
+    <updated>2026-06-08T08:19:12-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/suco-natural-de-abacaxi-400ml"/>
+    <title>Suco Natural de Abacaxi 400ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/458634158_1922085694964184_7340403931686095779_n.jpg?v=1780917553"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108530390</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108497622</id>
+    <published>2026-06-08T08:19:07-03:00</published>
+    <updated>2026-06-08T08:19:07-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/rodizio-em-casa-6x-hamburgueres-500g-de-fritas-500g-nuggets-2x-coca-cola-2l-4-molhos-especiais"/>
+    <title>RODÍZIO EM CASA - 6x Hambúrgueres + 500g de Fritas + 500g Nuggets + 2X Coca-Cola 2L + 4 Molhos Especiais</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_06_06.png?v=1780917548"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            69.80
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>2x Classic Costela, 2x Classic Cheddar, 1x Classic Salada, 1x Classic Smash</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108497622</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">69.80</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108399318</id>
+    <published>2026-06-08T08:19:01-03:00</published>
+    <updated>2026-06-08T08:19:01-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/mini-churros-doce-de-leite-3-unidades"/>
+    <title>Mini Churros Doce de Leite 3 Unidades</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/Group_1706.png?v=1780917542"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            6.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108399318</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">6.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108366550</id>
+    <published>2026-06-08T08:18:58-03:00</published>
+    <updated>2026-06-08T08:18:58-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/heineken-lata-350ml"/>
+    <title>Heineken Lata 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/download.webp?v=1780917539"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Cerveja Heineken puro malte lata 350ml. Qualidade premium holandesa desde 1873.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108366550</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108333782</id>
+    <published>2026-06-08T08:18:55-03:00</published>
+    <updated>2026-06-08T08:18:55-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/guarana-antarctica-350ml"/>
+    <title>Guaraná Antarctica 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/guarana-lata-Bt2qG9Kf.webp?v=1780917536"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Refrigerante Guaraná Antarctica lata gelada 350ml. O original do Brasil!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108333782</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108268246</id>
+    <published>2026-06-08T08:18:50-03:00</published>
+    <updated>2026-06-08T08:18:50-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/fanta-laranja-350ml"/>
+    <title>Fanta Laranja 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/fanta-lata-YtswgwWr.webp?v=1780917531"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Refrigerante Fanta Laranja lata gelada 350ml. Sabor refrescante!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108268246</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108169942</id>
+    <published>2026-06-08T08:18:43-03:00</published>
+    <updated>2026-06-08T08:18:43-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-classic-cheddar-1-coca-cola-fritas"/>
+    <title>Combo Classic Cheddar + 1 Coca-Cola + Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_11_11.png?v=1780917525"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            19.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Hamburguer 200g, Creme de Cheddar, Bacon, Catupiry, Cebola Caramelizada, Pão Australiano com Gergelim.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108169942</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">19.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108071638</id>
+    <published>2026-06-08T08:18:36-03:00</published>
+    <updated>2026-06-08T08:18:36-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/coca-cola-sem-acucar-350ml"/>
+    <title>Coca-Cola Sem Açúcar 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/coca-zero-zxvpqvGl.webp?v=1780917517"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Coca-Cola Sem Açúcar lata gelada 350ml. Deliciosa e refrescante!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108071638</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375108038870</id>
+    <published>2026-06-08T08:18:34-03:00</published>
+    <updated>2026-06-08T08:18:34-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/coca-cola-sem-acucar-2-litros"/>
+    <title>Coca-Cola Sem Açúcar 2 Litros</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/coca-2l-zero-BKrPPENe.webp?v=1780917515"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            12.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Garrafa PET 2L de Coca-Cola Sem Açúcar. Todo o sabor, zero açúcar!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375108038870</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">12.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107940566</id>
+    <published>2026-06-08T08:18:29-03:00</published>
+    <updated>2026-06-08T08:18:29-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/coca-cola-original-350ml"/>
+    <title>Coca-Cola Original 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/coca-cola-CLxVEwGb.jpg?v=1780917510"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Refrigerante Coca-Cola lata gelada 350ml. A original!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107940566</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107907798</id>
+    <published>2026-06-08T08:18:26-03:00</published>
+    <updated>2026-06-08T08:18:26-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/coca-cola-original-2-litros"/>
+    <title>Coca-Cola Original 2 Litros</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/coca-2l-tVVBD8F8.webp?v=1780917507"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            12.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Garrafa PET 2L do refrigerante mais famoso do mundo. Ideal para compartilhar!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107907798</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">12.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107875030</id>
+    <published>2026-06-08T08:18:19-03:00</published>
+    <updated>2026-06-08T08:18:19-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/classic-smash-burguer-coca-cola-fritas"/>
+    <title>Classic Smash Burguer + Coca-Cola + Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_07_04.png?v=1780917500"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            17.80
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span class="detalhe">2x Smash Burguer 100g (cada), Molho Cheddar, Cebola Picada, Bacon, Maionese temperada, Pão de Brioche com Gergelim.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107875030</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">17.80</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107776726</id>
+    <published>2026-06-08T08:18:13-03:00</published>
+    <updated>2026-06-08T08:18:13-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/rodizio-em-casa-6x-hamburgueres-500g-de-fritas-500g-nuggets-2x-coca-cola-2l-4-molhos-especiais-1"/>
+    <title>COMBO de Fritas + Frango Frito + Nuggets</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_08_15.png?v=1780917494"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            69.80
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>350g de nossas deliciosas Batatas Fritas (escolha sua preferida) + 8 Suculentos Frangos Frito + 15 Nuggets quentinhos! Acompanhados de 2X Coca-Cola para o COMBO PERFEITO!</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107776726</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">69.80</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107678422</id>
+    <published>2026-06-08T08:18:06-03:00</published>
+    <updated>2026-06-08T08:18:06-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-trio-smash-3x-classic-smash-burguer-500g-fritas-coca-cola-2l"/>
+    <title>COMBO Trio Smash - 3X Classic Smash Burguer + 500g Fritas + Coca-Cola 2L</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_09_35.png?v=1780917487"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            37.80
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>3x Smash Burguer 100g (cada), Molho Cheddar, Cebola Picada, Bacon, Maionese temperada, Pão de Brioche com Gergelim.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107678422</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">37.80</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107580118</id>
+    <published>2026-06-08T08:17:59-03:00</published>
+    <updated>2026-06-08T08:17:59-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-solteiro-1x-classic-chicken-cheese-coca-cola-500g-fritas-500g-de-frango-frito"/>
+    <title>COMBO Solteiro - 1X Classic Chicken Cheese + Coca-Cola + 500g Fritas + 500g de Frango Frito</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_15_17.png?v=1780917480"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            27.80
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Deliciosa Sobrecoxa de Frango empanada 200g, Bacon, Maionese temperada, Alface, Pão de Brioche.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107580118</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">27.80</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107481814</id>
+    <published>2026-06-08T08:17:51-03:00</published>
+    <updated>2026-06-08T08:17:51-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-familia-5-lanches-5x-coca-cola-5x-fritas"/>
+    <title>COMBO Família 5 Lanches + 5X Coca-Cola + 5X Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_22_57_02.png?v=1780917472"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            57.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>2x Classic Costela, 2x Classic Salada, 1x Classic Melt. Todos lanches acompanham bebida e fritas!</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107481814</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">57.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107350742</id>
+    <published>2026-06-08T08:17:44-03:00</published>
+    <updated>2026-06-08T08:17:44-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-costela-classic-coca-cola-fritas"/>
+    <title>COMBO Costela Classic + Coca-Cola + Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_01_22.png?v=1780917465"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            39.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Hamburguer 200g, Costela Desfiado, Molho Cheddar, Maionese da Casa, Pão de Brioche.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107350742</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">39.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107317974</id>
+    <published>2026-06-08T08:17:39-03:00</published>
+    <updated>2026-06-08T08:17:39-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-classic-onion-rings-coca-cola-fritas"/>
+    <title>COMBO Classic Onion Rings + Coca-Cola + Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_05_04.png?v=1780917461"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            29.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Hamburguer 200g, Molho Barbecue, Queijo mussarela, Onion Rings, Pão de Brioche.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107317974</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">29.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375107186902</id>
+    <published>2026-06-08T08:17:33-03:00</published>
+    <updated>2026-06-08T08:17:33-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/combo-classic-chicken-coca-cola-fritas"/>
+    <title>COMBO Classic Chicken + Coca-Cola + Fritas</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/ChatGPTImage28demai.de2026_23_00_02.png?v=1780917454"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            19.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Deliciosa Sobrecoxa de Frango empanada 200g, Bacon, Maionese temperada, Alface, Pão de Brioche.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375107186902</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">19.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375106990294</id>
+    <published>2026-06-08T08:17:27-03:00</published>
+    <updated>2026-06-08T08:17:27-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/budweiser-lata-350ml"/>
+    <title>Budweiser Lata 350ml</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/budweiser-lata-uI1BBVa5.webp?v=1780917448"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            6.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p><span>Cerveja Budweiser American Lager lata 350ml. The King of Beers, receita original desde 1876.</span></p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375106990294</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">6.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://www.hexadivinosdelivery.site/products/9375106728150</id>
+    <published>2026-06-08T08:17:13-03:00</published>
+    <updated>2026-06-08T08:17:13-03:00</updated>
+    <link rel="alternate" type="text/html" href="https://www.hexadivinosdelivery.site/products/brownie-de-chocolate"/>
+    <title>Brownie de Chocolate</title>
+    <s:type></s:type>
+    <s:vendor>Meltz Burguer</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0824/8977/0198/files/pngtree-delicious-fudgy-brownie-slice-png-image_14307145.png?v=1780917435"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Fornecedor: </strong>Meltz Burguer<br>
+        <strong>Tipo: </strong><br>
+        <strong>Preço: </strong>
+            7.90
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:variant>
+      <id>https://www.hexadivinosdelivery.site/products/9375106728150</id>
+      <title>Default Title</title>
+      <s:price currency="BRL">7.90</s:price>
+      <s:sku/>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+</feed>

