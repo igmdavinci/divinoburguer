@@ -4,6 +4,7 @@
     state: 'Espirito Santo'
   };
   const minimumOrderCents = 1500;
+  const deliveryEstimateText = '25-35 min';
   let estimatedLocation = { ...fallbackLocation };
   let estimatedLocationPromise = null;
 
@@ -238,6 +239,12 @@
     return checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10]);
   }
 
+  function isPixApprovedStatus(status) {
+    return ['approved', 'aprovado', 'paid', 'pago', 'confirmed', 'confirmado', 'completed', 'concluido'].includes(
+      String(status || '').trim().toLowerCase()
+    );
+  }
+
   function formatShortDate(value) {
     const digits = onlyDigits(value).slice(0, 4);
     if (digits.length <= 2) return digits;
@@ -439,15 +446,38 @@
       <div class="divino-pix-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="divino-pix-title">
         <button type="button" class="divino-pix-modal__close" data-pix-close aria-label="Fechar">&times;</button>
         <h2 id="divino-pix-title">Pix gerado</h2>
-        <p>Escaneie o QR Code ou copie o codigo Pix abaixo.</p>
-        <div class="divino-pix-modal__qr">
+        <p data-pix-instructions>Escaneie o QR Code ou copie o codigo Pix abaixo.</p>
+        <div class="divino-pix-modal__qr" data-pix-content>
           ${qrImage ? `<img alt="QR Code Pix" src="${qrImage}">` : '<span>Use o Pix copia e cola abaixo.</span>'}
         </div>
-        <textarea readonly>${escapeHtml(code)}</textarea>
+        <textarea readonly data-pix-code>${escapeHtml(code)}</textarea>
         <button type="button" class="button button--primary" id="divino-copy-pix">Copiar codigo</button>
+        <button type="button" class="button button--primary divino-pix-test" id="divino-test-pix-approved">Testar pedido confirmado</button>
       </div>
     `;
     showModal(modal);
+
+    const showPixConfirmed = () => {
+      const title = modal.querySelector('#divino-pix-title');
+      const instructions = modal.querySelector('[data-pix-instructions]');
+      const content = modal.querySelector('[data-pix-content]');
+      const textarea = modal.querySelector('[data-pix-code]');
+      const copy = modal.querySelector('#divino-copy-pix');
+      const testButton = modal.querySelector('#divino-test-pix-approved');
+
+      if (title) title.textContent = 'Pedido confirmado';
+      if (instructions) instructions.textContent = '';
+      if (content) {
+        content.classList.add('divino-pix-modal__confirmed');
+        content.innerHTML = `
+          <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
+          <span>Previsão de entrega: ${deliveryEstimateText}</span>
+        `;
+      }
+      if (textarea) textarea.hidden = true;
+      if (copy) copy.hidden = true;
+      if (testButton) testButton.hidden = true;
+    };
 
     modal.querySelectorAll('[data-pix-close]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -464,6 +494,35 @@
         setButtonCopied(modal.querySelector('#divino-copy-pix'));
       }
     });
+    modal.querySelector('#divino-test-pix-approved').addEventListener('click', showPixConfirmed);
+
+    const transactionId = payload.transactionId || payload.id || '';
+    const identifier = payload.identifier || payload.clientIdentifier || '';
+    if (transactionId || identifier) {
+      const query = new URLSearchParams();
+      if (transactionId) query.set('id', transactionId);
+      if (identifier) query.set('clientIdentifier', identifier);
+      let attempts = 0;
+      const pollStatus = async () => {
+        attempts += 1;
+        try {
+          const response = await fetch(`/api/pix/status?${query.toString()}`, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' }
+          });
+          const statusPayload = await response.json().catch(() => ({}));
+          if (response.ok && isPixApprovedStatus(statusPayload.status)) {
+            showPixConfirmed();
+            return;
+          }
+        } catch {}
+
+        if (!modal.hidden && attempts < 40) {
+          window.setTimeout(pollStatus, 15000);
+        }
+      };
+      window.setTimeout(pollStatus, 15000);
+    }
   }
 
   function renderCheckoutSection(cart) {
@@ -490,7 +549,7 @@
               <label>Nome completo<input name="name" autocomplete="name" required></label>
               <label>Email<input name="email" type="email" autocomplete="email" required></label>
               <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required></label>
+              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
             </div>
             <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
             <button type="submit" class="button button--primary">Gerar Pix</button>
@@ -499,12 +558,12 @@
             <div class="divino-form-grid">
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
               <label>Nome completo<input name="firstName" type="text"></label>
-              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>
+              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
               <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
               <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
               <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
             </div>
-            <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar compra</button>
+            <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar pedido</button>
           </div>
           <div id="divino-payment-message" class="divino-cart-error" hidden></div>
         </form>
@@ -570,12 +629,23 @@
       paymentMessage.hidden = true;
     }
 
+    function updateCpfFeedback(input) {
+      const digits = onlyDigits(input.value);
+      const error = section.querySelector(`[data-cpf-error="${input.name}"]`);
+      const invalid = digits.length === 11 && !isValidCpf(input.value);
+
+      input.classList.toggle('is-invalid', invalid);
+      if (error) error.textContent = invalid ? 'CPF invalido.' : '';
+      return invalid;
+    }
+
     section.querySelectorAll('[data-payment-panel="card"] input').forEach((input) => {
       input.addEventListener('input', () => {
         if (input.name === 'ddd') {
           input.value = input.value.replace(/\D/g, '').slice(0, 3);
         } else if (input.name === 'cpf') {
           input.value = formatCpf(input.value);
+          updateCpfFeedback(input);
         } else if (input.name === 'celular') {
           input.value = onlyDigits(input.value);
         } else if (input.name === 'data') {
@@ -594,6 +664,7 @@
 
     section.querySelector('[name="document"]').addEventListener('input', (event) => {
       event.currentTarget.value = formatCpf(event.currentTarget.value);
+      updateCpfFeedback(event.currentTarget);
       clearValidationMessage();
     });
 
@@ -683,7 +754,7 @@
         message.hidden = false;
       } finally {
         submit.disabled = false;
-        submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar compra';
+        submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar pedido';
       }
     });
 
@@ -738,7 +809,7 @@
             </div>
           ` : ''}
           <div id="divino-cart-error" class="divino-cart-error" hidden></div>
-          <button type="button" id="divino-checkout-button" class="button button--primary" style="margin-top: 12px;" ${cart.total_price < minimumOrderCents ? 'disabled' : ''}>Finalizar compra</button>
+          <button type="button" id="divino-checkout-button" class="button button--primary" style="margin-top: 12px;" ${cart.total_price < minimumOrderCents ? 'disabled' : ''}>Finalizar pedido</button>
         </div>
       `;
 
@@ -842,7 +913,7 @@
           <tbody>
             <tr>
               <td><strong>Motoboy</strong></td>
-              <td><i class="fa-solid fa-motorcycle"></i> <b>25-35</b> min</td>
+              <td><i class="fa-solid fa-motorcycle"></i> <b>${deliveryEstimateText.replace(' min', '')}</b> min</td>
               <td><strong style="color: var(--frete-buscar-precos);">Gratis</strong></td>
             </tr>
           </tbody>

@@ -367,6 +367,7 @@
           <label>
             CPF
             <input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required>
+            <span class="field-error" data-cpf-error="document"></span>
           </label>
         </div>
 
@@ -397,6 +398,7 @@
           <label>
             CPF
             <input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+            <span class="field-error" data-cpf-error="cpf"></span>
           </label>
 
           <label>
@@ -517,6 +519,16 @@
       return selected ? selected.value : 'pix';
     }
 
+    function updateCpfFeedback(input) {
+      const digits = onlyDigits(input.value);
+      const error = form.querySelector(`[data-cpf-error="${input.name}"]`);
+      const invalid = digits.length === 11 && !isValidCpf(input.value);
+
+      input.classList.toggle('invalid', invalid);
+      if (error) error.textContent = invalid ? 'CPF invalido.' : '';
+      return invalid;
+    }
+
     function setMessage(text, isError) {
       message.textContent = text || '';
       message.classList.toggle('error', Boolean(isError));
@@ -612,7 +624,7 @@
 
     function updateSubmitButton() {
       const method = selectedPaymentMethod();
-      submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
+      submitButton.textContent = method === 'card' ? 'Finalizar pedido' : 'Gerar Pix';
       submitButton.disabled = checkoutBlocked;
     }
 
@@ -622,6 +634,7 @@
 
     form.elements.cpf.addEventListener('input', (event) => {
       event.currentTarget.value = formatCpf(event.currentTarget.value);
+      updateCpfFeedback(event.currentTarget);
     });
 
     form.elements.celular.addEventListener('input', (event) => {
@@ -642,6 +655,7 @@
 
     form.elements.document.addEventListener('input', (event) => {
       event.currentTarget.value = formatCpf(event.currentTarget.value);
+      updateCpfFeedback(event.currentTarget);
     });
 
     function renderSummary(session) {
