@@ -18,6 +18,10 @@
       "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
     },
     {
+      "source": "/cart.html",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
       "source": "/cdn/:path*",
       "destination": "/divinoburguer/www.hexadivinosdelivery.site/cdn/:path*"
     },

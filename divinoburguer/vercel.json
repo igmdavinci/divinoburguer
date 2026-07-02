@@ -9,6 +9,14 @@
       "destination": "/www.hexadivinosdelivery.site/cart.html"
     },
     {
+      "source": "/cart/",
+      "destination": "/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
+      "source": "/cart.html",
+      "destination": "/www.hexadivinosdelivery.site/cart.html"
+    },
+    {
       "source": "/cart.json",
       "destination": "/api/cart"
     },

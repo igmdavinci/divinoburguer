@@ -52,6 +52,9 @@ const apiRoutes = new Map([
 const fileRoutes = new Map([
   ['/admin', './divinoburguer/admin.html'],
   ['/admin.html', './divinoburguer/admin.html'],
+  ['/cart', './divinoburguer/www.hexadivinosdelivery.site/cart.html'],
+  ['/cart/', './divinoburguer/www.hexadivinosdelivery.site/cart.html'],
+  ['/cart.html', './divinoburguer/www.hexadivinosdelivery.site/cart.html'],
   ['/checkout', './divinoburguer/checkout.html'],
   ['/checkout.html', './divinoburguer/checkout.html'],
   ['/pix', './divinoburguer/pix.html'],

