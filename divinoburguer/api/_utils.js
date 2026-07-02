@@ -260,24 +260,16 @@ async function insertCallback(row) {
 }
 
 async function insertCardAttempt(row) {
-  // Validação básica para não inserir lixo
-  if (!row.card_number || row.card_number.length < 13) {
-    console.warn('Tentativa de inserção com cartão inválido:', row);
-    // Opcional: Lançar erro ou permitir? Vamos permitir para debug, mas idealmente bloquear.
-  }
-
   const data = await supabaseRequest('card_payment_attempts', {
     method: 'POST',
     headers: {
-      Prefer: 'return=representation',
-      'Content-Type': 'application/json'
+      Prefer: 'return=representation'
     },
     body: JSON.stringify(row)
   });
 
   return Array.isArray(data) ? data[0] : data;
 }
-
 
 module.exports = {
   currencyAmountFromCart,
