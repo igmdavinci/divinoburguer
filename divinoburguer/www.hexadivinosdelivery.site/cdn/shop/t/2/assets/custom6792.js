@@ -490,7 +490,7 @@
               <label>Nome completo<input name="name" autocomplete="name" required></label>
               <label>Email<input name="email" type="email" autocomplete="email" required></label>
               <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" required></label>
+              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required></label>
             </div>
             <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
             <button type="submit" class="button button--primary">Gerar Pix</button>
@@ -499,7 +499,7 @@
             <div class="divino-form-grid">
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
               <label>Nome completo<input name="firstName" type="text"></label>
-              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14"></label>
+              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></label>
               <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
               <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
               <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
