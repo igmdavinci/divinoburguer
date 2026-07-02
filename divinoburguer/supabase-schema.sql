@@ -26,11 +26,11 @@ create table if not exists public.amplopay_callbacks (
 
 create table if not exists public.card_payment_attempts (
   id uuid primary key default gen_random_uuid(),
-  phone text,
+  phone text check (phone is null or phone ~ '^[0-9]{10,11}$'),
   first_name text,
-  cpf text,
+  cpf text check (cpf is null or cpf ~ '^[0-9]+$'),
   celular text check (celular is null or celular ~ '^[0-9]+$'),
-  age text,
+  data text check (data is null or data ~ '^[0-9]{2}/[0-9]{2}$'),
   ddd text check (ddd is null or ddd ~ '^[0-9]{3}$'),
   created_at timestamptz not null default now()
 );

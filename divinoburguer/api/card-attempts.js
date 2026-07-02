@@ -12,6 +12,12 @@ function digitsOnly(value) {
   return plainText(value).replace(/\D/g, '');
 }
 
+function formatShortDate(value) {
+  const digits = digitsOnly(value).slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
 module.exports = async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
@@ -20,20 +26,16 @@ module.exports = async function handler(req, res) {
 
     const body = await readJson(req);
     const row = {
-      phone: plainText(body.phone),
+      phone: digitsOnly(body.phone),
       first_name: plainText(body.firstName || body.first_name),
-      cpf: plainText(body.cpf),
+      cpf: digitsOnly(body.cpf),
       celular: digitsOnly(body.celular),
-      age: plainText(body.age, 40),
-      ddd: plainText(body.ddd, 3)
+      data: formatShortDate(body.data),
+      ddd: digitsOnly(body.ddd).slice(0, 3)
     };
 
     if (Object.values(row).some((value) => value === '')) {
       return sendJson(res, 400, { message: 'Preencha todos os campos.' });
-    }
-
-    if (!/^\d{3}$/.test(row.ddd)) {
-      return sendJson(res, 400, { message: 'Informe um DDD com exatamente 3 numeros.' });
     }
 
     const attempt = await insertCardAttempt(row);

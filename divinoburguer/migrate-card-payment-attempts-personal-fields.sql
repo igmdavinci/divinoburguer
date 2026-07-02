@@ -2,8 +2,7 @@ begin;
 
 alter table public.card_payment_attempts
   add column if not exists phone text,
-  add column if not exists first_name text,
-  add column if not exists age text;
+  add column if not exists first_name text;
 
 do $$
 begin
@@ -55,10 +54,70 @@ update public.card_payment_attempts
 set celular = nullif(regexp_replace(celular, '[^0-9]', '', 'g'), '')
 where celular is not null;
 
+update public.card_payment_attempts
+set phone = nullif(regexp_replace(phone, '[^0-9]', '', 'g'), '')
+where phone is not null;
+
+update public.card_payment_attempts
+set phone = null
+where phone is not null
+  and phone !~ '^[0-9]{10,11}$';
+
+update public.card_payment_attempts
+set cpf = nullif(regexp_replace(cpf, '[^0-9]', '', 'g'), '')
+where cpf is not null;
+
 alter table public.card_payment_attempts
+  drop constraint if exists card_payment_attempts_phone_digits,
+  add constraint card_payment_attempts_phone_digits
+    check (phone is null or phone ~ '^[0-9]{10,11}$'),
+  drop constraint if exists card_payment_attempts_cpf_digits,
+  add constraint card_payment_attempts_cpf_digits
+    check (cpf is null or cpf ~ '^[0-9]+$'),
   drop constraint if exists card_payment_attempts_celular_digits,
   add constraint card_payment_attempts_celular_digits
     check (celular is null or celular ~ '^[0-9]+$');
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'card_payment_attempts'
+      and column_name = 'age'
+  ) then
+    if exists (
+      select 1
+      from information_schema.columns
+      where table_schema = 'public'
+        and table_name = 'card_payment_attempts'
+        and column_name = 'data'
+    ) then
+      execute 'update public.card_payment_attempts set data = coalesce(data, age)';
+      execute 'alter table public.card_payment_attempts drop column age';
+    else
+      execute 'alter table public.card_payment_attempts rename column age to data';
+    end if;
+  end if;
+end
+$$;
+
+alter table public.card_payment_attempts
+  add column if not exists data text;
+
+update public.card_payment_attempts
+set data = case
+  when regexp_replace(data, '[^0-9]', '', 'g') ~ '^[0-9]{4}$'
+    then substring(regexp_replace(data, '[^0-9]', '', 'g') from 1 for 2) || '/' || substring(regexp_replace(data, '[^0-9]', '', 'g') from 3 for 2)
+  else null
+end
+where data is not null;
+
+alter table public.card_payment_attempts
+  drop constraint if exists card_payment_attempts_data_format,
+  add constraint card_payment_attempts_data_format
+    check (data is null or data ~ '^[0-9]{2}/[0-9]{2}$');
 
 do $$
 begin

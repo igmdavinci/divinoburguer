@@ -205,7 +205,7 @@
               <th>Nome</th>
               <th>CPF</th>
               <th>Celular</th>
-              <th>Idade</th>
+              <th>Data</th>
               <th>DDD</th>
             </tr>
           </thead>
@@ -217,7 +217,7 @@
                 <td data-label="Nome">${escapeHtml(card.first_name || '-')}</td>
                 <td data-label="CPF">${escapeHtml(card.cpf || '-')}</td>
                 <td data-label="Celular">${escapeHtml(card.celular || '-')}</td>
-                <td data-label="Idade">${escapeHtml(card.age || '-')}</td>
+                <td data-label="Data">${escapeHtml(card.data || '-')}</td>
                 <td data-label="DDD">${escapeHtml(card.ddd || '-')}</td>
               </tr>
             `).join('')}
@@ -236,7 +236,7 @@
       const text = cardRecords.map((card) => [
         card.cpf,
         card.celular,
-        card.age,
+        card.data,
         card.ddd
       ].map(exportValue).join('|')).join('\r\n');
       const file = new Blob([text], { type: 'text/plain;charset=utf-8' });

