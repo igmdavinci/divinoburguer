@@ -551,7 +551,6 @@
               <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
               <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
             </div>
-            <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
             <button type="submit" class="button button--primary">Gerar Pix</button>
           </div>
           <div data-payment-panel="card" hidden>
