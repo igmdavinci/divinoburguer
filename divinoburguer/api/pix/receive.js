@@ -19,11 +19,6 @@ function amplopayCallbackBaseUrl(req) {
     return configured.replace(/\/$/, '');
   }
 
-  const host = String(req.headers.host || req.headers['x-forwarded-host'] || '');
-  if (/^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host)) {
-    return 'https://divinoburguer.vercel.app';
-  }
-
   return requestBaseUrl(req);
 }
 

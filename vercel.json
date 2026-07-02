@@ -4,22 +4,43 @@
       "includeFiles": "divinoburguer/www.hexadivinosdelivery.site/products/**"
     }
   },
+  "redirects": [
+    {
+      "source": "/cart",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart/",
+      "destination": "/sacola",
+      "permanent": true
+    },
+    {
+      "source": "/cart.html",
+      "destination": "/sacola",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
       "destination": "/divinoburguer/www.hexadivinosdelivery.site/index.html"
     },
     {
-      "source": "/cart",
+      "source": "/sacola",
       "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
     },
     {
-      "source": "/cart/",
-      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
+      "source": "/cardapio",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/collections/all.html"
     },
     {
-      "source": "/cart.html",
-      "destination": "/divinoburguer/www.hexadivinosdelivery.site/cart.html"
+      "source": "/contato",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/pages/contact.html"
+    },
+    {
+      "source": "/buscar",
+      "destination": "/divinoburguer/www.hexadivinosdelivery.site/search.html"
     },
     {
       "source": "/cdn/:path*",

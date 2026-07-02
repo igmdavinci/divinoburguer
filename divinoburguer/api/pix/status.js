@@ -1,6 +1,7 @@
 const {
   getOrderByIdentifier,
   readJson,
+  requestBaseUrl,
   requiredEnv,
   sendJson,
   updateOrderByIdentifier
@@ -26,7 +27,7 @@ module.exports = async function handler(req, res) {
       return sendJson(res, 405, { message: 'Metodo nao permitido.' });
     }
 
-    const url = new URL(req.url, `https://${req.headers.host || 'localhost'}`);
+    const url = new URL(req.url, requestBaseUrl(req));
     const id = url.searchParams.get('id') || url.searchParams.get('transactionId');
     const clientIdentifier = url.searchParams.get('clientIdentifier') || url.searchParams.get('identifier');
 

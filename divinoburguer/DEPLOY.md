@@ -34,14 +34,3 @@ Nao use `SUPABASE_SERVICE_ROLE_KEY` no frontend. Ela deve ficar somente nas vari
 4. `/api/pix/receive` cria o Pix na AmploPay.
 5. `/pix.html` mostra QR Code e copia e cola.
 6. A AmploPay chama `/api/pix/callback` quando houver atualizacao.
-
-## Teste local
-
-Com a Vercel CLI instalada:
-
-```bash
-npm install -g vercel
-vercel dev
-```
-
-Depois abra `http://localhost:3000`.

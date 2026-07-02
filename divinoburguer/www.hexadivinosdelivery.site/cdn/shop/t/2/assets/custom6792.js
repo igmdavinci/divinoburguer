@@ -26,6 +26,36 @@
     });
   }
 
+  function normalizePublicLinks() {
+    const publicRoutes = new Map([
+      ['/index.html', '/'],
+      ['/cart', '/sacola'],
+      ['/cart/', '/sacola'],
+      ['/cart.html', '/sacola'],
+      ['/collections/all.html', '/cardapio'],
+      ['/pages/contact.html', '/contato'],
+      ['/search.html', '/buscar'],
+      ['/divinoburguer/www.hexadivinosdelivery.site/collections/all.html', '/cardapio']
+    ]);
+
+    document.querySelectorAll('a[href]').forEach((link) => {
+      const rawHref = link.getAttribute('href');
+      if (!rawHref || rawHref.startsWith('#')) return;
+
+      try {
+        const url = new URL(rawHref, window.location.href);
+        if (url.origin !== window.location.origin) return;
+
+        const route = publicRoutes.get(url.pathname);
+        if (route) {
+          link.setAttribute('href', `${route}${url.search}${url.hash}`);
+        }
+      } catch {
+        // Keep malformed or third-party links unchanged.
+      }
+    });
+  }
+
   function ensureToastRoot() {
     let root = document.getElementById('divino-toast-root');
     if (root) return root;
@@ -98,7 +128,7 @@
       count.textContent = String(payload.item_count || 0);
     });
     showToast('Produto adicionado a sacola.', {
-      href: '/cart',
+      href: '/sacola',
       label: 'Ir para sacola'
     });
   }
@@ -538,7 +568,8 @@
   }
 
   async function renderLocalCart() {
-    if (!window.location.pathname.endsWith('/cart') && !window.location.pathname.endsWith('/cart.html')) return;
+    const cartPaths = ['/sacola', '/cart', '/cart/', '/cart.html'];
+    if (!cartPaths.includes(window.location.pathname)) return;
 
     const main = document.querySelector('#shopify-section-template--22109436444886__main .container');
     if (!main) return;
@@ -555,7 +586,7 @@
             <h1 class="heading h1">Carrinho</h1>
             <p class="text--large">Seu carrinho esta vazio</p>
             <div class="button-wrapper">
-              <a href="/divinoburguer/www.hexadivinosdelivery.site/collections/all.html" class="button button--primary">Comece a comprar</a>
+              <a href="/cardapio" class="button button--primary">Comece a comprar</a>
             </div>
           </div>
         `;
@@ -713,6 +744,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    normalizePublicLinks();
     normalizeCartAddForms();
     renderLocalCart();
     setupFixedShipping();
