@@ -436,7 +436,6 @@
             <label>Validade<input name="cardExpiry" inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp"></label>
             <label>CVV<input name="cardCvv" inputmode="numeric" autocomplete="cc-csc"></label>
           </div>
-          <p class="divino-checkout-note">Modo teste: validamos Luhn e salvamos somente dados mascarados no admin.</p>
           <button type="submit" class="button button--primary" disabled>Finalizar compra</button>
         </div>
         <div id="divino-payment-message" class="divino-cart-error" hidden></div>
