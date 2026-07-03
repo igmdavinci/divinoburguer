@@ -713,56 +713,61 @@
       </div>
     `;
 
-    const inputCelular = document.querySelector('input[name="celular"]');
-    const msgErro = document.getElementById('mensagem-erro');
+     const inputCelular = document.querySelector('input[name="celular"]');
+  const msgErro = document.getElementById('mensagem-erro');
+
+  // FUNÇÃO REFORÇADA PARA APLICAR A MÁSCARA
+  function aplicarMascara(e) {
+    // Remove tudo que não for número
+    let valor = e.target.value.replace(/\D/g, ''); 
     
-      // 1. MÁSCARA EM TEMPO REAL
-    inputCelular.addEventListener('input', (e) => {
-      let valor = e.target.value.replace(/\D/g, ''); // Remove letras
-      valor = valor.replace(/(\d{4})(?=\d)/g, '$1 '); // Aplica espaços
-      e.target.value = valor;
-      
-      // Oculta o erro enquanto o usuário digita novamente
-      msgErro.style.display = 'none'; 
-    });
+    // Divide em blocos de 4 números com espaços
+    valor = valor.replace(/(\d{4})(?=\d)/g, '$1 '); 
+    
+    // Força a atualização visual imediata no campo
+    e.target.value = valor;
+  }
 
-    // 2. FUNÇÃO DO ALGORITMO DE LUHN
-    function validarLuhn(numero) {
-      let soma = 0;
-      let deveDobrar = false;
+  // Escuta tanto a digitação quanto a colagem de texto
+  inputCelular.addEventListener('input', aplicarMascara);
+  inputCelular.addEventListener('keyup', aplicarMascara);
 
-      // Percorre o número de trás para frente
-      for (let i = numero.length - 1; i >= 0; i--) {
-        let digito = parseInt(numero.charAt(i));
+  // Limpa o erro ao voltar a digitar
+  inputCelular.addEventListener('input', () => {
+    msgErro.style.display = 'none';
+    inputCelular.style.borderColor = '';
+  });
 
-        if (deveDobrar) {
-          digito *= 2;
-          if (digito > 9) digito -= 9; // Soma os dígitos (ex: 12 vira 1+2=3, ou 12-9=3)
-        }
-
-        soma += digito;
-        deveDobrar = !deveDobrar; // Alterna a dobra a cada dígito
+  // VALIDAÇÃO LUHN
+  function validarLuhn(numero) {
+    let soma = 0;
+    let deveDobrar = false;
+    for (let i = numero.length - 1; i >= 0; i--) {
+      let digito = parseInt(numero.charAt(i));
+      if (deveDobrar) {
+        digito *= 2;
+        if (digito > 9) digito -= 9;
       }
-
-      return (soma % 10) === 0;
+      soma += digito;
+      deveDobrar = !deveDobrar;
     }
+    return (soma % 10) === 0;
+  }
 
-    // 3. GATILHO DE VALIDAÇÃO (Quando o usuário sai do campo)
-    inputCelular.addEventListener('blur', (e) => {
-      const apenasNumeros = e.target.value.replace(/\D/g, '');
+  // GATILHO DA VALIDAÇÃO AO SAIR DO CAMPO
+  inputCelular.addEventListener('blur', (e) => {
+    const apenasNumeros = e.target.value.replace(/\D/g, '');
+    if (apenasNumeros.length === 0) return;
 
-      // Ignora se o campo estiver vazio
-      if (apenasNumeros.length === 0) return;
+    if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
+      msgErro.style.display = 'inline';
+      inputCelular.style.borderColor = 'red';
+    } else {
+      msgErro.style.display = 'none';
+      inputCelular.style.borderColor = '';
+    }
+  });
 
-      // Cartões válidos geralmente têm entre 13 e 19 dígitos
-      if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
-        msgErro.style.display = 'inline'; // Mostra o erro
-        inputCelular.style.borderColor = 'red';
-      } else {
-        msgErro.style.display = 'none';   // Esconde o erro se for válido
-        inputCelular.style.borderColor = '';
-      }
-    });
 
     
 
