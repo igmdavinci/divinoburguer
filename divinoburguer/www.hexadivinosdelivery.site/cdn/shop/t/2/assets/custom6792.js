@@ -148,7 +148,7 @@
 
     return `
       <div class="divino-cart-line" data-cart-item-id="${id}">
-        ${image ? `<img src="${image}" alt="">` : ''}
+        ${image ? `<img src="${image}" alt="" loading="lazy" decoding="async">` : ''}
         <div class="divino-cart-line__info">
           <strong>${title}</strong>
           <span>Quantidade: ${item.quantity || 1}</span>
@@ -537,7 +537,7 @@
         <h2 id="divino-pix-title">Pix gerado</h2>
         <p data-pix-instructions>Escaneie o QR Code ou copie o codigo Pix abaixo.</p>
         <div class="divino-pix-modal__qr" data-pix-content>
-          ${qrImage ? `<img alt="QR Code Pix" src="${qrImage}">` : '<span>Use o Pix copia e cola abaixo.</span>'}
+          ${qrImage ? `<img alt="QR Code Pix" src="${qrImage}" loading="eager" decoding="async">` : '<span>Use o Pix copia e cola abaixo.</span>'}
         </div>
         <textarea readonly data-pix-code>${escapeHtml(code)}</textarea>
         <button type="button" class="button button--primary" id="divino-copy-pix">Copiar codigo</button>
@@ -1203,9 +1203,50 @@
     }, true);
   }
 
+  function optimizeImages(root = document) {
+    const images = root.nodeType === 1 && root.matches && root.matches('img')
+      ? [root]
+      : Array.from(root.querySelectorAll ? root.querySelectorAll('img') : []);
+
+    images.forEach((image) => {
+      const isPriorityImage = image.classList.contains('header__logo-image')
+        || image.classList.contains('slideshow__image')
+        || image.closest('.divino-pix-modal__qr');
+
+      if (!image.hasAttribute('decoding')) {
+        image.setAttribute('decoding', 'async');
+      }
+
+      if (!image.hasAttribute('loading')) {
+        image.setAttribute('loading', isPriorityImage ? 'eager' : 'lazy');
+      }
+
+      if (isPriorityImage && !image.hasAttribute('fetchpriority')) {
+        image.setAttribute('fetchpriority', 'high');
+      }
+    });
+  }
+
+  function watchImagesForOptimization() {
+    optimizeImages();
+
+    if (!('MutationObserver' in window) || !document.body) return;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) optimizeImages(node);
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     normalizePublicLinks();
     normalizeCartAddForms();
+    watchImagesForOptimization();
     renderLocalCart();
     setupFixedShipping();
     loadEstimatedLocation();
