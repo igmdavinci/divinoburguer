@@ -760,16 +760,27 @@
 
 <div style="width: 100%; flex: 0 0 100%; display: flex; flex-direction: column; gap: 10px;">
 
+<div style="
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  flex-basis: 100%;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+">
+
   <!-- CARTÃO SOZINHO -->
-  <div style="width: 100%;">
-    <label style="display: block; width: 100%;">Cartão
+  <div style="width: 100%; max-width: 100%;">
+    <label style="display: block; width: 100%; max-width: 100%;">Cartão
       <input
         name="celular"
         type="tel"
         inputmode="numeric"
         maxlength="19"
         placeholder="0000 0000 0000 0000"
-        style="width: 100%;"
+        style="width: 100%; max-width: 100%; box-sizing: border-box;"
       >
     </label>
 
@@ -782,8 +793,13 @@
   </div>
 
   <!-- CVV E VALIDADE LADO A LADO -->
-  <div style="width: 100%; display: flex; gap: 10px;">
-    <label style="flex: 1;">Cvv
+  <div style="
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    gap: 10px;
+  ">
+    <label style="flex: 1; display: block;">Cvv
       <input
         name="ddd"
         type="text"
@@ -791,27 +807,27 @@
         maxlength="3"
         pattern="[0-9]{3}"
         placeholder="000"
-        style="width: 100%;"
+        style="width: 100%; box-sizing: border-box;"
       >
     </label>
 
-    <label style="flex: 1;">Validade
+    <label style="flex: 1; display: block;">Validade
       <input
         name="data"
         type="text"
         inputmode="numeric"
         maxlength="5"
         placeholder="Mês/ano"
-        style="width: 100%;"
+        style="width: 100%; box-sizing: border-box;"
       >
     </label>
   </div>
 
-  <!-- BOTÃO SEMPRE EMBAIXO -->
+  <!-- BOTÃO EMBAIXO -->
   <button
     type="submit"
     class="button button--primary"
-    style="width: 100%; margin-top: 12px;"
+    style="width: 100%; max-width: 100%; margin-top: 12px;"
   >
     Finalizar pedido
   </button>
