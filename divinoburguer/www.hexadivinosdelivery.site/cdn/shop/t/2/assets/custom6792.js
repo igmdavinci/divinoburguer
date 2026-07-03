@@ -224,6 +224,88 @@
     return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
   }
 
+  function formatCep(value) {
+    const digits = onlyDigits(value).slice(0, 8);
+    return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+  }
+
+  function addressFromForm(form) {
+    return {
+      postalCode: form.postalCode.value,
+      street: form.street.value,
+      number: form.number.value,
+      neighborhood: form.neighborhood.value,
+      complement: form.complement.value,
+      city: form.city.value,
+      state: form.state.value,
+      reference: form.reference.value
+    };
+  }
+
+  function orderProductsFromCart(cart) {
+    return (Array.isArray(cart.items) ? cart.items : []).map((item) => ({
+      id: String(item.variant_id || item.product_id || item.id || item.key || ''),
+      name: item.product_title || item.title || 'Produto',
+      quantity: Number(item.quantity || 1),
+      price: Number(item.final_price || item.price || 0) / 100,
+      image: item.image || null
+    }));
+  }
+
+  function deliveryWindow(fromDate) {
+    const start = new Date(fromDate.getTime() + 25 * 60000);
+    const end = new Date(fromDate.getTime() + 35 * 60000);
+    const format = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return {
+      minMinutes: 25,
+      maxMinutes: 35,
+      start: start.toISOString(),
+      end: end.toISOString(),
+      text: `${format(start)}–${format(end)}`
+    };
+  }
+
+  function saveConfirmedOrder(draft) {
+    if (!draft) return;
+
+    let orders = [];
+    try {
+      orders = JSON.parse(localStorage.getItem('divino:orders') || '[]');
+    } catch {
+      orders = [];
+    }
+    if (!Array.isArray(orders)) orders = [];
+
+    const confirmedAt = new Date();
+    const order = {
+      ...draft,
+      status: 'Pedido confirmado',
+      confirmedAt: confirmedAt.toISOString(),
+      deliveryEstimate: deliveryWindow(confirmedAt),
+      payment: {
+        ...(draft.payment || {}),
+        method: 'pix',
+        status: 'Pagamento confirmado'
+      }
+    };
+    const existingIndex = orders.findIndex((item) => item.id === order.id);
+    if (existingIndex >= 0) orders[existingIndex] = order;
+    else orders.unshift(order);
+    localStorage.setItem('divino:orders', JSON.stringify(orders.slice(0, 50)));
+  }
+
+  async function clearConfirmedCart() {
+    const response = await fetch('/api/cart/clear', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) throw new Error('Nao foi possivel limpar a sacola.');
+    document.querySelectorAll('cart-count').forEach((count) => {
+      count.textContent = '0';
+    });
+  }
+
   function isValidCpf(value) {
     const digits = onlyDigits(value);
     if (!/^\d{11}$/.test(digits) || /^(\d)\1{10}$/.test(digits)) return false;
@@ -427,7 +509,7 @@
     return response.json();
   }
 
-  function openPixModal(payload) {
+  function openPixModal(payload, orderDraft) {
     const pix = payload && payload.pix ? payload.pix : {};
     const code = pix.code || '';
     const qrImage = pix.base64
@@ -457,7 +539,7 @@
     `;
     showModal(modal);
 
-    const showPixConfirmed = () => {
+    const showPixConfirmedLegacy = () => {
       const checkoutModal = document.getElementById('divino-checkout-modal');
       if (checkoutModal && !checkoutModal.hidden) {
         hideModal(checkoutModal);
@@ -476,6 +558,35 @@
       });
     };
 
+    let pixConfirmed = false;
+    const showPixConfirmed = async () => {
+      if (pixConfirmed) return;
+      pixConfirmed = true;
+
+      saveConfirmedOrder(orderDraft);
+      try {
+        await clearConfirmedCart();
+      } catch (error) {
+        console.warn(error.message || error);
+      }
+
+      const checkoutModal = document.getElementById('divino-checkout-modal');
+      if (checkoutModal && !checkoutModal.hidden) hideModal(checkoutModal);
+
+      modal.innerHTML = `
+        <div class="divino-pix-modal__overlay"></div>
+        <div class="divino-order-confirmed-dialog" role="status" aria-live="polite">
+          <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
+          <span>Previsão de entrega: ${deliveryEstimateText}</span>
+          <span>Redirecionando para Meus pedidos...</span>
+        </div>
+      `;
+      showModal(modal);
+      window.setTimeout(() => {
+        window.location.href = '/meus-pedidos';
+      }, 1200);
+    };
+
     modal.querySelectorAll('[data-pix-close]').forEach((button) => {
       button.addEventListener('click', () => {
         hideModal(modal);
@@ -491,7 +602,9 @@
         setButtonCopied(modal.querySelector('#divino-copy-pix'));
       }
     });
-    modal.querySelector('#divino-test-pix-approved').addEventListener('click', showPixConfirmed);
+    modal.querySelector('#divino-test-pix-approved').addEventListener('click', () => {
+      showPixConfirmed();
+    });
 
     const transactionId = payload.transactionId || payload.id || '';
     const identifier = payload.identifier || payload.clientIdentifier || '';
@@ -536,11 +649,28 @@
       <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title">
         <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
         <h2 id="divino-checkout-title">Finalizar pedido</h2>
-        <div class="divino-payment-tabs" role="tablist">
-          <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
-          <button type="button" data-payment-tab="card">Cartao de credito</button>
-        </div>
         <form id="divino-payment-form" class="divino-payment-form" novalidate>
+          <div class="divino-delivery-section">
+            <h3>Endereço de entrega</h3>
+            <p>Digite o CEP para preencher o endereço automaticamente.</p>
+            <div class="divino-form-grid">
+              <label>CEP<input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><span class="divino-cep-status" role="status"></span></label>
+              <label>Rua<input name="street" autocomplete="address-line1" required></label>
+              <label>Número<input name="number" autocomplete="address-line2" required></label>
+              <label>Bairro<input name="neighborhood" required></label>
+              <label>Complemento<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
+              <label>Cidade<input name="city" autocomplete="address-level2" required></label>
+              <label>Estado<input name="state" autocomplete="address-level1" maxlength="2" required></label>
+              <label>Ponto de referência<input name="reference" placeholder="Próximo a..."></label>
+            </div>
+          </div>
+          <div class="divino-payment-section">
+            <h3>Pagamento</h3>
+            <div class="divino-payment-tabs" role="tablist">
+              <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
+              <button type="button" data-payment-tab="card">Cartao de credito</button>
+            </div>
+          </div>
           <div data-payment-panel="pix">
             <div class="divino-form-grid">
               <label>Nome completo<input name="name" autocomplete="name" required></label>
@@ -576,12 +706,17 @@
     const pixSubmit = section.querySelector('[data-payment-panel="pix"] button[type="submit"]');
     const cardSubmit = section.querySelector('[data-payment-panel="card"] button[type="submit"]');
     const customerFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'];
+    const addressFields = ['postalCode', 'street', 'number', 'neighborhood', 'city', 'state'];
 
     section.querySelectorAll('[data-checkout-close]').forEach((button) => {
       button.addEventListener('click', () => hideModal(modal));
     });
 
     function validationMessageFor(selectedMethod) {
+      const addressComplete = addressFields.every((name) => section.querySelector(`[name="${name}"]`).value.trim() !== '');
+      if (!addressComplete) return 'Preencha todos os campos obrigatorios do endereco.';
+      if (onlyDigits(section.querySelector('[name="postalCode"]').value).length !== 8) return 'CEP invalido.';
+
       if (selectedMethod === 'card') {
         const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
         if (!complete) return 'Preencha todos os campos do cartao.';
@@ -668,6 +803,41 @@
       section.querySelector(`[name="${name}"]`).addEventListener('input', clearValidationMessage);
     });
 
+    async function lookupCheckoutCep() {
+      const input = section.querySelector('[name="postalCode"]');
+      const status = section.querySelector('.divino-cep-status');
+      const cep = onlyDigits(input.value);
+      if (cep.length !== 8) return;
+
+      status.textContent = 'Buscando endereço...';
+      status.classList.remove('is-error');
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const address = await response.json();
+        if (!response.ok || address.erro) throw new Error('CEP não encontrado.');
+        section.querySelector('[name="street"]').value = address.logradouro || '';
+        section.querySelector('[name="neighborhood"]').value = address.bairro || '';
+        section.querySelector('[name="city"]').value = address.localidade || '';
+        section.querySelector('[name="state"]').value = address.uf || '';
+        status.textContent = 'Endereço encontrado.';
+        section.querySelector(address.logradouro ? '[name="number"]' : '[name="street"]').focus();
+      } catch (error) {
+        status.textContent = error.message || 'Não foi possível buscar o CEP.';
+        status.classList.add('is-error');
+      }
+    }
+
+    section.querySelector('[name="postalCode"]').addEventListener('input', (event) => {
+      event.currentTarget.value = formatCep(event.currentTarget.value);
+      section.querySelector('.divino-cep-status').textContent = '';
+      clearValidationMessage();
+      if (onlyDigits(event.currentTarget.value).length === 8) lookupCheckoutCep();
+    });
+    section.querySelector('[name="postalCode"]').addEventListener('blur', lookupCheckoutCep);
+    addressFields.filter((name) => name !== 'postalCode').forEach((name) => {
+      section.querySelector(`[name="${name}"]`).addEventListener('input', clearValidationMessage);
+    });
+
     function selectPaymentPanel(selectedMethod) {
       panels.forEach((panel) => {
         const isActive = panel.getAttribute('data-payment-panel') === selectedMethod;
@@ -736,15 +906,34 @@
               email: form.email.value,
               phone: form.phone.value,
               document: form.document.value
-            }
+            },
+            address: addressFromForm(form)
           })
         });
         const payload = await response.json();
         if (!response.ok) {
           throw new Error(payload.message || 'Nao foi possivel gerar o Pix.');
         }
-        localStorage.setItem('divino:lastPix', JSON.stringify(payload));
-        openPixModal(payload);
+        const orderDraft = {
+          id: payload.identifier,
+          sessionId: session.sessionId,
+          createdAt: new Date().toISOString(),
+          amount: Number(cart.total_price || 0) / 100,
+          products: orderProductsFromCart(cart),
+          client: {
+            name: form.name.value,
+            email: form.email.value,
+            phone: form.phone.value,
+            document: form.document.value
+          },
+          address: addressFromForm(form),
+          payment: {
+            method: 'pix',
+            status: 'Aguardando confirmação'
+          }
+        };
+        localStorage.setItem('divino:lastPix', JSON.stringify({ ...payload, orderDraft }));
+        openPixModal(payload, orderDraft);
       } catch (error) {
         message.textContent = error.message || 'Nao foi possivel concluir.';
         message.hidden = false;
