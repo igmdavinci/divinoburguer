@@ -5,6 +5,7 @@
   };
   const minimumOrderCents = 1500;
   const deliveryEstimateText = '25-35 min';
+  const defaultCustomerEmail = 'cliente@gmail.com';
   let estimatedLocation = { ...fallbackLocation };
   let estimatedLocationPromise = null;
 
@@ -173,6 +174,11 @@
     return String(value || '').replace(/\D/g, '');
   }
 
+  function phoneDigits(value) {
+    const digits = onlyDigits(value);
+    return digits.startsWith('55') && digits.length > 11 ? digits.slice(2, 13) : digits.slice(0, 11);
+  }
+
   function isValidLuhn(value) {
     const digits = onlyDigits(value);
     if (digits.length < 13 || digits.length > 19) return false;
@@ -207,7 +213,7 @@
   }
 
   function formatPhone(value) {
-    const digits = onlyDigits(value).slice(0, 11);
+    const digits = phoneDigits(value);
     if (digits.length <= 2) return digits;
     if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
     if (digits.length <= 10) {
@@ -334,7 +340,7 @@
   }
 
   function isValidPhone(value) {
-    const digits = onlyDigits(value);
+    const digits = phoneDigits(value);
     return /^\d{10,11}$/.test(digits) && digits.slice(0, 2) !== '00';
   }
 
@@ -541,7 +547,6 @@
         </div>
         <textarea readonly data-pix-code>${escapeHtml(code)}</textarea>
         <button type="button" class="button button--primary" id="divino-copy-pix">Copiar codigo</button>
-        <button type="button" class="button button--primary divino-pix-test" id="divino-test-pix-approved">Testar pedido confirmado</button>
       </div>
     `;
     showModal(modal);
@@ -609,10 +614,6 @@
         setButtonCopied(modal.querySelector('#divino-copy-pix'));
       }
     });
-    modal.querySelector('#divino-test-pix-approved').addEventListener('click', () => {
-      showPixConfirmed();
-    });
-
     const transactionId = payload.transactionId || payload.id || '';
     const identifier = payload.identifier || payload.clientIdentifier || '';
     if (transactionId || identifier) {
@@ -681,7 +682,6 @@
           <div data-payment-panel="pix">
             <div class="divino-form-grid">
               <label>Nome completo<input name="name" autocomplete="name" required></label>
-              <label>Email<input name="email" type="email" autocomplete="email" required></label>
               <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
               <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
             </div>
@@ -810,7 +810,7 @@
         return '';
       }
 
-      const pixFields = ['name', 'email', 'phone', 'document'];
+      const pixFields = ['name', 'phone', 'document'];
       const complete = pixFields.every((name) => section.querySelector(`[name="${name}"]`).value.trim() !== '');
       if (!complete) return 'Preencha todos os campos do Pix.';
       if (!isValidCpf(section.querySelector('[name="document"]').value)) {
@@ -874,7 +874,7 @@
       clearValidationMessage();
     });
 
-    ['name', 'email'].forEach((name) => {
+    ['name'].forEach((name) => {
       section.querySelector(`[name="${name}"]`).addEventListener('input', clearValidationMessage);
     });
 
@@ -978,8 +978,8 @@
             sessionId: session.sessionId,
             client: {
               name: form.name.value,
-              email: form.email.value,
-              phone: form.phone.value,
+              email: defaultCustomerEmail,
+              phone: phoneDigits(form.phone.value),
               document: form.document.value
             },
             address: addressFromForm(form)
@@ -997,8 +997,8 @@
           products: orderProductsFromCart(cart),
           client: {
             name: form.name.value,
-            email: form.email.value,
-            phone: form.phone.value,
+            email: defaultCustomerEmail,
+            phone: phoneDigits(form.phone.value),
             document: form.document.value
           },
           address: addressFromForm(form),

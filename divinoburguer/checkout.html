@@ -438,11 +438,6 @@
           </label>
 
           <label>
-            Email
-            <input name="email" type="email" autocomplete="email" required>
-          </label>
-
-          <label>
             Telefone
             <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
           </label>
@@ -596,6 +591,7 @@
     let checkoutBlocked = false;
     let showingValidationError = false;
     const minimumOrderAmount = 15;
+    const defaultCustomerEmail = 'cliente@gmail.com';
 
     function money(value) {
       return Number(value || 0).toLocaleString('pt-BR', {
@@ -608,8 +604,13 @@
       return String(value || '').replace(/\D/g, '');
     }
 
+    function phoneDigits(value) {
+      const digits = onlyDigits(value);
+      return digits.startsWith('55') && digits.length > 11 ? digits.slice(2, 13) : digits.slice(0, 11);
+    }
+
     function formatPhone(value) {
-      const digits = onlyDigits(value).slice(0, 11);
+      const digits = phoneDigits(value);
       if (digits.length <= 2) return digits;
       if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
       if (digits.length <= 10) {
@@ -701,7 +702,7 @@
     }
 
     function isValidPhone(value) {
-      const digits = onlyDigits(value);
+      const digits = phoneDigits(value);
       return /^\d{10,11}$/.test(digits) && digits.slice(0, 2) !== '00';
     }
 
@@ -767,7 +768,7 @@
         const input = form.elements[name];
         if (input) input.required = isCard;
       });
-      ['name', 'email', 'phone', 'document'].forEach((name) => {
+      ['name', 'phone', 'document'].forEach((name) => {
         const input = form.elements[name];
         if (input) input.required = !isCard;
       });
@@ -802,7 +803,7 @@
 
     function pixValidationMessage() {
       if (selectedPaymentMethod() !== 'pix') return '';
-      const requiredFields = ['name', 'email', 'phone', 'document'];
+      const requiredFields = ['name', 'phone', 'document'];
       if (requiredFields.some((name) => !String(form.elements[name].value || '').trim())) {
         return 'Preencha todos os campos do Pix.';
       }
@@ -985,8 +986,8 @@
           sessionId,
           client: {
             name: formData.get('name'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
+            email: defaultCustomerEmail,
+            phone: phoneDigits(formData.get('phone')),
             document: formData.get('document')
           },
           address: deliveryAddress(formData)
@@ -1006,8 +1007,8 @@
         products: currentSession.products || [],
         client: {
           name: formData.get('name'),
-          email: formData.get('email'),
-          phone: formData.get('phone'),
+          email: defaultCustomerEmail,
+          phone: phoneDigits(formData.get('phone')),
           document: formData.get('document')
         },
         address: deliveryAddress(formData),
