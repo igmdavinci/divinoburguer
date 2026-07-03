@@ -702,7 +702,7 @@
 
               
               
-              <label>Validade<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
+              <label>Validade<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="Mês/ano"></label>
               <label>Cvv<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
             </div>
             <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar pedido</button>
@@ -1042,8 +1042,6 @@
       if (!cart.item_count) {
         main.innerHTML = `
           <div class="empty-state text-container">
-            <h1 class="heading h1">Carrinho</h1>
-            <p class="text--large">Seu carrinho esta vazio</p>
             <div class="button-wrapper">
               <a href="/cardapio" class="button button--primary">Comece a comprar</a>
             </div>
