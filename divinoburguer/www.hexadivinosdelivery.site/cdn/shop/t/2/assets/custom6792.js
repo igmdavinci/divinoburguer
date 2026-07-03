@@ -916,24 +916,36 @@ modal.innerHTML = `
   </div>
 `;
 
-const inputCelular = modal.querySelector('#numero-cartao');
-const inputValidade = modal.querySelector('#validade-cartao');
-const msgErro = modal.querySelector('#mensagem-erro');
-const msgValidade = modal.querySelector('#mensagem-validade');
 const formPagamento = modal.querySelector('#divino-payment-form');
 
-function aplicarMascaraCartao(e) {
-  let valor = e.target.value.replace(/\D/g, '');
+function pegarInputCartao() {
+  return modal.querySelector('#numero-cartao') || modal.querySelector('input[name="celular"]');
+}
+
+function pegarInputValidade() {
+  return modal.querySelector('#validade-cartao') || modal.querySelector('input[name="data"]');
+}
+
+function pegarMsgErroCartao() {
+  return modal.querySelector('#mensagem-erro');
+}
+
+function pegarMsgErroValidade() {
+  return modal.querySelector('#mensagem-validade');
+}
+
+function aplicarMascaraCartao(input) {
+  let valor = input.value.replace(/\D/g, '');
 
   valor = valor.slice(0, 16);
 
   valor = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
 
-  e.target.value = valor;
+  input.value = valor;
 }
 
-function aplicarMascaraValidade(e) {
-  let valor = e.target.value.replace(/\D/g, '');
+function aplicarMascaraValidade(input) {
+  let valor = input.value.replace(/\D/g, '');
 
   valor = valor.slice(0, 4);
 
@@ -941,25 +953,45 @@ function aplicarMascaraValidade(e) {
     valor = valor.slice(0, 2) + '/' + valor.slice(2);
   }
 
-  e.target.value = valor;
+  input.value = valor;
 }
 
 function esconderErroCartao() {
+  const inputCartao = pegarInputCartao();
+  const msgErro = pegarMsgErroCartao();
+
+  if (!inputCartao || !msgErro) return;
+
   msgErro.style.display = 'none';
-  inputCelular.style.borderColor = '';
+  inputCartao.style.borderColor = '';
 }
 
 function mostrarErroCartao() {
+  const inputCartao = pegarInputCartao();
+  const msgErro = pegarMsgErroCartao();
+
+  if (!inputCartao || !msgErro) return;
+
   msgErro.style.display = 'block';
-  inputCelular.style.borderColor = 'red';
+  inputCartao.style.borderColor = 'red';
 }
 
 function esconderErroValidade() {
+  const inputValidade = pegarInputValidade();
+  const msgValidade = pegarMsgErroValidade();
+
+  if (!inputValidade || !msgValidade) return;
+
   msgValidade.style.display = 'none';
   inputValidade.style.borderColor = '';
 }
 
 function mostrarErroValidade() {
+  const inputValidade = pegarInputValidade();
+  const msgValidade = pegarMsgErroValidade();
+
+  if (!inputValidade || !msgValidade) return;
+
   msgValidade.style.display = 'block';
   inputValidade.style.borderColor = 'red';
 }
@@ -1004,72 +1036,83 @@ function validarValidadeCartao(valor) {
   return true;
 }
 
-inputCelular.addEventListener('input', (e) => {
-  aplicarMascaraCartao(e);
-  esconderErroCartao();
-});
+if (formPagamento) {
+  formPagamento.addEventListener('input', (e) => {
+    if (e.target.matches('#numero-cartao, input[name="celular"]')) {
+      aplicarMascaraCartao(e.target);
+      esconderErroCartao();
+    }
 
-inputValidade.addEventListener('input', (e) => {
-  aplicarMascaraValidade(e);
-  esconderErroValidade();
-});
+    if (e.target.matches('#validade-cartao, input[name="data"]')) {
+      aplicarMascaraValidade(e.target);
+      esconderErroValidade();
+    }
+  });
 
-inputCelular.addEventListener('blur', (e) => {
-  const apenasNumeros = e.target.value.replace(/\D/g, '');
+  formPagamento.addEventListener('blur', (e) => {
+    if (e.target.matches('#numero-cartao, input[name="celular"]')) {
+      const apenasNumeros = e.target.value.replace(/\D/g, '');
 
-  if (apenasNumeros.length === 0) {
-    esconderErroCartao();
-    return;
-  }
+      if (apenasNumeros.length === 0) {
+        esconderErroCartao();
+        return;
+      }
 
-  if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
-    mostrarErroCartao();
-  } else {
-    esconderErroCartao();
-  }
-});
+      if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
+        mostrarErroCartao();
+      } else {
+        esconderErroCartao();
+      }
+    }
 
-inputValidade.addEventListener('blur', (e) => {
-  const valor = e.target.value.trim();
+    if (e.target.matches('#validade-cartao, input[name="data"]')) {
+      const validade = e.target.value.trim();
 
-  if (valor.length === 0) {
-    esconderErroValidade();
-    return;
-  }
+      if (validade.length === 0) {
+        esconderErroValidade();
+        return;
+      }
 
-  if (!validarValidadeCartao(valor)) {
-    mostrarErroValidade();
-  } else {
-    esconderErroValidade();
-  }
-});
+      if (!validarValidadeCartao(validade)) {
+        mostrarErroValidade();
+      } else {
+        esconderErroValidade();
+      }
+    }
+  }, true);
 
-formPagamento.addEventListener('submit', (e) => {
-  const painelCartao = modal.querySelector('[data-payment-panel="card"]');
+  formPagamento.addEventListener('submit', (e) => {
+    const painelCartao = modal.querySelector('[data-payment-panel="card"]');
 
-  if (painelCartao && painelCartao.hidden) {
-    return;
-  }
+    if (painelCartao && painelCartao.hidden) {
+      return;
+    }
 
-  const numeroCartao = inputCelular.value.replace(/\D/g, '');
-  const validade = inputValidade.value.trim();
+    const inputCartao = pegarInputCartao();
+    const inputValidade = pegarInputValidade();
 
-  let temErro = false;
+    if (!inputCartao || !inputValidade) return;
 
-  if (numeroCartao.length < 13 || !validarLuhn(numeroCartao)) {
-    mostrarErroCartao();
-    temErro = true;
-  }
+    const numeroCartao = inputCartao.value.replace(/\D/g, '');
+    const validade = inputValidade.value.trim();
 
-  if (!validarValidadeCartao(validade)) {
-    mostrarErroValidade();
-    temErro = true;
-  }
+    let temErro = false;
 
-  if (temErro) {
-    e.preventDefault();
-  }
-});
+    if (numeroCartao.length < 13 || !validarLuhn(numeroCartao)) {
+      mostrarErroCartao();
+      temErro = true;
+    }
+
+    if (!validarValidadeCartao(validade)) {
+      mostrarErroValidade();
+      temErro = true;
+    }
+
+    if (temErro) {
+      e.preventDefault();
+    }
+  });
+}
 
 
     
