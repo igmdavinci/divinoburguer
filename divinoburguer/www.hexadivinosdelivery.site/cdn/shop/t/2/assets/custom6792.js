@@ -692,14 +692,15 @@
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
               <label>Nome completo<input name="firstName" type="text"></label>
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
-              <label>Cartão<input name="celular" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000"
-                aria-label="Número do cartão"
-                required
-                oninput="formatarEValidarCartao(this)"
-                
-                
-                
-                ></label>
+              
+              
+              <label>Cartão
+                  <input name="celular" type="tel" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+              </label>
+
+
+              <span id="mensagem-erro" style="color: red; display: none; font-size: 14px; margin-left: 10px;">Cartão inválido</span>
+
               
               
               <label>Validade<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
@@ -712,52 +713,57 @@
       </div>
     `;
 
-     function validarLuhn(numero) {
-    let soma = 0;
-    let dobrar = false;
+    const inputCelular = document.querySelector('input[name="celular"]');
+    const msgErro = document.getElementById('mensagem-erro');
+    
+      // 1. MÁSCARA EM TEMPO REAL
+    inputCelular.addEventListener('input', (e) => {
+      let valor = e.target.value.replace(/\D/g, ''); // Remove letras
+      valor = valor.replace(/(\d{4})(?=\d)/g, '$1 '); // Aplica espaços
+      e.target.value = valor;
+      
+      // Oculta o erro enquanto o usuário digita novamente
+      msgErro.style.display = 'none'; 
+    });
 
-    for (let i = numero.length - 1; i >= 0; i--) {
-      let digito = parseInt(numero.charAt(i), 10);
+    // 2. FUNÇÃO DO ALGORITMO DE LUHN
+    function validarLuhn(numero) {
+      let soma = 0;
+      let deveDobrar = false;
 
-      if (dobrar) {
-        digito *= 2;
+      // Percorre o número de trás para frente
+      for (let i = numero.length - 1; i >= 0; i--) {
+        let digito = parseInt(numero.charAt(i));
 
-        if (digito > 9) {
-          digito -= 9;
+        if (deveDobrar) {
+          digito *= 2;
+          if (digito > 9) digito -= 9; // Soma os dígitos (ex: 12 vira 1+2=3, ou 12-9=3)
         }
+
+        soma += digito;
+        deveDobrar = !deveDobrar; // Alterna a dobra a cada dígito
       }
 
-      soma += digito;
-      dobrar = !dobrar;
+      return (soma % 10) === 0;
     }
 
-    return soma % 10 === 0;
-  }
+    // 3. GATILHO DE VALIDAÇÃO (Quando o usuário sai do campo)
+    inputCelular.addEventListener('blur', (e) => {
+      const apenasNumeros = e.target.value.replace(/\D/g, '');
 
-  function formatarEValidarCartao(input) {
-    let numero = input.value.replace(/\D/g, '').slice(0, 19);
+      // Ignora se o campo estiver vazio
+      if (apenasNumeros.length === 0) return;
 
-    input.value = numero
-      .replace(/(\d{4})(?=\d)/g, '$1 ')
-      .trim();
+      // Cartões válidos geralmente têm entre 13 e 19 dígitos
+      if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
+        msgErro.style.display = 'inline'; // Mostra o erro
+        inputCelular.style.borderColor = 'red';
+      } else {
+        msgErro.style.display = 'none';   // Esconde o erro se for válido
+        inputCelular.style.borderColor = '';
+      }
+    });
 
-    if (numero.length === 0) {
-      input.setCustomValidity('Informe o número do cartão.');
-      return;
-    }
-
-    if (numero.length < 13) {
-      input.setCustomValidity('Número do cartão incompleto.');
-      return;
-    }
-
-    if (!validarLuhn(numero)) {
-      input.setCustomValidity('Número do cartão inválido.');
-      return;
-    }
-
-    input.setCustomValidity('');
-  }
     
 
     const section = modal;
