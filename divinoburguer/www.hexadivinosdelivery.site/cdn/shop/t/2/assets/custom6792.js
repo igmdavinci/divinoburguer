@@ -692,8 +692,7 @@
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
               <label>Nome completo<input name="firstName" type="text"></label>
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
-              <label>Cartão<
-                input name="celular" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000"
+              <label>Cartão<input name="celular" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000"
                 aria-label="Número do cartão"
                 required
                 oninput="formatarEValidarCartao(this)"
