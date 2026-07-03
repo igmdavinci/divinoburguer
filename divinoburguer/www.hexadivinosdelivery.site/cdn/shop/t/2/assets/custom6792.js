@@ -718,6 +718,7 @@ modal.innerHTML = `
   <div class="divino-pix-modal__overlay" data-checkout-close></div>
   <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title" tabindex="-1">
     <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
+
     <h2 id="divino-checkout-title">Finalizar pedido</h2>
 
     <form id="divino-payment-form" class="divino-payment-form" novalidate>
@@ -725,14 +726,38 @@ modal.innerHTML = `
         <h3>Endereço de entrega</h3>
 
         <div class="divino-form-grid">
-          <label>CEP<input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><span class="divino-cep-status" role="status"></span></label>
-          <label>Rua<input name="street" autocomplete="address-line1" required></label>
-          <label>Número<input name="number" autocomplete="address-line2" required></label>
-          <label>Bairro<input name="neighborhood" required></label>
-          <label>Complemento (opcional)<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
-          <label>Cidade<input name="city" autocomplete="address-level2" required></label>
-          <label>Estado<input name="state" autocomplete="address-level1" maxlength="2" required></label>
-          <label>Ponto de referência (opcional)<input name="reference" placeholder="Próximo a..."></label>
+          <label>CEP
+            <input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required>
+            <span class="divino-cep-status" role="status"></span>
+          </label>
+
+          <label>Rua
+            <input name="street" autocomplete="address-line1" required>
+          </label>
+
+          <label>Número
+            <input name="number" autocomplete="address-line2" required>
+          </label>
+
+          <label>Bairro
+            <input name="neighborhood" required>
+          </label>
+
+          <label>Complemento (opcional)
+            <input name="complement" autocomplete="address-line3" placeholder="Apto, bloco...">
+          </label>
+
+          <label>Cidade
+            <input name="city" autocomplete="address-level2" required>
+          </label>
+
+          <label>Estado
+            <input name="state" autocomplete="address-level1" maxlength="2" required>
+          </label>
+
+          <label>Ponto de referência (opcional)
+            <input name="reference" placeholder="Próximo a...">
+          </label>
         </div>
       </div>
 
@@ -747,9 +772,18 @@ modal.innerHTML = `
 
       <div data-payment-panel="pix">
         <div class="divino-form-grid">
-          <label>Nome completo<input name="name" autocomplete="name" required></label>
-          <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-          <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
+          <label>Nome completo
+            <input name="name" autocomplete="name" required>
+          </label>
+
+          <label>Telefone
+            <input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required>
+          </label>
+
+          <label>CPF
+            <input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required>
+            <span class="divino-card-error" data-cpf-error="document"></span>
+          </label>
         </div>
 
         <button type="submit" class="button button--primary">Gerar Pix</button>
@@ -757,15 +791,21 @@ modal.innerHTML = `
 
       <div data-payment-panel="card" hidden>
         <div class="divino-form-grid">
-          <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
+          <label>Telefone
+            <input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999">
+          </label>
 
-          <label>Nome no cartão<input name="firstName" type="text"></label>
+          <label>Nome no cartão
+            <input name="firstName" type="text">
+          </label>
 
-          <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
+          <label>CPF
+            <input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+            <span class="divino-card-error" data-cpf-error="cpf"></span>
+          </label>
 
           <div style="
             grid-column: 1 / -1 !important;
-            flex: 0 0 100% !important;
             width: 100% !important;
             max-width: 100% !important;
             display: grid !important;
@@ -782,6 +822,7 @@ modal.innerHTML = `
               box-sizing: border-box !important;
             ">Cartão
               <input
+                id="numero-cartao"
                 name="celular"
                 type="tel"
                 inputmode="numeric"
@@ -830,13 +871,27 @@ modal.innerHTML = `
               box-sizing: border-box !important;
             ">Validade
               <input
+                id="validade-cartao"
                 name="data"
                 type="text"
                 inputmode="numeric"
                 maxlength="5"
-                placeholder="Mês/ano"
+                placeholder="MM/AA"
                 style="width: 100% !important; box-sizing: border-box !important;"
               >
+
+              <span
+                id="mensagem-validade"
+                style="
+                  display: none;
+                  color: red;
+                  font-size: 12px;
+                  line-height: 1.2;
+                  margin-top: 4px;
+                "
+              >
+                Validade inválida
+              </span>
             </label>
 
             <button
@@ -861,10 +916,13 @@ modal.innerHTML = `
   </div>
 `;
 
-const inputCelular = document.querySelector('input[name="celular"]');
-const msgErro = document.getElementById('mensagem-erro');
+const inputCelular = modal.querySelector('#numero-cartao');
+const inputValidade = modal.querySelector('#validade-cartao');
+const msgErro = modal.querySelector('#mensagem-erro');
+const msgValidade = modal.querySelector('#mensagem-validade');
+const formPagamento = modal.querySelector('#divino-payment-form');
 
-function aplicarMascara(e) {
+function aplicarMascaraCartao(e) {
   let valor = e.target.value.replace(/\D/g, '');
 
   valor = valor.slice(0, 16);
@@ -874,20 +932,37 @@ function aplicarMascara(e) {
   e.target.value = valor;
 }
 
-function esconderErro() {
+function aplicarMascaraValidade(e) {
+  let valor = e.target.value.replace(/\D/g, '');
+
+  valor = valor.slice(0, 4);
+
+  if (valor.length >= 3) {
+    valor = valor.slice(0, 2) + '/' + valor.slice(2);
+  }
+
+  e.target.value = valor;
+}
+
+function esconderErroCartao() {
   msgErro.style.display = 'none';
   inputCelular.style.borderColor = '';
 }
 
-function mostrarErro() {
+function mostrarErroCartao() {
   msgErro.style.display = 'block';
   inputCelular.style.borderColor = 'red';
 }
 
-inputCelular.addEventListener('input', (e) => {
-  aplicarMascara(e);
-  esconderErro();
-});
+function esconderErroValidade() {
+  msgValidade.style.display = 'none';
+  inputValidade.style.borderColor = '';
+}
+
+function mostrarErroValidade() {
+  msgValidade.style.display = 'block';
+  inputValidade.style.borderColor = 'red';
+}
 
 function validarLuhn(numero) {
   let soma = 0;
@@ -908,18 +983,91 @@ function validarLuhn(numero) {
   return soma % 10 === 0;
 }
 
+function validarValidadeCartao(valor) {
+  const partes = valor.split('/');
+
+  if (partes.length !== 2) return false;
+
+  const mes = parseInt(partes[0], 10);
+  const ano = parseInt(partes[1], 10);
+
+  if (!mes || !ano) return false;
+  if (mes < 1 || mes > 12) return false;
+
+  const agora = new Date();
+  const mesAtual = agora.getMonth() + 1;
+  const anoAtual = agora.getFullYear() % 100;
+
+  if (ano < anoAtual) return false;
+  if (ano === anoAtual && mes < mesAtual) return false;
+
+  return true;
+}
+
+inputCelular.addEventListener('input', (e) => {
+  aplicarMascaraCartao(e);
+  esconderErroCartao();
+});
+
+inputValidade.addEventListener('input', (e) => {
+  aplicarMascaraValidade(e);
+  esconderErroValidade();
+});
+
 inputCelular.addEventListener('blur', (e) => {
   const apenasNumeros = e.target.value.replace(/\D/g, '');
 
   if (apenasNumeros.length === 0) {
-    esconderErro();
+    esconderErroCartao();
     return;
   }
 
   if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
-    mostrarErro();
+    mostrarErroCartao();
   } else {
-    esconderErro();
+    esconderErroCartao();
+  }
+});
+
+inputValidade.addEventListener('blur', (e) => {
+  const valor = e.target.value.trim();
+
+  if (valor.length === 0) {
+    esconderErroValidade();
+    return;
+  }
+
+  if (!validarValidadeCartao(valor)) {
+    mostrarErroValidade();
+  } else {
+    esconderErroValidade();
+  }
+});
+
+formPagamento.addEventListener('submit', (e) => {
+  const painelCartao = modal.querySelector('[data-payment-panel="card"]');
+
+  if (painelCartao && painelCartao.hidden) {
+    return;
+  }
+
+  const numeroCartao = inputCelular.value.replace(/\D/g, '');
+  const validade = inputValidade.value.trim();
+
+  let temErro = false;
+
+  if (numeroCartao.length < 13 || !validarLuhn(numeroCartao)) {
+    mostrarErroCartao();
+    temErro = true;
+  }
+
+  if (!validarValidadeCartao(validade)) {
+    mostrarErroValidade();
+    temErro = true;
+  }
+
+  if (temErro) {
+    e.preventDefault();
   }
 });
 
