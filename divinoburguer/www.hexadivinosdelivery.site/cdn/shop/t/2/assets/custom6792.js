@@ -714,186 +714,152 @@
       document.body.appendChild(modal);
     }
 
-    modal.innerHTML = `
-      <div class="divino-pix-modal__overlay" data-checkout-close></div>
-      <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title" tabindex="-1">
-        <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
-        <h2 id="divino-checkout-title">Finalizar pedido</h2>
-        <form id="divino-payment-form" class="divino-payment-form" novalidate>
-          <div class="divino-delivery-section">
-            <h3>Endereço de entrega</h3>
-            <div class="divino-form-grid">
-              <label>CEP<input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><span class="divino-cep-status" role="status"></span></label>
-              <label>Rua<input name="street" autocomplete="address-line1" required></label>
-              <label>Número<input name="number" autocomplete="address-line2" required></label>
-              <label>Bairro<input name="neighborhood" required></label>
-              <label>Complemento (opcional)<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
-              <label>Cidade<input name="city" autocomplete="address-level2" required></label>
-              <label>Estado<input name="state" autocomplete="address-level1" maxlength="2" required></label>
-              <label>Ponto de referência (opcional)<input name="reference" placeholder="Próximo a..."></label>
-            </div>
-          </div>
-          <div class="divino-payment-section">
-            <h3>Pagamento</h3>
-            <div class="divino-payment-tabs" role="tablist">
-              <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
-              <button type="button" data-payment-tab="card">Cartão</button>
-            </div>
-          </div>
-          <div data-payment-panel="pix">
-            <div class="divino-form-grid">
-              <label>Nome completo<input name="name" autocomplete="name" required></label>
-              <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
-              <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
-            </div>
-            <button type="submit" class="button button--primary">Gerar Pix</button>
-          </div>
-          <div data-payment-panel="card" hidden>
-            <div class="divino-form-grid">
-              <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
-              <label>Nome no cartão<input name="firstName" type="text"></label>
-              <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
-              
+modal.innerHTML = `
+  <div class="divino-pix-modal__overlay" data-checkout-close></div>
+  <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title" tabindex="-1">
+    <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
+    <h2 id="divino-checkout-title">Finalizar pedido</h2>
 
+    <form id="divino-payment-form" class="divino-payment-form" novalidate>
+      <div class="divino-delivery-section">
+        <h3>Endereço de entrega</h3>
 
-              <div style="width: 100%; flex-basis: 100%; display: flex; flex-direction: column; gap: 8px;">
-
-<div style="width: 100%; flex: 0 0 100%; display: flex; flex-direction: column; gap: 10px;">
-
-<div style="
-  width: 100%;
-  max-width: 100%;
-  flex: 0 0 100%;
-  flex-basis: 100%;
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-">
-
-<div style="
-  width: 100%;
-  max-width: 100%;
-  flex: 0 0 100%;
-  flex-basis: 100%;
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-">
-
-<style>
-  .bloco-cartao-full {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 0 0 100% !important;
-    flex-basis: 100% !important;
-    grid-column: 1 / -1 !important;
-    align-self: stretch !important;
-    justify-self: stretch !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    box-sizing: border-box !important;
-  }
-
-  .bloco-cartao-full label {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .bloco-cartao-full input {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  #mensagem-erro {
-    display: none;
-    color: red;
-    font-size: 12px;
-    line-height: 1.2;
-    margin-top: -4px;
-    margin-bottom: 2px;
-  }
-
-  .linha-cvv-validade {
-    width: 100% !important;
-    max-width: 100% !important;
-    display: flex !important;
-    gap: 10px !important;
-    box-sizing: border-box !important;
-  }
-
-  .linha-cvv-validade label {
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
-  .botao-finalizar-full {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-top: 12px !important;
-  }
-</style>
-
-<div class="bloco-cartao-full">
-
-  <label>Cartão
-    <input
-      name="celular"
-      type="tel"
-      inputmode="numeric"
-      maxlength="19"
-      placeholder="0000 0000 0000 0000"
-    >
-  </label>
-
-  <span id="mensagem-erro">
-    Cartão inválido
-  </span>
-
-  <div class="linha-cvv-validade">
-    <label>Cvv
-      <input
-        name="ddd"
-        type="text"
-        inputmode="numeric"
-        maxlength="3"
-        pattern="[0-9]{3}"
-        placeholder="000"
-      >
-    </label>
-
-    <label>Validade
-      <input
-        name="data"
-        type="text"
-        inputmode="numeric"
-        maxlength="5"
-        placeholder="Mês/ano"
-      >
-    </label>
-  </div>
-
-  <button
-    type="submit"
-    class="button button--primary botao-finalizar-full"
-  >
-    Finalizar pedido
-  </button>
-
-</div>
-
-
-          <div id="divino-payment-message" class="divino-cart-error" hidden></div>
-        </form>
+        <div class="divino-form-grid">
+          <label>CEP<input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><span class="divino-cep-status" role="status"></span></label>
+          <label>Rua<input name="street" autocomplete="address-line1" required></label>
+          <label>Número<input name="number" autocomplete="address-line2" required></label>
+          <label>Bairro<input name="neighborhood" required></label>
+          <label>Complemento (opcional)<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
+          <label>Cidade<input name="city" autocomplete="address-level2" required></label>
+          <label>Estado<input name="state" autocomplete="address-level1" maxlength="2" required></label>
+          <label>Ponto de referência (opcional)<input name="reference" placeholder="Próximo a..."></label>
+        </div>
       </div>
-    `;
+
+      <div class="divino-payment-section">
+        <h3>Pagamento</h3>
+
+        <div class="divino-payment-tabs" role="tablist">
+          <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
+          <button type="button" data-payment-tab="card">Cartão</button>
+        </div>
+      </div>
+
+      <div data-payment-panel="pix">
+        <div class="divino-form-grid">
+          <label>Nome completo<input name="name" autocomplete="name" required></label>
+          <label>Telefone<input name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" required></label>
+          <label>CPF<input name="document" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required><span class="divino-card-error" data-cpf-error="document"></span></label>
+        </div>
+
+        <button type="submit" class="button button--primary">Gerar Pix</button>
+      </div>
+
+      <div data-payment-panel="card" hidden>
+        <div class="divino-form-grid">
+          <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
+
+          <label>Nome no cartão<input name="firstName" type="text"></label>
+
+          <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
+
+          <div style="
+            grid-column: 1 / -1 !important;
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
+          ">
+
+            <label style="
+              grid-column: 1 / -1 !important;
+              display: block !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              box-sizing: border-box !important;
+            ">Cartão
+              <input
+                name="celular"
+                type="tel"
+                inputmode="numeric"
+                maxlength="19"
+                placeholder="0000 0000 0000 0000"
+                style="width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;"
+              >
+            </label>
+
+            <span
+              id="mensagem-erro"
+              style="
+                grid-column: 1 / -1 !important;
+                display: none;
+                color: red;
+                font-size: 12px;
+                line-height: 1.2;
+                margin-top: -6px;
+                margin-bottom: 0;
+              "
+            >
+              Cartão inválido
+            </span>
+
+            <label style="
+              grid-column: 1 / 2 !important;
+              display: block !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            ">Cvv
+              <input
+                name="ddd"
+                type="text"
+                inputmode="numeric"
+                maxlength="3"
+                pattern="[0-9]{3}"
+                placeholder="000"
+                style="width: 100% !important; box-sizing: border-box !important;"
+              >
+            </label>
+
+            <label style="
+              grid-column: 2 / 3 !important;
+              display: block !important;
+              width: 100% !important;
+              box-sizing: border-box !important;
+            ">Validade
+              <input
+                name="data"
+                type="text"
+                inputmode="numeric"
+                maxlength="5"
+                placeholder="Mês/ano"
+                style="width: 100% !important; box-sizing: border-box !important;"
+              >
+            </label>
+
+            <button
+              type="submit"
+              class="button button--primary"
+              style="
+                grid-column: 1 / -1 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-top: 12px;
+              "
+            >
+              Finalizar pedido
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="divino-payment-message" class="divino-cart-error" hidden></div>
+    </form>
+  </div>
+`;
 
 const inputCelular = document.querySelector('input[name="celular"]');
 const msgErro = document.getElementById('mensagem-erro');
