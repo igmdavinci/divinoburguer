@@ -695,7 +695,7 @@
               
               
               <label>Cartão
-                  <input name="celular" type="tel" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
+                  <input name="celular" type="tel" inputmode="numeric" maxlength="16" placeholder="0000 0000 0000 0000">
               </label>
 
 
