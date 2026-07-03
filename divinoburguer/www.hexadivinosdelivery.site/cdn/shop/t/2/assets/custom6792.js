@@ -368,6 +368,13 @@
 
   function showModal(modal) {
     modal.hidden = false;
+    modal.scrollTop = 0;
+    const dialog = modal.querySelector('[role="dialog"], [role="alertdialog"], [role="status"]');
+    if (dialog) dialog.scrollTop = 0;
+    window.requestAnimationFrame(() => {
+      modal.scrollTop = 0;
+      if (dialog) dialog.scrollTop = 0;
+    });
     updateModalOpenState();
   }
 
@@ -646,7 +653,7 @@
 
     modal.innerHTML = `
       <div class="divino-pix-modal__overlay" data-checkout-close></div>
-      <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title">
+      <div class="divino-pix-modal__dialog divino-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="divino-checkout-title" tabindex="-1">
         <button type="button" class="divino-pix-modal__close" data-checkout-close aria-label="Fechar">&times;</button>
         <h2 id="divino-checkout-title">Finalizar pedido</h2>
         <form id="divino-payment-form" class="divino-payment-form" novalidate>
@@ -944,7 +951,7 @@
     });
 
     showModal(modal);
-    section.querySelector('[name="name"]').focus();
+    section.querySelector('.divino-checkout-dialog').focus({ preventScroll: true });
   }
 
   async function startCheckout(button) {
