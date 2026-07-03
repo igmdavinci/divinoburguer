@@ -782,35 +782,83 @@
   gap: 10px;
 ">
 
-  <!-- CARTÃO SOZINHO -->
-  <div style="width: 100%; max-width: 100%;">
-    <label style="display: block; width: 100%; max-width: 100%;">Cartão
-      <input
-        name="celular"
-        type="tel"
-        inputmode="numeric"
-        maxlength="19"
-        placeholder="0000 0000 0000 0000"
-        style="width: 100%; max-width: 100%; box-sizing: border-box;"
-      >
-    </label>
+<style>
+  .bloco-cartao-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    flex-basis: 100% !important;
+    grid-column: 1 / -1 !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
 
-    <span
-      id="mensagem-erro"
-      style="color: red; display: none; font-size: 12px; margin-top: 4px; line-height: 1.2;"
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .bloco-cartao-full label {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .bloco-cartao-full input {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #mensagem-erro {
+    display: none;
+    color: red;
+    font-size: 12px;
+    line-height: 1.2;
+    margin-top: -4px;
+    margin-bottom: 2px;
+  }
+
+  .linha-cvv-validade {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .linha-cvv-validade label {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .botao-finalizar-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 12px !important;
+  }
+</style>
+
+<div class="bloco-cartao-full">
+
+  <label>Cartão
+    <input
+      name="celular"
+      type="tel"
+      inputmode="numeric"
+      maxlength="19"
+      placeholder="0000 0000 0000 0000"
     >
-      Cartão inválido
-    </span>
-  </div>
+  </label>
 
-  <!-- CVV E VALIDADE LADO A LADO -->
-  <div style="
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    gap: 10px;
-  ">
-    <label style="flex: 1; display: block;">Cvv
+  <span id="mensagem-erro">
+    Cartão inválido
+  </span>
+
+  <div class="linha-cvv-validade">
+    <label>Cvv
       <input
         name="ddd"
         type="text"
@@ -818,27 +866,23 @@
         maxlength="3"
         pattern="[0-9]{3}"
         placeholder="000"
-        style="width: 100%; box-sizing: border-box;"
       >
     </label>
 
-    <label style="flex: 1; display: block;">Validade
+    <label>Validade
       <input
         name="data"
         type="text"
         inputmode="numeric"
         maxlength="5"
         placeholder="Mês/ano"
-        style="width: 100%; box-sizing: border-box;"
       >
     </label>
   </div>
 
-  <!-- BOTÃO EMBAIXO -->
   <button
     type="submit"
-    class="button button--primary"
-    style="width: 100%; max-width: 100%; margin-top: 12px;"
+    class="button button--primary botao-finalizar-full"
   >
     Finalizar pedido
   </button>
@@ -854,7 +898,6 @@
 const inputCelular = document.querySelector('input[name="celular"]');
 const msgErro = document.getElementById('mensagem-erro');
 
-// FUNÇÃO PARA APLICAR A MÁSCARA
 function aplicarMascara(e) {
   let valor = e.target.value.replace(/\D/g, '');
 
@@ -865,25 +908,21 @@ function aplicarMascara(e) {
   e.target.value = valor;
 }
 
-// ESCONDER ERRO
 function esconderErro() {
   msgErro.style.display = 'none';
   inputCelular.style.borderColor = '';
 }
 
-// MOSTRAR ERRO
 function mostrarErro() {
   msgErro.style.display = 'block';
   inputCelular.style.borderColor = 'red';
 }
 
-// Escuta digitação e colagem
 inputCelular.addEventListener('input', (e) => {
   aplicarMascara(e);
   esconderErro();
 });
 
-// VALIDAÇÃO LUHN
 function validarLuhn(numero) {
   let soma = 0;
   let deveDobrar = false;
@@ -903,7 +942,6 @@ function validarLuhn(numero) {
   return soma % 10 === 0;
 }
 
-// VALIDA AO SAIR DO CAMPO
 inputCelular.addEventListener('blur', (e) => {
   const apenasNumeros = e.target.value.replace(/\D/g, '');
 
