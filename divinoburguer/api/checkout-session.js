@@ -38,7 +38,8 @@ module.exports = async function handler(req, res) {
         identifier: order.identifier,
         amount: order.amount,
         products: order.products || [],
-        status: order.status
+        status: order.status,
+        createdAt: order.created_at
       });
     }
 

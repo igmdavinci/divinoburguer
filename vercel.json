@@ -147,6 +147,14 @@
       "destination": "/divinoburguer/pix.html"
     },
     {
+      "source": "/meus-pedidos",
+      "destination": "/divinoburguer/pedidos.html"
+    },
+    {
+      "source": "/pedidos.html",
+      "destination": "/divinoburguer/pedidos.html"
+    },
+    {
       "source": "/.well-known/shopify/monorail/v1/produce",
       "destination": "/api/monorail"
     }

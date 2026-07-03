@@ -154,6 +154,27 @@
       line-height: 1.4;
     }
 
+    .confirmed-actions {
+      width: 100%;
+      display: grid;
+      gap: 10px;
+    }
+
+    .confirmed-actions a {
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      padding: 0 14px;
+      background: var(--green);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .confirmed-actions a.secondary {
+      background: #252525;
+    }
+
     @media (max-width: 520px) {
       .actions {
         grid-template-columns: 1fr;
@@ -172,7 +193,7 @@
     <div class="actions">
       <button id="copy">Copiar codigo</button>
       <button id="test-approved">Testar pedido confirmado</button>
-      <a class="button secondary" href="/www.hexadivinosdelivery.site/index.html">Voltar para loja</a>
+      <a class="button secondary" href="/">Voltar para loja</a>
     </div>
 
     <div id="status" class="status" role="status"></div>
@@ -191,6 +212,7 @@
     const deliveryEstimateText = '25-35 min';
     let copyResetTimer = null;
     let orderConfirmed = false;
+    let lastPixPayload = {};
 
     function setStatus(text, isError) {
       statusBox.textContent = text || '';
@@ -217,7 +239,7 @@
       );
     }
 
-    function showOrderConfirmed() {
+    function showOrderConfirmedLegacy() {
       orderConfirmed = true;
       document.querySelector('main').classList.add('confirmed-only');
       document.querySelector('h1').hidden = true;
@@ -226,6 +248,73 @@
       qr.innerHTML = `
         <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
         <span>Previsão de entrega: ${deliveryEstimateText}</span>
+      `;
+      pixCode.hidden = true;
+      document.querySelector('.actions').hidden = true;
+      setStatus('');
+    }
+
+    function deliveryWindow(fromDate) {
+      const start = new Date(fromDate.getTime() + 25 * 60000);
+      const end = new Date(fromDate.getTime() + 35 * 60000);
+      const format = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      return {
+        minMinutes: 25,
+        maxMinutes: 35,
+        start: start.toISOString(),
+        end: end.toISOString(),
+        text: `${format(start)}–${format(end)}`
+      };
+    }
+
+    function saveConfirmedOrder() {
+      const draft = lastPixPayload.orderDraft;
+      if (!draft) return;
+
+      const orders = JSON.parse(localStorage.getItem('divino:orders') || '[]');
+      const existingIndex = orders.findIndex((order) => order.id === draft.id);
+      const confirmedAt = new Date();
+      const confirmedOrder = {
+        ...draft,
+        status: 'Pedido confirmado',
+        confirmedAt: confirmedAt.toISOString(),
+        deliveryEstimate: deliveryWindow(confirmedAt),
+        payment: {
+          ...(draft.payment || {}),
+          method: 'pix',
+          status: 'Pagamento confirmado'
+        }
+      };
+
+      if (existingIndex >= 0) orders[existingIndex] = confirmedOrder;
+      else orders.unshift(confirmedOrder);
+      localStorage.setItem('divino:orders', JSON.stringify(orders.slice(0, 50)));
+    }
+
+    async function clearCart() {
+      try {
+        await fetch('/api/cart/clear', { method: 'POST' });
+      } catch {
+        // O pedido continua salvo mesmo se a limpeza precisar ser refeita na próxima visita.
+      }
+    }
+
+    async function showOrderConfirmed() {
+      if (orderConfirmed) return;
+      orderConfirmed = true;
+      saveConfirmedOrder();
+      await clearCart();
+      document.querySelector('main').classList.add('confirmed-only');
+      document.querySelector('h1').hidden = true;
+      document.querySelector('main > p').hidden = true;
+      qr.classList.add('confirmed');
+      qr.innerHTML = `
+        <strong>Seu pedido foi confirmado, estamos preparando e em breve sairá para entrega.</strong>
+        <span>Previsão de entrega: ${deliveryEstimateText}</span>
+        <div class="confirmed-actions">
+          <a href="/meus-pedidos">Acompanhar em Meus pedidos</a>
+          <a class="secondary" href="/">Voltar para a loja</a>
+        </div>
       `;
       pixCode.hidden = true;
       document.querySelector('.actions').hidden = true;
@@ -290,9 +379,9 @@
     }
 
     try {
-      const payload = JSON.parse(localStorage.getItem('divino:lastPix') || '{}');
-      renderPix(payload);
-      if (!payload.pix) {
+      lastPixPayload = JSON.parse(localStorage.getItem('divino:lastPix') || '{}');
+      renderPix(lastPixPayload);
+      if (!lastPixPayload.pix) {
         setStatus('Abra esta tela logo apos gerar o Pix para ver o QR Code.', true);
       }
     } catch {

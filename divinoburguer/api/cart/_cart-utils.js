@@ -68,7 +68,7 @@ function getCatalog() {
         handle: product.handle || '',
         price: Number(variant.price || product.price || 0),
         final_price: Number(variant.price || product.price || 0),
-        image: normalizeImage(product.featured_image || product.images?.[0] || '')
+        image: normalizeImage(product.featured_image || product.images?.[0] || '', productsDir)
       });
     } catch {
       continue;
@@ -79,8 +79,19 @@ function getCatalog() {
   return products;
 }
 
-function normalizeImage(image) {
+function normalizeImage(image, productsDir) {
   if (!image) return null;
+  const fileName = String(image).split('?')[0].split('/').pop();
+  const assetsDir = path.join(path.dirname(productsDir), 'cdn', 'shop', 'files');
+
+  if (fileName && fs.existsSync(assetsDir)) {
+    const baseName = path.parse(fileName).name;
+    const localMatch = fs.readdirSync(assetsDir).find((candidate) => {
+      return path.parse(candidate).name.startsWith(baseName);
+    });
+    if (localMatch) return `/cdn/shop/files/${encodeURIComponent(localMatch)}`;
+  }
+
   if (image.startsWith('//')) return `https:${image}`;
   return image;
 }

@@ -101,6 +101,7 @@ module.exports = async function handler(req, res) {
     const body = await readJson(req);
     const sessionId = body.sessionId || body.session_id;
     const client = normalizeClient(body.client || {});
+    const address = body.address && typeof body.address === 'object' ? body.address : {};
 
     if (!sessionId) {
       return sendJson(res, 400, { message: 'Sessao ausente.' });
@@ -172,6 +173,11 @@ module.exports = async function handler(req, res) {
       transaction_id: gatewayResponse.transactionId || null,
       status: gatewayResponse.status || 'PIX_CREATED',
       client,
+      metadata: {
+        ...(order.metadata || {}),
+        address,
+        paymentMethod: 'pix'
+      },
       pix: gatewayResponse.pix || null,
       gateway_response: gatewayResponse
     });

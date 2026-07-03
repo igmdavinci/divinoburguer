@@ -966,3 +966,48 @@
 })();
 
 //# sourceMappingURL=/cdn/shop/t/2/assets/custom.js.map?v=165930397078196874451780917605
+
+// Ajustes da loja local: remove destinos antigos e mantém "Meus pedidos" acessível.
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('a[href], form[action]').forEach((element) => {
+    const attribute = element.matches('form') ? 'action' : 'href';
+    const value = element.getAttribute(attribute) || '';
+
+    if (/myshopify\.com\/customer_authentication/i.test(value)) {
+      element.setAttribute(attribute, '/meus-pedidos');
+      element.setAttribute('aria-label', 'Meus pedidos');
+      return;
+    }
+
+    if (/^(?:https?:)?\/\/(?:www\.)?hexadivinosdelivery\.site/i.test(value)) {
+      try {
+        const localUrl = new URL(value, window.location.origin);
+        element.setAttribute(attribute, `${localUrl.pathname}${localUrl.search}${localUrl.hash}`);
+      } catch {
+        element.removeAttribute(attribute);
+      }
+    }
+
+    if (/utmify/i.test(value)) {
+      element.removeAttribute(attribute);
+    }
+  });
+
+  const desktopMenu = document.querySelector('.header__linklist');
+  if (desktopMenu && !desktopMenu.querySelector('a[href="/meus-pedidos"]')) {
+    const item = document.createElement('li');
+    item.className = 'header__linklist-item';
+    item.dataset.itemTitle = 'Meus pedidos';
+    item.innerHTML = '<a class="header__linklist-link link--animated" href="/meus-pedidos">Meus pedidos</a>';
+    desktopMenu.appendChild(item);
+  }
+
+  const mobileMenu = document.querySelector('.mobile-nav');
+  if (mobileMenu && !mobileMenu.querySelector('a[href="/meus-pedidos"]')) {
+    const item = document.createElement('li');
+    item.className = 'mobile-nav__item';
+    item.dataset.level = '1';
+    item.innerHTML = '<a href="/meus-pedidos" class="mobile-nav__link heading h5">Meus pedidos</a>';
+    mobileMenu.appendChild(item);
+  }
+});

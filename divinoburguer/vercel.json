@@ -90,6 +90,14 @@
       "destination": "/pix.html"
     },
     {
+      "source": "/meus-pedidos",
+      "destination": "/pedidos.html"
+    },
+    {
+      "source": "/pedidos.html",
+      "destination": "/pedidos.html"
+    },
+    {
       "source": "/.well-known/shopify/monorail/v1/produce",
       "destination": "/api/monorail"
     }

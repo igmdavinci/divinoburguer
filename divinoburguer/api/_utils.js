@@ -125,7 +125,7 @@ function currencyAmountFromCart(cartPayload) {
     return sum + (linePrice || (unitPrice * quantity) || 0);
   }, 0);
   const total = explicitTotal || itemTotal;
-  const amount = total > 1000 ? total / 100 : total;
+  const amount = total / 100;
 
   if (!Number.isFinite(amount) || amount <= 0) {
     throw new Error('Carrinho vazio ou valor invalido.');
@@ -143,7 +143,8 @@ function productsFromCart(cartPayload) {
       id: String(item.variant_id || item.product_id || item.id || item.key || makeIdentifier('item')),
       name: String(item.product_title || item.title || item.name || 'Produto'),
       quantity: Number(item.quantity || 1),
-      price: Number((Number.isFinite(unitPrice) ? unitPrice : 0).toFixed(2))
+      price: Number((Number.isFinite(unitPrice) ? unitPrice : 0).toFixed(2)),
+      image: item.image || item.featured_image || null
     };
   });
 }
