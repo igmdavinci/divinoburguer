@@ -675,7 +675,7 @@
             <h3>Pagamento</h3>
             <div class="divino-payment-tabs" role="tablist">
               <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
-              <button type="button" data-payment-tab="card">Cartão de credito</button>
+              <button type="button" data-payment-tab="card">Cartão</button>
             </div>
           </div>
           <div data-payment-panel="pix">
