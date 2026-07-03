@@ -755,17 +755,24 @@
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
               
               
-              <label>Cartão
-                  <input name="celular" type="tel" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000">
-              </label>
+<div style="width: 100%; display: block;">
+  <label>Cartão
+    <input
+      name="celular"
+      type="tel"
+      inputmode="numeric"
+      maxlength="19"
+      placeholder="0000 0000 0000 0000"
+    >
+  </label>
 
-
-              <span
-                id="mensagem-erro"
-                style="color: red; display: block; visibility: hidden; font-size: 12px; margin-top: 3px; line-height: 1;"
-              >
-                Cartão inválido
-              </span>
+  <span
+    id="mensagem-erro"
+    style="color: red; display: none; font-size: 12px; margin-top: 4px; margin-bottom: 6px; line-height: 1.2;"
+  >
+    Cartão inválido
+  </span>
+</div>
 
               
               
@@ -782,38 +789,26 @@
 const inputCelular = document.querySelector('input[name="celular"]');
 const msgErro = document.getElementById('mensagem-erro');
 
-// Evita que a mensagem empurre o layout quando aparecer
-msgErro.style.display = 'block';
-msgErro.style.visibility = 'hidden';
-msgErro.style.fontSize = '12px';
-msgErro.style.marginLeft = '0';
-msgErro.style.marginTop = '3px';
-msgErro.style.lineHeight = '1';
-
 // FUNÇÃO PARA APLICAR A MÁSCARA
 function aplicarMascara(e) {
-  // Remove tudo que não for número
   let valor = e.target.value.replace(/\D/g, '');
 
-  // Limita a 16 números, por causa do maxlength="19" com espaços
   valor = valor.slice(0, 16);
 
-  // Divide em blocos de 4 números com espaços
   valor = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
 
-  // Atualiza o campo
   e.target.value = valor;
 }
 
 // ESCONDER ERRO
 function esconderErro() {
-  msgErro.style.visibility = 'hidden';
+  msgErro.style.display = 'none';
   inputCelular.style.borderColor = '';
 }
 
 // MOSTRAR ERRO
 function mostrarErro() {
-  msgErro.style.visibility = 'visible';
+  msgErro.style.display = 'block';
   inputCelular.style.borderColor = 'red';
 }
 
