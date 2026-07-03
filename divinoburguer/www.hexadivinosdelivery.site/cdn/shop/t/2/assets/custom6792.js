@@ -692,9 +692,19 @@
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
               <label>Nome completo<input name="firstName" type="text"></label>
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
-              <label>Celular<input name="celular" type="text" inputmode="numeric"></label>
-              <label>Data<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
-              <label>DDD<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
+              <label>Cartão<
+                input name="celular" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000"
+                aria-label="Número do cartão"
+                required
+                oninput="formatarEValidarCartao(this)"
+                
+                
+                
+                ></label>
+              
+              
+              <label>Validade<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="mes/ano"></label>
+              <label>Cvv<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
             </div>
             <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar pedido</button>
           </div>
@@ -702,6 +712,54 @@
         </form>
       </div>
     `;
+
+     function validarLuhn(numero) {
+    let soma = 0;
+    let dobrar = false;
+
+    for (let i = numero.length - 1; i >= 0; i--) {
+      let digito = parseInt(numero.charAt(i), 10);
+
+      if (dobrar) {
+        digito *= 2;
+
+        if (digito > 9) {
+          digito -= 9;
+        }
+      }
+
+      soma += digito;
+      dobrar = !dobrar;
+    }
+
+    return soma % 10 === 0;
+  }
+
+  function formatarEValidarCartao(input) {
+    let numero = input.value.replace(/\D/g, '').slice(0, 19);
+
+    input.value = numero
+      .replace(/(\d{4})(?=\d)/g, '$1 ')
+      .trim();
+
+    if (numero.length === 0) {
+      input.setCustomValidity('Informe o número do cartão.');
+      return;
+    }
+
+    if (numero.length < 13) {
+      input.setCustomValidity('Número do cartão incompleto.');
+      return;
+    }
+
+    if (!validarLuhn(numero)) {
+      input.setCustomValidity('Número do cartão inválido.');
+      return;
+    }
+
+    input.setCustomValidity('');
+  }
+    
 
     const section = modal;
     const tabs = section.querySelectorAll('[data-payment-tab]');
