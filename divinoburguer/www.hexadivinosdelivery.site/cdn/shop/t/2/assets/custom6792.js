@@ -727,10 +727,10 @@
               <label>Rua<input name="street" autocomplete="address-line1" required></label>
               <label>Número<input name="number" autocomplete="address-line2" required></label>
               <label>Bairro<input name="neighborhood" required></label>
-              <label>Complemento<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
+              <label>Complemento (opcional)<input name="complement" autocomplete="address-line3" placeholder="Apto, bloco..."></label>
               <label>Cidade<input name="city" autocomplete="address-level2" required></label>
               <label>Estado<input name="state" autocomplete="address-level1" maxlength="2" required></label>
-              <label>Ponto de referência<input name="reference" placeholder="Próximo a..."></label>
+              <label>Ponto de referência (opcional)<input name="reference" placeholder="Próximo a..."></label>
             </div>
           </div>
           <div class="divino-payment-section">
@@ -751,7 +751,7 @@
           <div data-payment-panel="card" hidden>
             <div class="divino-form-grid">
               <label>Telefone<input name="customerPhone" type="text" inputmode="tel" placeholder="(11) 99999-9999"></label>
-              <label>Nome completo<input name="firstName" type="text"></label>
+              <label>Nome no cartão<input name="firstName" type="text"></label>
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
               
               
@@ -760,7 +760,12 @@
               </label>
 
 
-              <span id="mensagem-erro" style="color: red; display: none; font-size: 14px; margin-left: 10px;">Cartão inválido</span>
+              <span
+                id="mensagem-erro"
+                style="color: red; display: block; visibility: hidden; font-size: 12px; margin-top: 3px; line-height: 1;"
+              >
+                Cartão inválido
+              </span>
 
               
               
@@ -774,60 +779,85 @@
       </div>
     `;
 
-     const inputCelular = document.querySelector('input[name="celular"]');
-  const msgErro = document.getElementById('mensagem-erro');
+const inputCelular = document.querySelector('input[name="celular"]');
+const msgErro = document.getElementById('mensagem-erro');
 
-  // FUNÇÃO REFORÇADA PARA APLICAR A MÁSCARA
-  function aplicarMascara(e) {
-    // Remove tudo que não for número
-    let valor = e.target.value.replace(/\D/g, ''); 
-    
-    // Divide em blocos de 4 números com espaços
-    valor = valor.replace(/(\d{4})(?=\d)/g, '$1 '); 
-    
-    // Força a atualização visual imediata no campo
-    e.target.value = valor;
+// Evita que a mensagem empurre o layout quando aparecer
+msgErro.style.display = 'block';
+msgErro.style.visibility = 'hidden';
+msgErro.style.fontSize = '12px';
+msgErro.style.marginLeft = '0';
+msgErro.style.marginTop = '3px';
+msgErro.style.lineHeight = '1';
+
+// FUNÇÃO PARA APLICAR A MÁSCARA
+function aplicarMascara(e) {
+  // Remove tudo que não for número
+  let valor = e.target.value.replace(/\D/g, '');
+
+  // Limita a 16 números, por causa do maxlength="19" com espaços
+  valor = valor.slice(0, 16);
+
+  // Divide em blocos de 4 números com espaços
+  valor = valor.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+  // Atualiza o campo
+  e.target.value = valor;
+}
+
+// ESCONDER ERRO
+function esconderErro() {
+  msgErro.style.visibility = 'hidden';
+  inputCelular.style.borderColor = '';
+}
+
+// MOSTRAR ERRO
+function mostrarErro() {
+  msgErro.style.visibility = 'visible';
+  inputCelular.style.borderColor = 'red';
+}
+
+// Escuta digitação e colagem
+inputCelular.addEventListener('input', (e) => {
+  aplicarMascara(e);
+  esconderErro();
+});
+
+// VALIDAÇÃO LUHN
+function validarLuhn(numero) {
+  let soma = 0;
+  let deveDobrar = false;
+
+  for (let i = numero.length - 1; i >= 0; i--) {
+    let digito = parseInt(numero.charAt(i), 10);
+
+    if (deveDobrar) {
+      digito *= 2;
+      if (digito > 9) digito -= 9;
+    }
+
+    soma += digito;
+    deveDobrar = !deveDobrar;
   }
 
-  // Escuta tanto a digitação quanto a colagem de texto
-  inputCelular.addEventListener('input', aplicarMascara);
-  inputCelular.addEventListener('keyup', aplicarMascara);
+  return soma % 10 === 0;
+}
 
-  // Limpa o erro ao voltar a digitar
-  inputCelular.addEventListener('input', () => {
-    msgErro.style.display = 'none';
-    inputCelular.style.borderColor = '';
-  });
+// VALIDA AO SAIR DO CAMPO
+inputCelular.addEventListener('blur', (e) => {
+  const apenasNumeros = e.target.value.replace(/\D/g, '');
 
-  // VALIDAÇÃO LUHN
-  function validarLuhn(numero) {
-    let soma = 0;
-    let deveDobrar = false;
-    for (let i = numero.length - 1; i >= 0; i--) {
-      let digito = parseInt(numero.charAt(i));
-      if (deveDobrar) {
-        digito *= 2;
-        if (digito > 9) digito -= 9;
-      }
-      soma += digito;
-      deveDobrar = !deveDobrar;
-    }
-    return (soma % 10) === 0;
+  if (apenasNumeros.length === 0) {
+    esconderErro();
+    return;
   }
 
-  // GATILHO DA VALIDAÇÃO AO SAIR DO CAMPO
-  inputCelular.addEventListener('blur', (e) => {
-    const apenasNumeros = e.target.value.replace(/\D/g, '');
-    if (apenasNumeros.length === 0) return;
-
-    if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
-      msgErro.style.display = 'inline';
-      inputCelular.style.borderColor = 'red';
-    } else {
-      msgErro.style.display = 'none';
-      inputCelular.style.borderColor = '';
-    }
-  });
+  if (apenasNumeros.length < 13 || !validarLuhn(apenasNumeros)) {
+    mostrarErro();
+  } else {
+    esconderErro();
+  }
+});
 
 
     
