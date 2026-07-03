@@ -197,7 +197,7 @@
     if (/^(5[1-5]|2[2-7])/.test(digits)) return 'Mastercard';
     if (/^3[47]/.test(digits)) return 'Amex';
     if (/^(4011|4312|4389|4514|4576|5041|5066|5067|509|6277|6362|6363|650|6516|6550)/.test(digits)) return 'Elo';
-    return 'Cartao';
+    return 'Cartão';
   }
 
   function formatExpiry(value) {
@@ -668,7 +668,7 @@
             <h3>Pagamento</h3>
             <div class="divino-payment-tabs" role="tablist">
               <button type="button" class="is-active" data-payment-tab="pix">Pix</button>
-              <button type="button" data-payment-tab="card">Cartao de credito</button>
+              <button type="button" data-payment-tab="card">Cartão de credito</button>
             </div>
           </div>
           <div data-payment-panel="pix">
@@ -719,7 +719,7 @@
 
       if (selectedMethod === 'card') {
         const complete = customerFields.every((name) => section.querySelector(`[name="${name}"]`).value !== '');
-        if (!complete) return 'Preencha todos os campos do cartao.';
+        if (!complete) return 'Preencha todos os campos do cartão.';
         if (!isValidPhone(section.querySelector('[name="customerPhone"]').value)) {
           return 'Telefone invalido. Informe DDD + numero.';
         }

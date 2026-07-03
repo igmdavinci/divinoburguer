@@ -192,7 +192,6 @@
 
     <div class="actions">
       <button id="copy">Copiar codigo</button>
-      <button id="test-approved">Testar pedido confirmado</button>
       <a class="button secondary" href="/">Voltar para loja</a>
     </div>
 
@@ -207,7 +206,6 @@
     const pixCode = document.getElementById('pix-code');
     const statusBox = document.getElementById('status');
     const copyButton = document.getElementById('copy');
-    const testApprovedButton = document.getElementById('test-approved');
     const defaultCopyText = copyButton.textContent;
     const deliveryEstimateText = '25-35 min';
     let copyResetTimer = null;
@@ -347,8 +345,6 @@
         showCopyFeedback();
       }
     });
-
-    testApprovedButton.addEventListener('click', showOrderConfirmed);
 
     async function checkStatus() {
       if (orderConfirmed) {

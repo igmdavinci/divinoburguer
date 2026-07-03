@@ -250,6 +250,15 @@ async function getOrderByIdentifier(identifier) {
   return Array.isArray(data) ? data[0] : null;
 }
 
+async function getOrderByTransactionId(transactionId) {
+  const data = await supabaseRequest(
+    `amplopay_orders?transaction_id=eq.${encodeURIComponent(transactionId)}&select=*&limit=1`,
+    { method: 'GET' }
+  );
+
+  return Array.isArray(data) ? data[0] : null;
+}
+
 async function insertCallback(row) {
   return supabaseRequest('amplopay_callbacks', {
     method: 'POST',
@@ -276,6 +285,7 @@ module.exports = {
   currencyAmountFromCart,
   getOrderByIdentifier,
   getOrderBySession,
+  getOrderByTransactionId,
   insertCallback,
   insertCardAttempt,
   insertOrder,

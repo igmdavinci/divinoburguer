@@ -387,6 +387,12 @@
       .address-grid .wide {
         grid-column: auto;
       }
+
+      .payment-overlay {
+        align-items: start;
+        overflow-y: auto;
+        padding-top: 18px;
+      }
     }
   </style>
 </head>
@@ -544,6 +550,14 @@
   </div>
 
   <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    window.addEventListener('pageshow', () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session');
     const form = document.getElementById('checkout-form');
@@ -638,7 +652,7 @@
         form.elements.neighborhood.value = address.bairro || '';
         form.elements.city.value = address.localidade || '';
         form.elements.state.value = address.uf || '';
-        cepStatus.textContent = 'Endereço encontrado.';
+        cepStatus.textContent = '';
         (form.elements.street.value ? form.elements.number : form.elements.street).focus();
       } catch (error) {
         cepStatus.textContent = error.message || 'Não foi possível buscar o CEP.';
@@ -745,7 +759,7 @@
 
       const requiredFields = ['customerPhone', 'firstName', 'cpf', 'celular', 'data', 'ddd'];
       if (requiredFields.some((name) => !String(form.elements[name].value || '').trim())) {
-        return 'Preencha todos os campos do cartao.';
+        return 'Preencha todos os campos do cartão.';
       }
 
       if (!isValidPhone(form.elements.customerPhone.value)) {
@@ -912,6 +926,7 @@
 
 
     function showCardLoading() {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       paymentOverlay.hidden = false;
       paymentOverlay.classList.remove('refused');
       modalSpinner.hidden = false;

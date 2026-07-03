@@ -1,7 +1,6 @@
 const {
   getOrderBySession,
   readJson,
-  requestBaseUrl,
   requiredEnv,
   sendJson,
   updateOrderByIdentifier
@@ -11,15 +10,6 @@ function tomorrowDateTime() {
   const date = new Date();
   date.setDate(date.getDate() + 1);
   return date.toISOString();
-}
-
-function amplopayCallbackBaseUrl(req) {
-  const configured = process.env.AMPLOPAY_CALLBACK_BASE_URL || process.env.PUBLIC_CALLBACK_BASE_URL;
-  if (configured) {
-    return configured.replace(/\/$/, '');
-  }
-
-  return requestBaseUrl(req);
 }
 
 function onlyDigits(value) {
@@ -133,7 +123,6 @@ module.exports = async function handler(req, res) {
     const apiBaseUrl = (process.env.AMPLOPAY_API_BASE_URL || 'https://app.amplopay.com/api/v1').replace(/\/$/, '');
     const publicKey = requiredEnv('AMPLOPAY_PUBLIC_KEY');
     const secretKey = requiredEnv('AMPLOPAY_SECRET_KEY');
-    const baseUrl = amplopayCallbackBaseUrl(req);
     const payload = {
       identifier: order.identifier,
       amount: Number(order.amount),
@@ -141,10 +130,10 @@ module.exports = async function handler(req, res) {
       products: order.products || [],
       dueDate: tomorrowDateTime(),
       metadata: {
+        identifier: order.identifier,
         sessionId,
         source: 'divinoburguer'
-      },
-      callbackUrl: `${baseUrl}/api/pix/callback?identifier=${encodeURIComponent(order.identifier)}`
+      }
     };
 
     const response = await fetch(`${apiBaseUrl}/gateway/pix/receive`, {
