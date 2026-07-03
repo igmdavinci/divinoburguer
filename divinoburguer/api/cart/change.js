@@ -13,7 +13,12 @@ module.exports = async function handler(req, res) {
 
   const body = await readFormOrJson(req);
   const id = String(body.id || body.variant_id || '');
-  const quantity = Math.max(0, Number(body.quantity || 0));
+  const requestedQuantity = Number(body.quantity);
+  if (!Number.isFinite(requestedQuantity) || requestedQuantity < 0) {
+    return sendJson(res, 400, { message: 'Quantidade invalida.' });
+  }
+
+  const quantity = Math.floor(requestedQuantity);
   let items = readCartCookie(req);
 
   if (id) {

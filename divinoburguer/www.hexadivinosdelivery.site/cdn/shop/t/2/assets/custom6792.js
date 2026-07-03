@@ -8,6 +8,7 @@
   const defaultCustomerEmail = 'cliente@gmail.com';
   let estimatedLocation = { ...fallbackLocation };
   let estimatedLocationPromise = null;
+  const cartQuantityInputTimers = new Map();
 
   function isCartAddForm(form) {
     if (!form || form.tagName !== 'FORM') return false;
@@ -129,6 +130,14 @@
     document.querySelectorAll('cart-count').forEach((count) => {
       count.textContent = String(payload.item_count || 0);
     });
+
+    const cartPaths = ['/sacola', '/cart', '/cart/', '/cart.html'];
+    if (cartPaths.includes(window.location.pathname)) {
+      await renderLocalCart(payload);
+      showToast('Produto adicionado a sacola.', null);
+      return;
+    }
+
     showToast('Produto adicionado a sacola.', {
       href: '/sacola',
       label: 'Ir para sacola'
@@ -142,17 +151,28 @@
     });
   }
 
+  function normalizeQuantity(value, fallback = 1) {
+    const quantity = Number(value);
+    if (!Number.isFinite(quantity)) return fallback;
+    return Math.max(1, Math.floor(quantity));
+  }
+
   function cartLineTemplate(item) {
     const image = item.image || '';
     const title = item.product_title || item.title || 'Produto';
     const id = item.variant_id || item.id || '';
+    const quantity = normalizeQuantity(item.quantity);
 
     return `
       <div class="divino-cart-line" data-cart-item-id="${id}">
         ${image ? `<img src="${image}" alt="" loading="lazy" decoding="async">` : ''}
         <div class="divino-cart-line__info">
-          <strong>${title}</strong>
-          <span>Quantidade: ${item.quantity || 1}</span>
+          <strong>${escapeHtml(title)}</strong>
+          <div class="divino-cart-quantity" aria-label="Quantidade de ${escapeHtml(title)}">
+            <button type="button" class="divino-cart-quantity__button" data-cart-quantity-action="decrease" data-cart-quantity-id="${id}" aria-label="Diminuir quantidade" ${quantity <= 1 ? 'disabled' : ''}>-</button>
+            <input class="divino-cart-quantity__input" data-cart-quantity="${id}" data-cart-current="${quantity}" type="number" min="1" step="1" inputmode="numeric" value="${quantity}" aria-label="Quantidade">
+            <button type="button" class="divino-cart-quantity__button" data-cart-quantity-action="increase" data-cart-quantity-id="${id}" aria-label="Aumentar quantidade">+</button>
+          </div>
           <button type="button" class="divino-cart-remove" data-cart-remove="${id}">Remover</button>
         </div>
         <strong>${formatMoney(item.final_line_price || item.line_price || item.final_price || item.price)}</strong>
@@ -520,6 +540,48 @@
     }
 
     return response.json();
+  }
+
+  async function updateCartItemQuantity(id, quantity) {
+    if (!id) return;
+
+    const response = await fetch('/cart/change.js', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: new URLSearchParams({
+        id: String(id),
+        quantity: String(normalizeQuantity(quantity))
+      }).toString()
+    });
+
+    if (!response.ok) {
+      throw new Error('Nao foi possivel atualizar a quantidade.');
+    }
+
+    return response.json();
+  }
+
+  function showCartError(message) {
+    const errorBox = document.getElementById('divino-cart-error');
+    if (!errorBox) return;
+
+    errorBox.textContent = message || 'Nao foi possivel atualizar a sacola.';
+    errorBox.hidden = false;
+  }
+
+  function setCartLineBusy(control, busy) {
+    const line = control && control.closest ? control.closest('.divino-cart-line') : null;
+    if (!line) return;
+
+    line.classList.toggle('is-updating', busy);
+    line.querySelectorAll('button, input').forEach((field) => {
+      field.disabled = busy;
+    });
   }
 
   function openPixModal(payload, orderDraft) {
@@ -1022,11 +1084,11 @@
   }
 
   async function startCheckout(button) {
-    const cart = await fetch('/cart.json', { credentials: 'same-origin' }).then((response) => response.json());
+    const cart = await fetch('/cart.json', { credentials: 'same-origin', cache: 'no-store' }).then((response) => response.json());
     renderCheckoutSection(cart);
   }
 
-  async function renderLocalCart() {
+  async function renderLocalCart(cartOverride) {
     const cartPaths = ['/sacola', '/cart', '/cart/', '/cart.html'];
     if (!cartPaths.includes(window.location.pathname)) return;
 
@@ -1034,7 +1096,7 @@
     if (!main) return;
 
     try {
-      const cart = await fetch('/cart.json', { credentials: 'same-origin' }).then((response) => response.json());
+      const cart = cartOverride || await fetch('/cart.json', { credentials: 'same-origin', cache: 'no-store' }).then((response) => response.json());
       document.querySelectorAll('cart-count').forEach((count) => {
         count.textContent = String(cart.item_count || 0);
       });
@@ -1081,17 +1143,78 @@
           button.textContent = 'Removendo...';
 
           try {
-            await removeCartItem(button.getAttribute('data-cart-remove'));
-            await renderLocalCart();
+            const updatedCart = await removeCartItem(button.getAttribute('data-cart-remove'));
+            await renderLocalCart(updatedCart);
           } catch (error) {
-            const errorBox = document.getElementById('divino-cart-error');
-            if (errorBox) {
-              errorBox.textContent = error.message || 'Nao foi possivel remover o item.';
-              errorBox.hidden = false;
-            }
+            showCartError(error.message || 'Nao foi possivel remover o item.');
             button.disabled = false;
             button.textContent = 'Remover';
           }
+        });
+      });
+
+      document.querySelectorAll('[data-cart-quantity-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const id = button.getAttribute('data-cart-quantity-id');
+          const line = button.closest('.divino-cart-line');
+          const input = line ? line.querySelector('[data-cart-quantity]') : null;
+          const current = normalizeQuantity(input ? input.value : 1);
+          const nextQuantity = button.getAttribute('data-cart-quantity-action') === 'increase'
+            ? current + 1
+            : Math.max(1, current - 1);
+
+          if (!input || nextQuantity === current) return;
+          input.value = String(nextQuantity);
+          setCartLineBusy(button, true);
+
+          try {
+            const updatedCart = await updateCartItemQuantity(id, nextQuantity);
+            await renderLocalCart(updatedCart);
+          } catch (error) {
+            showCartError(error.message || 'Nao foi possivel atualizar a quantidade.');
+            setCartLineBusy(button, false);
+            input.value = input.getAttribute('data-cart-current') || String(current);
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-cart-quantity]').forEach((input) => {
+        const commitQuantityInput = async () => {
+          const id = input.getAttribute('data-cart-quantity');
+          window.clearTimeout(cartQuantityInputTimers.get(id));
+          cartQuantityInputTimers.delete(id);
+
+          const current = normalizeQuantity(input.getAttribute('data-cart-current') || 1);
+          const nextQuantity = normalizeQuantity(input.value, current);
+
+          input.value = String(nextQuantity);
+          if (nextQuantity === current) return;
+
+          setCartLineBusy(input, true);
+
+          try {
+            const updatedCart = await updateCartItemQuantity(id, nextQuantity);
+            await renderLocalCart(updatedCart);
+          } catch (error) {
+            showCartError(error.message || 'Nao foi possivel atualizar a quantidade.');
+            setCartLineBusy(input, false);
+            input.value = String(current);
+          }
+        };
+
+        input.addEventListener('input', () => {
+          const id = input.getAttribute('data-cart-quantity');
+          window.clearTimeout(cartQuantityInputTimers.get(id));
+          cartQuantityInputTimers.set(id, window.setTimeout(commitQuantityInput, 450));
+        });
+
+        input.addEventListener('change', commitQuantityInput);
+
+        input.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter') return;
+          event.preventDefault();
+          input.blur();
+          commitQuantityInput();
         });
       });
     } catch {
