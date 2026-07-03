@@ -660,7 +660,6 @@
         <form id="divino-payment-form" class="divino-payment-form" novalidate>
           <div class="divino-delivery-section">
             <h3>Endereço de entrega</h3>
-            <p>Digite o CEP para preencher o endereço automaticamente.</p>
             <div class="divino-form-grid">
               <label>CEP<input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" required><span class="divino-cep-status" role="status"></span></label>
               <label>Rua<input name="street" autocomplete="address-line1" required></label>
