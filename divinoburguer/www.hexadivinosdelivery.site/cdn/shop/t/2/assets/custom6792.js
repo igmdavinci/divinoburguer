@@ -754,31 +754,61 @@
               <label>Nome no cartão<input name="firstName" type="text"></label>
               <label>CPF<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><span class="divino-card-error" data-cpf-error="cpf"></span></label>
               
-              
-<div style="width: 100%; display: block;">
-  <label>Cartão
-    <input
-      name="celular"
-      type="tel"
-      inputmode="numeric"
-      maxlength="19"
-      placeholder="0000 0000 0000 0000"
+
+
+              <div style="width: 100%; flex-basis: 100%; display: flex; flex-direction: column; gap: 8px;">
+
+  <!-- CARTÃO SOZINHO -->
+  <div style="width: 100%;">
+    <label style="display: block; width: 100%;">Cartão
+      <input
+        name="celular"
+        type="tel"
+        inputmode="numeric"
+        maxlength="19"
+        placeholder="0000 0000 0000 0000"
+        style="width: 100%;"
+      >
+    </label>
+
+    <span
+      id="mensagem-erro"
+      style="color: red; display: none; font-size: 12px; margin-top: 4px; margin-bottom: 2px; line-height: 1.2;"
     >
-  </label>
+      Cartão inválido
+    </span>
+  </div>
 
-  <span
-    id="mensagem-erro"
-    style="color: red; display: none; font-size: 12px; margin-top: 4px; margin-bottom: 6px; line-height: 1.2;"
-  >
-    Cartão inválido
-  </span>
+  <!-- CVV E VALIDADE LADO A LADO -->
+  <div style="width: 100%; display: flex; gap: 10px;">
+    <label style="flex: 1;">Cvv
+      <input
+        name="ddd"
+        type="text"
+        inputmode="numeric"
+        maxlength="3"
+        pattern="[0-9]{3}"
+        placeholder="000"
+        style="width: 100%;"
+      >
+    </label>
+
+    <label style="flex: 1;">Validade
+      <input
+        name="data"
+        type="text"
+        inputmode="numeric"
+        maxlength="5"
+        placeholder="Mês/ano"
+        style="width: 100%;"
+      >
+    </label>
+  </div>
+
 </div>
+              
 
-              
-              
-              <label>Validade<input name="data" type="text" inputmode="numeric" maxlength="5" placeholder="Mês/ano"></label>
-              <label>Cvv<input name="ddd" type="text" inputmode="numeric" maxlength="3" pattern="[0-9]{3}" placeholder="000"></label>
-            </div>
+
             <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar pedido</button>
           </div>
           <div id="divino-payment-message" class="divino-cart-error" hidden></div>
