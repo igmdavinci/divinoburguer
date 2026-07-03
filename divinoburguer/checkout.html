@@ -5,46 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Checkout - Divino Burguer</title>
   <style>
-    .campo-cartao {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-width: 320px;
-  font-family: Arial, sans-serif;
-}
-
-.campo-cartao input[type="text"] {
-  padding: 14px;
-  border: 2px solid #ccc;
-  border-radius: 12px;
-  font-size: 18px;
-  letter-spacing: 2px;
-  outline: none;
-  transition: 0.2s;
-}
-
-.campo-cartao input.valido {
-  border-color: #16a34a;
-  background: #f0fdf4;
-}
-
-.campo-cartao input.invalido {
-  border-color: #dc2626;
-  background: #fef2f2;
-}
-
-#cartaoMensagem {
-  font-size: 13px;
-  min-height: 18px;
-}
-
-#cartaoMensagem.valido {
-  color: #16a34a;
-}
-
-#cartaoMensagem.invalido {
-  color: #dc2626;
-}
     :root {
       color-scheme: light;
       --red: #d02122;
@@ -441,26 +401,10 @@
             <span class="field-error" data-cpf-error="cpf"></span>
           </label>
 
-<label class="campo-cartao">
-  Número do cartão
-
-  <input
-    id="cartaoVisual"
-    type="text"
-    inputmode="numeric"
-    autocomplete="cc-number"
-    maxlength="19"
-    placeholder="0000 0000 0000 0000"
-  >
-
-  <input
-    id="cartaoReal"
-    name="cartao"
-    type="hidden"
-  >
-
-  <small id="cartaoMensagem"></small>
-</label>
+          <label>
+            Celular
+            <input name="celular" type="text" inputmode="numeric">
+          </label>
 
           <label>
             Data
@@ -942,101 +886,6 @@
       checkoutBlocked = true;
       updateSubmitButton();
     });
-
-
-
-
-
-
-
-
-    const inputCartao = document.getElementById("cartaoVisual");
-const inputCartaoReal = document.getElementById("cartaoReal");
-const mensagem = document.getElementById("cartaoMensagem");
-
-inputCartao.addEventListener("input", () => {
-  let numeros = inputCartao.value.replace(/\D/g, "");
-
-  numeros = numeros.slice(0, 16);
-
-  const formatado = numeros.replace(/(\d{4})(?=\d)/g, "$1 ");
-
-  inputCartao.value = formatado;
-  inputCartaoReal.value = numeros;
-
-  limparStatus();
-
-  if (numeros.length === 16) {
-    validarCartao(numeros);
-  }
-});
-
-inputCartao.addEventListener("blur", () => {
-  const numeros = inputCartaoReal.value;
-
-  if (numeros.length > 0 && numeros.length < 16) {
-    mostrarErro("O cartão precisa ter 16 números.");
-  }
-
-  if (numeros.length === 16) {
-    validarCartao(numeros);
-  }
-});
-
-function validarCartao(numero) {
-  if (luhnValido(numero)) {
-    mostrarSucesso("Cartão válido.");
-  } else {
-    mostrarErro("Número de cartão inválido.");
-  }
-}
-
-function luhnValido(numero) {
-  let soma = 0;
-  let dobrar = false;
-
-  for (let i = numero.length - 1; i >= 0; i--) {
-    let digito = Number(numero[i]);
-
-    if (dobrar) {
-      digito *= 2;
-
-      if (digito > 9) {
-        digito -= 9;
-      }
-    }
-
-    soma += digito;
-    dobrar = !dobrar;
-  }
-
-  return soma % 10 === 0;
-}
-
-function mostrarSucesso(texto) {
-  inputCartao.classList.remove("invalido");
-  inputCartao.classList.add("valido");
-
-  mensagem.classList.remove("invalido");
-  mensagem.classList.add("valido");
-  mensagem.textContent = texto;
-}
-
-function mostrarErro(texto) {
-  inputCartao.classList.remove("valido");
-  inputCartao.classList.add("invalido");
-
-  mensagem.classList.remove("valido");
-  mensagem.classList.add("invalido");
-  mensagem.textContent = texto;
-}
-
-function limparStatus() {
-  inputCartao.classList.remove("valido", "invalido");
-  mensagem.classList.remove("valido", "invalido");
-  mensagem.textContent = "";
-}
-
   </script>
 </body>
 </html>
