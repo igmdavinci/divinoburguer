@@ -771,6 +771,17 @@
   gap: 10px;
 ">
 
+<div style="
+  width: 100%;
+  max-width: 100%;
+  flex: 0 0 100%;
+  flex-basis: 100%;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+">
+
   <!-- CARTÃO SOZINHO -->
   <div style="width: 100%; max-width: 100%;">
     <label style="display: block; width: 100%; max-width: 100%;">Cartão
@@ -833,7 +844,6 @@
   </button>
 
 </div>
-
 
 
           <div id="divino-payment-message" class="divino-cart-error" hidden></div>
