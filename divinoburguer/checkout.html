@@ -12,6 +12,8 @@
       --muted: #676767;
       --line: #e8e0dc;
       --paper: #fffaf6;
+      --warm: #fff3ea;
+      --field: #fffdfb;
       --white: #ffffff;
       --green: #12805c;
       --danger: #a31919;
@@ -24,7 +26,7 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: var(--paper);
+      background: linear-gradient(180deg, var(--warm) 0, var(--paper) 220px);
       color: var(--ink);
     }
 
@@ -84,6 +86,11 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 22px;
+      box-shadow: 0 14px 34px rgba(25, 25, 25, 0.06);
+    }
+
+    section {
+      background: linear-gradient(180deg, #ffffff 0, #fffaf6 100%);
     }
 
     form {
@@ -106,12 +113,16 @@
       padding: 11px 12px;
       font: inherit;
       color: var(--ink);
-      background: var(--white);
+      background: var(--field);
+      box-shadow: inset 0 1px 0 rgba(25, 25, 25, 0.03);
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
 
     input:focus {
-      outline: 2px solid rgba(208, 33, 34, 0.22);
+      outline: 0;
       border-color: var(--red);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(208, 33, 34, 0.13);
     }
 
     input.invalid {
@@ -134,6 +145,7 @@
       font: inherit;
       font-weight: 800;
       cursor: pointer;
+      box-shadow: 0 8px 18px rgba(208, 33, 34, 0.18);
     }
 
     button:disabled {
@@ -159,7 +171,9 @@
       border: 1px solid #d8ceca;
       border-radius: 6px;
       padding: 12px;
+      background: var(--field);
       cursor: pointer;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
 
     .payment-option input {
@@ -170,6 +184,7 @@
 
     .payment-option:has(input:checked) {
       border-color: var(--red);
+      background: #fff7f2;
       box-shadow: 0 0 0 2px rgba(208, 33, 34, 0.12);
     }
 
@@ -191,9 +206,22 @@
     }
 
     .form-section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin: 0;
       font-size: 18px;
       line-height: 1.25;
+    }
+
+    .form-section-title::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(208, 33, 34, 0.12);
     }
 
     .form-section-description {
@@ -313,7 +341,8 @@
 
     .payment-modal {
       width: min(420px, 100%);
-      background: var(--white);
+      background: linear-gradient(180deg, var(--paper) 0, var(--white) 120px);
+      border: 1px solid rgba(208, 33, 34, 0.14);
       border-radius: 8px;
       padding: 26px;
       text-align: center;
