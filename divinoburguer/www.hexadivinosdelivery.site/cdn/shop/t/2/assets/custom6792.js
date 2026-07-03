@@ -758,6 +758,8 @@
 
               <div style="width: 100%; flex-basis: 100%; display: flex; flex-direction: column; gap: 8px;">
 
+<div style="width: 100%; flex: 0 0 100%; display: flex; flex-direction: column; gap: 10px;">
+
   <!-- CARTÃO SOZINHO -->
   <div style="width: 100%;">
     <label style="display: block; width: 100%;">Cartão
@@ -773,7 +775,7 @@
 
     <span
       id="mensagem-erro"
-      style="color: red; display: none; font-size: 12px; margin-top: 4px; margin-bottom: 2px; line-height: 1.2;"
+      style="color: red; display: none; font-size: 12px; margin-top: 4px; line-height: 1.2;"
     >
       Cartão inválido
     </span>
@@ -805,12 +807,19 @@
     </label>
   </div>
 
+  <!-- BOTÃO SEMPRE EMBAIXO -->
+  <button
+    type="submit"
+    class="button button--primary"
+    style="width: 100%; margin-top: 12px;"
+  >
+    Finalizar pedido
+  </button>
+
 </div>
-              
 
 
-            <button type="submit" class="button button--primary" style="margin-top: 12px;">Finalizar pedido</button>
-          </div>
+
           <div id="divino-payment-message" class="divino-cart-error" hidden></div>
         </form>
       </div>
