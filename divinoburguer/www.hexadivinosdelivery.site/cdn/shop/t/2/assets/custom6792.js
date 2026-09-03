@@ -1721,3 +1721,35 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileMenu.appendChild(item);
   }
 });
+
+// Precos definidos pelo administrador. O carrinho e o checkout calculam os
+// valores no servidor; este trecho atualiza somente a exibicao do catalogo.
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('/api/catalog/prices', { credentials: 'same-origin' });
+    const payload = await response.json();
+    if (!response.ok || !Array.isArray(payload.products)) return;
+
+    const pricesByProduct = new Map(payload.products.map((product) => [
+      String(product.product_id),
+      Number(product.price)
+    ]));
+    const format = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+
+    document.querySelectorAll('input[name="product-id"]').forEach((input) => {
+      const price = pricesByProduct.get(String(input.value));
+      if (!Number.isFinite(price)) return;
+
+      const item = input.closest('product-item, .product-item');
+      if (!item) return;
+      item.querySelectorAll('.price').forEach((priceElement) => {
+        priceElement.textContent = format.format(price / 100);
+      });
+    });
+  } catch {
+    // Se a API estiver indisponivel, mantem os valores publicados no catalogo.
+  }
+});

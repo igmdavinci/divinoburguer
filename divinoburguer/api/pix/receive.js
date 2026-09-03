@@ -1,6 +1,7 @@
 const {
   getOrderBySession,
   readJson,
+  requestBaseUrl,
   requiredEnv,
   sendJson,
   updateOrderByIdentifier
@@ -9,7 +10,7 @@ const {
 function tomorrowDateTime() {
   const date = new Date();
   date.setDate(date.getDate() + 1);
-  return date.toISOString();
+  return date.toISOString().slice(0, 10);
 }
 
 function onlyDigits(value) {
@@ -61,14 +62,14 @@ function normalizeGatewayError(payload, statusCode) {
   if (statusCode === 403 && !message) {
     return {
       ...payload,
-      message: 'A Amplopay bloqueou a requisicao. Em teste local, use uma URL publica para callback e confira se a credencial esta ativa.'
+      message: 'A SigiloPay bloqueou a requisicao. Em teste local, use uma URL publica para callback e confira se a credencial esta ativa.'
     };
   }
 
   if (/permiss[aã]o|Criar\/Consultar Transa/i.test(message)) {
     return {
       ...payload,
-      message: 'A chave da Amplopay nao tem permissao para Criar/Consultar Transacoes. Ative essa permissao no painel da Amplopay ou solicite a liberacao ao suporte.'
+      message: 'A chave da SigiloPay nao tem permissao para criar ou consultar transacoes. Ative essa permissao no painel da SigiloPay ou solicite a liberacao ao suporte.'
     };
   }
 
@@ -120,7 +121,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const apiBaseUrl = (process.env.AMPLOPAY_API_BASE_URL || 'https://app.amplopay.com/api/v1').replace(/\/$/, '');
+    const apiBaseUrl = (process.env.AMPLOPAY_API_BASE_URL || 'https://app.sigilopay.com.br/api/v1').replace(/\/$/, '');
     const publicKey = requiredEnv('AMPLOPAY_PUBLIC_KEY');
     const secretKey = requiredEnv('AMPLOPAY_SECRET_KEY');
     const payload = {
@@ -129,6 +130,7 @@ module.exports = async function handler(req, res) {
       client,
       products: order.products || [],
       dueDate: tomorrowDateTime(),
+      callbackUrl: `${requestBaseUrl(req)}/api/pix/callback?identifier=${encodeURIComponent(order.identifier)}`,
       metadata: {
         identifier: order.identifier,
         sessionId,

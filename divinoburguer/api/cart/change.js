@@ -28,5 +28,5 @@ module.exports = async function handler(req, res) {
   }
 
   writeCartCookie(res, items);
-  return sendJson(res, 200, cartResponse(items));
+  return sendJson(res, 200, await cartResponse(items));
 };

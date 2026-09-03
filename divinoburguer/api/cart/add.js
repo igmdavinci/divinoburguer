@@ -33,7 +33,7 @@ module.exports = async function handler(req, res) {
 
   const wantsJson = req.url.endsWith('.js') || String(req.headers.accept || '').includes('application/json');
   if (wantsJson) {
-    return sendJson(res, 200, cartResponse(items));
+    return sendJson(res, 200, await cartResponse(items));
   }
 
   res.statusCode = 303;

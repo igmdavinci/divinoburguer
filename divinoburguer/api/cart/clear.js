@@ -7,5 +7,5 @@ module.exports = async function handler(req, res) {
   }
 
   clearCartCookie(res);
-  return sendJson(res, 200, cartResponse([]));
+  return sendJson(res, 200, await cartResponse([]));
 };

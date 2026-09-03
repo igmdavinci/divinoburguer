@@ -80,6 +80,36 @@
       flex-wrap: wrap;
       margin-bottom: 16px;
     }
+    .section-title {
+      margin: 0 0 6px;
+      font-size: 19px;
+    }
+    .section-copy {
+      margin: 0 0 18px;
+    }
+    .price-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: none;
+    }
+    .price-form input {
+      width: 108px;
+      min-height: 38px;
+      padding: 8px 10px;
+    }
+    .price-form button {
+      min-height: 38px;
+      white-space: nowrap;
+    }
+    .price-form .reset-price {
+      background: #6a5c57;
+    }
+    .admin-section + .admin-section {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid #e8e0dc;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -156,7 +186,15 @@
         <button type="button" class="secondary" id="clear-list" disabled>Limpar lista</button>
         <button type="button" class="secondary" id="logout">Sair</button>
       </div>
-      <div id="cards"></div>
+      <section class="admin-section">
+        <h2 class="section-title">Precos do cardapio</h2>
+        <p class="muted section-copy">Altere o preco em reais. O novo valor aparece no site e passa a ser usado no carrinho e no checkout.</p>
+        <div id="products"></div>
+      </section>
+      <section class="admin-section">
+        <h2 class="section-title">Registros</h2>
+        <div id="cards"></div>
+      </section>
     </section>
   </main>
 
@@ -164,10 +202,53 @@
     const loginPanel = document.getElementById('login-panel');
     const cardsPanel = document.getElementById('cards-panel');
     const cardsBox = document.getElementById('cards');
+    const productsBox = document.getElementById('products');
     const loginError = document.getElementById('login-error');
     const exportButton = document.getElementById('export-txt');
     const clearButton = document.getElementById('clear-list');
     let cardRecords = [];
+
+    function moneyFromCents(value) {
+      return (Number(value || 0) / 100).toFixed(2).replace('.', ',');
+    }
+
+    async function renderProducts() {
+      productsBox.innerHTML = '<p class="muted">Carregando cardapio...</p>';
+      const response = await fetch('/api/admin/products', {
+        credentials: 'same-origin'
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.message || 'Nao foi possivel carregar o cardapio.');
+      }
+
+      const products = payload.products || [];
+      if (!products.length) {
+        productsBox.innerHTML = '<p class="muted">Nenhum produto encontrado.</p>';
+        return;
+      }
+
+      productsBox.innerHTML = `
+        <table>
+          <thead><tr><th>Produto</th><th>Preco</th><th>Acao</th></tr></thead>
+          <tbody>
+            ${products.map((product) => `
+              <tr>
+                <td data-label="Produto">${escapeHtml(product.title)}</td>
+                <td data-label="Preco">R$ ${moneyFromCents(product.price)}</td>
+                <td data-label="Acao">
+                  <form class="price-form" data-variant-id="${escapeHtml(product.id)}">
+                    <input name="price" inputmode="decimal" aria-label="Novo preco para ${escapeHtml(product.title)}" value="${moneyFromCents(product.price)}" required>
+                    <button type="submit">Salvar</button>
+                    <button type="button" class="reset-price" title="Voltar ao preco original">Restaurar</button>
+                  </form>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -258,6 +339,9 @@
       loginPanel.hidden = authenticated;
       cardsPanel.hidden = !authenticated;
       if (authenticated) {
+        renderProducts().catch((error) => {
+          productsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+        });
         renderCards().catch((error) => {
           cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
         });
@@ -326,9 +410,56 @@
     });
 
     document.getElementById('refresh').addEventListener('click', () => {
+      renderProducts().catch((error) => {
+        productsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
+      });
       renderCards().catch((error) => {
         cardsBox.innerHTML = `<p class="error">${escapeHtml(error.message)}</p>`;
       });
+    });
+    productsBox.addEventListener('submit', async (event) => {
+      const form = event.target.closest('.price-form');
+      if (!form) return;
+      event.preventDefault();
+      const submit = form.querySelector('button[type="submit"]');
+      submit.disabled = true;
+      try {
+        const response = await fetch('/api/admin/products', {
+          method: 'PATCH',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variantId: form.dataset.variantId, price: new FormData(form).get('price') })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.message || 'Nao foi possivel salvar o preco.');
+        await renderProducts();
+      } catch (error) {
+        window.alert(error.message);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    productsBox.addEventListener('click', async (event) => {
+      const button = event.target.closest('.reset-price');
+      if (!button) return;
+      const form = button.closest('.price-form');
+      if (!window.confirm('Restaurar o preco original deste produto?')) return;
+      button.disabled = true;
+      try {
+        const response = await fetch('/api/admin/products', {
+          method: 'DELETE',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variantId: form.dataset.variantId })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.message || 'Nao foi possivel restaurar o preco.');
+        await renderProducts();
+      } catch (error) {
+        window.alert(error.message);
+      } finally {
+        button.disabled = false;
+      }
     });
     exportButton.addEventListener('click', exportTxt);
     clearButton.addEventListener('click', () => {

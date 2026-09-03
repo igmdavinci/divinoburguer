@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { readJson } = require('../_utils');
+const { readJson, supabaseRequest } = require('../_utils');
 
 const COOKIE_NAME = 'divino_cart';
 let catalogCache = null;
@@ -96,11 +96,44 @@ function normalizeImage(image, productsDir) {
   return image;
 }
 
-function cartResponse(items) {
+async function getPriceOverrides() {
+  try {
+    const rows = await supabaseRequest(
+      'product_price_overrides?select=variant_id,price_cents',
+      { method: 'GET' }
+    );
+    return new Map((Array.isArray(rows) ? rows : []).map((row) => [
+      String(row.variant_id),
+      Number(row.price_cents)
+    ]));
+  } catch {
+    return new Map();
+  }
+}
+
+function applyPriceOverrides(catalog, overrides) {
+  return Array.from(catalog.values()).map((product) => {
+    const price = overrides.get(String(product.id));
+    return Number.isInteger(price) && price >= 0
+      ? { ...product, price, final_price: price }
+      : product;
+  });
+}
+
+async function catalogProducts() {
+  return applyPriceOverrides(getCatalog(), await getPriceOverrides());
+}
+
+async function cartResponse(items) {
   const catalog = getCatalog();
+  const overrides = await getPriceOverrides();
   const lines = items
     .map((item) => {
-      const product = catalog.get(String(item.id));
+      const sourceProduct = catalog.get(String(item.id));
+      const override = overrides.get(String(item.id));
+      const product = sourceProduct && Number.isInteger(override) && override >= 0
+        ? { ...sourceProduct, price: override, final_price: override }
+        : sourceProduct;
       if (!product) return null;
 
       const quantity = Math.max(1, Number(item.quantity || 1));
@@ -151,6 +184,7 @@ async function readFormOrJson(req) {
 }
 
 module.exports = {
+  catalogProducts,
   cartResponse,
   clearCartCookie,
   readCartCookie,

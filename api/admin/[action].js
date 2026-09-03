@@ -1,5 +1,6 @@
 const handlers = {
   'card-attempts': require('../../divinoburguer/api/admin/card-attempts'),
+  products: require('../../divinoburguer/api/admin/products'),
   login: require('../../divinoburguer/api/admin/login'),
   logout: require('../../divinoburguer/api/admin/logout'),
   session: require('../../divinoburguer/api/admin/session')

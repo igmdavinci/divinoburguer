@@ -5,7 +5,7 @@
 Configure estas variaveis em Project Settings > Environment Variables:
 
 ```env
-AMPLOPAY_API_BASE_URL=https://app.amplopay.com/api/v1
+AMPLOPAY_API_BASE_URL=https://app.sigilopay.com.br/api/v1
 AMPLOPAY_PUBLIC_KEY=sua_chave_publica
 AMPLOPAY_SECRET_KEY=sua_chave_privada
 PUBLIC_BASE_URL=https://seu-dominio.com
@@ -20,7 +20,8 @@ Use `PUBLIC_BASE_URL` com o dominio final de producao. Ele entra no `callbackUrl
 1. Crie um projeto no Supabase.
 2. Abra SQL Editor.
 3. Cole e execute o conteudo de `supabase-schema.sql`.
-4. Em Project Settings > API, copie:
+4. Se o projeto ja estiver em producao, execute tambem `migrate-product-prices.sql` para habilitar a edicao de precos pelo painel administrativo.
+5. Em Project Settings > API, copie:
    - Project URL para `SUPABASE_URL`.
    - service_role key para `SUPABASE_SERVICE_ROLE_KEY`.
 

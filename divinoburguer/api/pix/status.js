@@ -13,7 +13,7 @@ function normalizeGatewayError(payload, statusCode) {
   if (statusCode === 403 || /permiss[aã]o|Criar\/Consultar Transa/i.test(message)) {
     return {
       ...payload,
-      message: 'A chave da Amplopay nao tem permissao para Criar/Consultar Transacoes. Ative essa permissao no painel da Amplopay ou solicite a liberacao ao suporte.'
+      message: 'A chave da SigiloPay nao tem permissao para criar ou consultar transacoes. Ative essa permissao no painel da SigiloPay ou solicite a liberacao ao suporte.'
     };
   }
 
@@ -35,12 +35,12 @@ module.exports = async function handler(req, res) {
       return sendJson(res, 400, { message: 'Informe id ou clientIdentifier.' });
     }
 
-    const apiBaseUrl = (process.env.AMPLOPAY_API_BASE_URL || 'https://app.amplopay.com/api/v1').replace(/\/$/, '');
+    const apiBaseUrl = (process.env.AMPLOPAY_API_BASE_URL || 'https://app.sigilopay.com.br/api/v1').replace(/\/$/, '');
     const params = new URLSearchParams();
     if (id) params.set('id', id);
     if (clientIdentifier) params.set('clientIdentifier', clientIdentifier);
 
-    const response = await fetch(`${apiBaseUrl}/gateway/transfers?${params.toString()}`, {
+    const response = await fetch(`${apiBaseUrl}/gateway/transactions?${params.toString()}`, {
       method: 'GET',
       headers: {
         'x-public-key': requiredEnv('AMPLOPAY_PUBLIC_KEY'),

@@ -6,5 +6,5 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { message: 'Metodo nao permitido.' });
   }
 
-  return sendJson(res, 200, cartResponse(readCartCookie(req)));
+  return sendJson(res, 200, await cartResponse(readCartCookie(req)));
 };

@@ -51,7 +51,7 @@ module.exports = async function handler(req, res) {
     let cartPayload = body.cart_payload || body.cartPayload || body.cart || {};
 
     if (!cartHasTotal(cartPayload)) {
-      const cookieCart = cartResponse(readCartCookie(req));
+      const cookieCart = await cartResponse(readCartCookie(req));
       if (cartHasTotal(cookieCart)) {
         cartPayload = cookieCart;
       }
