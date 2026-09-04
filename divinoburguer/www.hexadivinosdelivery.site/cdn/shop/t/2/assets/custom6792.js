@@ -6,6 +6,7 @@
   // CEP 29230-000 (Anchieta/ES). Como o CEP abrange a cidade, usamos seu
   // ponto central para calcular uma estimativa, não uma rota de GPS.
   const storeLocation = { latitude: -20.7955, longitude: -40.6425 };
+  const deliveryMaxDistanceKm = 72;
   const minimumOrderCents = 1500;
   let deliveryEstimateText = '30-40 min';
   const defaultCustomerEmail = 'cliente@gmail.com';
@@ -1552,8 +1553,15 @@ if (formPagamento) {
       return;
     }
 
-    const lower = Math.max(30, Math.round(30 + distance * 2));
-    const upper = lower + Math.max(10, Math.round(distance * 0.8));
+    if (distance > deliveryMaxDistanceKm) {
+      deliveryEstimateText = 'consulte disponibilidade';
+      if (distanceElement) distanceElement.textContent = `fora da área de entrega (até ${deliveryMaxDistanceKm} km)`;
+      if (timeElement) timeElement.textContent = 'Consulte disponibilidade';
+      return;
+    }
+
+    const lower = Math.min(45, Math.max(30, Math.round(30 + distance * 0.21)));
+    const upper = Math.min(50, lower + 5);
     deliveryEstimateText = `${lower}-${upper} min`;
     if (distanceElement) distanceElement.textContent = `${distance.toFixed(1).replace('.', ',')} km de você`;
     if (timeElement) timeElement.textContent = `${deliveryEstimateText}`;
@@ -1609,9 +1617,11 @@ if (formPagamento) {
     }
 
     if (result) {
-      const deliveryTime = isEspiritosanto(location.state)
+      const availableForDelivery = isEspiritosanto(location.state)
+        && (distanceInKm(location) === null || distanceInKm(location) <= deliveryMaxDistanceKm);
+      const deliveryTime = availableForDelivery
         ? `<i class="fa-solid fa-motorcycle"></i> <b>${deliveryEstimateText}</b>`
-        : '<b>Entregas somente no Espírito Santo</b>';
+        : `<b>Entregas em até ${deliveryMaxDistanceKm} km</b>`;
       result.style.display = 'block';
       result.innerHTML = `
         <table class="table">
