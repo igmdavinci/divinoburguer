@@ -257,6 +257,9 @@
                 <td data-label="Preço normal">R$ ${moneyFromCents(product.regular_price || product.price)}</td>
                 <td data-label="Acao">
                   <form class="price-form" data-variant-id="${escapeHtml(product.id)}">
+                    <label>Nome do produto
+                      <input name="title" aria-label="Nome de ${escapeHtml(product.title)}" value="${escapeHtml(product.title)}" required>
+                    </label>
                     <label>Preço normal
                       <input name="price" inputmode="decimal" aria-label="Preço normal para ${escapeHtml(product.title)}" value="${moneyFromCents(product.regular_price || product.price)}" required>
                     </label>
@@ -455,6 +458,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             variantId: form.dataset.variantId,
+            title: new FormData(form).get('title'),
             price: new FormData(form).get('price'),
             promotionalPrice: new FormData(form).get('promotionalPrice')
           })

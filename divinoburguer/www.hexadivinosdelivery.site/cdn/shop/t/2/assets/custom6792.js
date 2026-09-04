@@ -1734,6 +1734,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       String(product.product_id),
       {
         price: Number(product.price),
+        title: String(product.title || '').trim(),
         compareAtPrice: Number(product.compare_at_price),
         isPromotion: Number(product.promotional_price) > 0
           && Number(product.promotional_price) < Number(product.compare_at_price)
@@ -1750,6 +1751,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const item = input.closest('product-item, .product-item');
       if (!item) return;
+      if (productPrice.title) {
+        item.querySelectorAll('.product-item-meta__title, .product-meta__title').forEach((titleElement) => {
+          titleElement.textContent = productPrice.title;
+        });
+      }
       item.querySelectorAll('.price').forEach((priceElement) => {
         const container = priceElement.closest('.price-list, .product-meta__price-list-container, .product-item-meta__price-list-container') || priceElement.parentElement;
         if (!container) return;
