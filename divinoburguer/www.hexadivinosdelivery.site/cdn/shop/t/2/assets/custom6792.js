@@ -1,10 +1,13 @@
 (() => {
   const fallbackLocation = {
-    city: 'Cariacica',
-    state: 'Espirito Santo'
+    city: 'sua região',
+    state: 'ES'
   };
+  // CEP 29230-000 (Anchieta/ES). Como o CEP abrange a cidade, usamos seu
+  // ponto central para calcular uma estimativa, não uma rota de GPS.
+  const storeLocation = { latitude: -20.7955, longitude: -40.6425 };
   const minimumOrderCents = 1500;
-  const deliveryEstimateText = '25-35 min';
+  let deliveryEstimateText = '30-40 min';
   const defaultCustomerEmail = 'cliente@gmail.com';
   let estimatedLocation = { ...fallbackLocation };
   let estimatedLocationPromise = null;
@@ -1513,6 +1516,47 @@ if (formPagamento) {
 
     if (city) city.textContent = location.city;
     if (state) state.textContent = location.state;
+    updateDeliveryEstimate(location);
+  }
+
+  function isEspiritosanto(state) {
+    return /^(es|esp[ií]rito santo)$/i.test(String(state || '').trim());
+  }
+
+  function distanceInKm(location) {
+    if (!Number.isFinite(location?.latitude) || !Number.isFinite(location?.longitude)) return null;
+    const radians = (value) => value * Math.PI / 180;
+    const latitudeDifference = radians(location.latitude - storeLocation.latitude);
+    const longitudeDifference = radians(location.longitude - storeLocation.longitude);
+    const first = Math.sin(latitudeDifference / 2) ** 2
+      + Math.cos(radians(storeLocation.latitude)) * Math.cos(radians(location.latitude))
+      * Math.sin(longitudeDifference / 2) ** 2;
+    const straightDistance = 6371 * 2 * Math.atan2(Math.sqrt(first), Math.sqrt(1 - first));
+    return Math.max(0.5, straightDistance * 1.25);
+  }
+
+  function updateDeliveryEstimate(location) {
+    const distance = distanceInKm(location);
+    const distanceElement = document.getElementById('localDistance');
+    const timeElement = document.getElementById('deliveryEstimate');
+
+    if (!isEspiritosanto(location?.state)) {
+      deliveryEstimateText = 'consulte disponibilidade';
+      if (distanceElement) distanceElement.textContent = 'entregas somente no ES';
+      if (timeElement) timeElement.textContent = 'Entregas no ES';
+      return;
+    }
+
+    if (!distance) {
+      if (distanceElement) distanceElement.textContent = 'calculando distância';
+      return;
+    }
+
+    const lower = Math.max(30, Math.round(30 + distance * 2));
+    const upper = lower + Math.max(10, Math.round(distance * 0.8));
+    deliveryEstimateText = `${lower}-${upper} min`;
+    if (distanceElement) distanceElement.textContent = `${distance.toFixed(1).replace('.', ',')} km de você`;
+    if (timeElement) timeElement.textContent = `${deliveryEstimateText}`;
   }
 
   async function loadEstimatedLocation() {
@@ -1523,13 +1567,13 @@ if (formPagamento) {
         {
           url: 'https://ipwho.is/?lang=pt-BR',
           parse: (data) => data && data.success !== false && data.city && data.region
-            ? { city: data.city, state: data.region }
+            ? { city: data.city, state: data.region, latitude: Number(data.latitude), longitude: Number(data.longitude) }
             : null
         },
         {
           url: 'https://ipapi.co/json/',
           parse: (data) => data && data.city && data.region
-            ? { city: data.city, state: data.region }
+            ? { city: data.city, state: data.region, latitude: Number(data.latitude), longitude: Number(data.longitude) }
             : null
         }
       ];
@@ -1565,6 +1609,9 @@ if (formPagamento) {
     }
 
     if (result) {
+      const deliveryTime = isEspiritosanto(location.state)
+        ? `<i class="fa-solid fa-motorcycle"></i> <b>${deliveryEstimateText}</b>`
+        : '<b>Entregas somente no Espírito Santo</b>';
       result.style.display = 'block';
       result.innerHTML = `
         <table class="table">
@@ -1578,7 +1625,7 @@ if (formPagamento) {
           <tbody>
             <tr>
               <td><strong>Motoboy</strong></td>
-              <td><i class="fa-solid fa-motorcycle"></i> <b>${deliveryEstimateText.replace(' min', '')}</b> min</td>
+              <td>${deliveryTime}</td>
               <td><strong style="color: var(--frete-buscar-precos);">Gratis</strong></td>
             </tr>
           </tbody>
