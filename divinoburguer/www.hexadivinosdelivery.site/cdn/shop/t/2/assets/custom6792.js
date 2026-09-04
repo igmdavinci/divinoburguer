@@ -1553,17 +1553,13 @@ if (formPagamento) {
       return;
     }
 
-    if (distance > deliveryMaxDistanceKm) {
-      deliveryEstimateText = 'consulte disponibilidade';
-      if (distanceElement) distanceElement.textContent = `fora da área de entrega (até ${deliveryMaxDistanceKm} km)`;
-      if (timeElement) timeElement.textContent = 'Consulte disponibilidade';
-      return;
-    }
-
-    const lower = Math.min(45, Math.max(30, Math.round(30 + distance * 0.21)));
+    // Por enquanto a comunicação não passa de 72 km, mesmo se a localização
+    // aproximada indicar uma distância maior.
+    const displayedDistance = Math.min(distance, deliveryMaxDistanceKm);
+    const lower = Math.min(45, Math.max(30, Math.round(30 + displayedDistance * 0.21)));
     const upper = Math.min(50, lower + 5);
     deliveryEstimateText = `${lower}-${upper} min`;
-    if (distanceElement) distanceElement.textContent = `${distance.toFixed(1).replace('.', ',')} km de você`;
+    if (distanceElement) distanceElement.textContent = `${displayedDistance.toFixed(1).replace('.', ',')} km de você`;
     if (timeElement) timeElement.textContent = `${deliveryEstimateText}`;
   }
 
@@ -1617,11 +1613,10 @@ if (formPagamento) {
     }
 
     if (result) {
-      const availableForDelivery = isEspiritosanto(location.state)
-        && (distanceInKm(location) === null || distanceInKm(location) <= deliveryMaxDistanceKm);
+      const availableForDelivery = isEspiritosanto(location.state);
       const deliveryTime = availableForDelivery
         ? `<i class="fa-solid fa-motorcycle"></i> <b>${deliveryEstimateText}</b>`
-        : `<b>Entregas em até ${deliveryMaxDistanceKm} km</b>`;
+        : '<b>Entregas somente no Espírito Santo</b>';
       result.style.display = 'block';
       result.innerHTML = `
         <table class="table">
