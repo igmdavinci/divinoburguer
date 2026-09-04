@@ -92,11 +92,30 @@
       align-items: center;
       gap: 8px;
       max-width: none;
+      flex-wrap: wrap;
     }
     .price-form input {
       width: 108px;
       min-height: 38px;
       padding: 8px 10px;
+    }
+    .price-form label {
+      display: grid;
+      gap: 4px;
+      color: #6a5c57;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .price-form .promo-input {
+      border-color: #e15b2a;
+      background: #fff5ef;
+    }
+    .price-form .promo-hint {
+      width: 100%;
+      margin: 0;
+      color: #876c60;
+      font-size: 11px;
     }
     .price-form button {
       min-height: 38px;
@@ -230,17 +249,23 @@
 
       productsBox.innerHTML = `
         <table>
-          <thead><tr><th>Produto</th><th>Preco</th><th>Acao</th></tr></thead>
+          <thead><tr><th>Produto</th><th>Preço normal</th><th>Alterar preço</th></tr></thead>
           <tbody>
             ${products.map((product) => `
               <tr>
                 <td data-label="Produto">${escapeHtml(product.title)}</td>
-                <td data-label="Preco">R$ ${moneyFromCents(product.price)}</td>
+                <td data-label="Preço normal">R$ ${moneyFromCents(product.regular_price || product.price)}</td>
                 <td data-label="Acao">
                   <form class="price-form" data-variant-id="${escapeHtml(product.id)}">
-                    <input name="price" inputmode="decimal" aria-label="Novo preco para ${escapeHtml(product.title)}" value="${moneyFromCents(product.price)}" required>
+                    <label>Preço normal
+                      <input name="price" inputmode="decimal" aria-label="Preço normal para ${escapeHtml(product.title)}" value="${moneyFromCents(product.regular_price || product.price)}" required>
+                    </label>
+                    <label>Preço promocional
+                      <input class="promo-input" name="promotionalPrice" inputmode="decimal" aria-label="Preço promocional para ${escapeHtml(product.title)}" value="${product.promotional_price ? moneyFromCents(product.promotional_price) : ''}" placeholder="Opcional">
+                    </label>
                     <button type="submit">Salvar</button>
                     <button type="button" class="reset-price" title="Voltar ao preco original">Restaurar</button>
+                    <p class="promo-hint">Deixe a promoção vazia para mostrar somente o preço normal.</p>
                   </form>
                 </td>
               </tr>
@@ -428,7 +453,11 @@
           method: 'PATCH',
           credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ variantId: form.dataset.variantId, price: new FormData(form).get('price') })
+          body: JSON.stringify({
+            variantId: form.dataset.variantId,
+            price: new FormData(form).get('price'),
+            promotionalPrice: new FormData(form).get('promotionalPrice')
+          })
         });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(payload.message || 'Nao foi possivel salvar o preco.');

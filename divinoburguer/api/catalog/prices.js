@@ -9,7 +9,13 @@ module.exports = async function handler(req, res) {
   try {
     const products = await catalogProducts();
     return sendJson(res, 200, {
-      products: products.map(({ id, product_id, price }) => ({ id, product_id, price }))
+      products: products.map(({ id, product_id, price, compare_at_price, promotional_price }) => ({
+        id,
+        product_id,
+        price,
+        compare_at_price,
+        promotional_price
+      }))
     });
   } catch {
     return sendJson(res, 200, { products: [] });

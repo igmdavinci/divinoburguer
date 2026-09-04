@@ -99,12 +99,17 @@ function normalizeImage(image, productsDir) {
 async function getPriceOverrides() {
   try {
     const rows = await supabaseRequest(
-      'product_price_overrides?select=variant_id,price_cents',
+      'product_price_overrides?select=variant_id,price_cents,promotional_price_cents',
       { method: 'GET' }
     );
     return new Map((Array.isArray(rows) ? rows : []).map((row) => [
       String(row.variant_id),
-      Number(row.price_cents)
+      {
+        price: Number(row.price_cents),
+        promotionalPrice: row.promotional_price_cents === null || row.promotional_price_cents === undefined
+          ? null
+          : Number(row.promotional_price_cents)
+      }
     ]));
   } catch {
     return new Map();
@@ -113,10 +118,23 @@ async function getPriceOverrides() {
 
 function applyPriceOverrides(catalog, overrides) {
   return Array.from(catalog.values()).map((product) => {
-    const price = overrides.get(String(product.id));
-    return Number.isInteger(price) && price >= 0
-      ? { ...product, price, final_price: price }
-      : product;
+    const override = overrides.get(String(product.id));
+    if (Number.isInteger(override?.price) && override.price >= 0) {
+      const promotionalPrice = Number.isInteger(override.promotionalPrice)
+        && override.promotionalPrice >= 0
+        && override.promotionalPrice < override.price
+        ? override.promotionalPrice
+        : null;
+      return {
+        ...product,
+        regular_price: override.price,
+        compare_at_price: promotionalPrice ? override.price : null,
+        promotional_price: promotionalPrice,
+        price: promotionalPrice ?? override.price,
+        final_price: promotionalPrice ?? override.price
+      };
+    }
+    return product;
   });
 }
 
@@ -131,8 +149,20 @@ async function cartResponse(items) {
     .map((item) => {
       const sourceProduct = catalog.get(String(item.id));
       const override = overrides.get(String(item.id));
-      const product = sourceProduct && Number.isInteger(override) && override >= 0
-        ? { ...sourceProduct, price: override, final_price: override }
+      const promotionalPrice = Number.isInteger(override?.promotionalPrice)
+        && override.promotionalPrice >= 0
+        && override.promotionalPrice < override.price
+        ? override.promotionalPrice
+        : null;
+      const product = sourceProduct && Number.isInteger(override?.price) && override.price >= 0
+        ? {
+            ...sourceProduct,
+            regular_price: override.price,
+            compare_at_price: promotionalPrice ? override.price : null,
+            promotional_price: promotionalPrice,
+            price: promotionalPrice ?? override.price,
+            final_price: promotionalPrice ?? override.price
+          }
         : sourceProduct;
       if (!product) return null;
 

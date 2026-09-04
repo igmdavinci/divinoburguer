@@ -42,6 +42,14 @@ module.exports = async function handler(req, res) {
     if (cents === null) {
       return sendJson(res, 400, { message: 'Informe um preco valido, com no maximo duas casas decimais.' });
     }
+    const promotionValue = String(body.promotionalPrice ?? body.promotional_price ?? '').trim();
+    const promotionalCents = promotionValue ? priceInCents(promotionValue) : null;
+    if (promotionValue && promotionalCents === null) {
+      return sendJson(res, 400, { message: 'Informe um preco promocional valido, com no maximo duas casas decimais.' });
+    }
+    if (promotionalCents !== null && promotionalCents >= cents) {
+      return sendJson(res, 400, { message: 'O preco promocional precisa ser menor que o preco normal.' });
+    }
 
     const rows = await supabaseRequest('product_price_overrides?on_conflict=variant_id', {
       method: 'POST',
@@ -53,6 +61,7 @@ module.exports = async function handler(req, res) {
         product_id: sourceProduct.product_id,
         title: sourceProduct.title,
         price_cents: cents,
+        promotional_price_cents: promotionalCents,
         updated_at: new Date().toISOString()
       })
     });

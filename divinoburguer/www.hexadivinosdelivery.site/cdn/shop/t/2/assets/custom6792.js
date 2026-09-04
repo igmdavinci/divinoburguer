@@ -1732,7 +1732,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const pricesByProduct = new Map(payload.products.map((product) => [
       String(product.product_id),
-      Number(product.price)
+      {
+        price: Number(product.price),
+        compareAtPrice: Number(product.compare_at_price),
+        isPromotion: Number(product.promotional_price) > 0
+          && Number(product.promotional_price) < Number(product.compare_at_price)
+      }
     ]));
     const format = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -1740,16 +1745,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.querySelectorAll('input[name="product-id"]').forEach((input) => {
-      const price = pricesByProduct.get(String(input.value));
-      if (!Number.isFinite(price)) return;
+      const productPrice = pricesByProduct.get(String(input.value));
+      if (!productPrice || !Number.isFinite(productPrice.price)) return;
 
       const item = input.closest('product-item, .product-item');
       if (!item) return;
       item.querySelectorAll('.price').forEach((priceElement) => {
-        priceElement.textContent = format.format(price / 100);
+        const container = priceElement.closest('.price-list, .product-meta__price-list-container, .product-item-meta__price-list-container') || priceElement.parentElement;
+        if (!container) return;
+
+        container.querySelectorAll('.admin-compare-price, .admin-promotion-badge').forEach((element) => element.remove());
+        priceElement.textContent = format.format(productPrice.price / 100);
+        priceElement.classList.toggle('admin-promotion-price', productPrice.isPromotion);
+
+        if (productPrice.isPromotion) {
+          const oldPrice = document.createElement('s');
+          oldPrice.className = 'admin-compare-price';
+          oldPrice.textContent = format.format(productPrice.compareAtPrice / 100);
+          const badge = document.createElement('span');
+          badge.className = 'admin-promotion-badge';
+          badge.textContent = 'OFERTA';
+          container.insertBefore(oldPrice, priceElement);
+          container.appendChild(badge);
+        }
       });
     });
   } catch {
     // Se a API estiver indisponivel, mantem os valores publicados no catalogo.
   }
 });
+
+const adminPromotionStyle = document.createElement('style');
+adminPromotionStyle.textContent = `
+  .admin-compare-price { margin-right: 7px; color: #7d7774; font-size: .82em; font-weight: 500; }
+  .admin-promotion-price { color: #d52f18 !important; font-weight: 800 !important; font-size: 1.12em; }
+  .admin-promotion-badge { display: inline-block; margin-left: 7px; padding: 3px 6px; border-radius: 4px; background: #d52f18; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: .04em; line-height: 1; vertical-align: middle; }
+`;
+document.head.appendChild(adminPromotionStyle);
