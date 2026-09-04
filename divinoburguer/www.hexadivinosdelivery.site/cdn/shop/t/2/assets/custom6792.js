@@ -1764,7 +1764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           oldPrice.textContent = format.format(productPrice.compareAtPrice / 100);
           const badge = document.createElement('span');
           badge.className = 'admin-promotion-badge';
-          badge.textContent = 'OFERTA';
+          badge.textContent = 'Promoção';
           container.insertBefore(oldPrice, priceElement);
           container.appendChild(badge);
         }
